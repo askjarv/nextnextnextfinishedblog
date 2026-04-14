@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss version="2.0">
   <channel>
-    <title>Next...Next...Next...Finished</title>
+    <title>Next Next Next... Finished</title>
     <link>https://askjarv.github.io/nextnextnextfinishedblog</link>
-    <description>A technical blog by some one in IT Security</description>
-    <lastBuildDate>Tue, 14 Apr 2026 15:02:34 +0000</lastBuildDate>
+    <description>A geeky blog about technical things</description>
+    <lastBuildDate>Tue, 14 Apr 2026 15:28:19 +0000</lastBuildDate>
     <generator>build.py</generator>
     <item>
       <title>Building an MCP server for Tripwire IP360 vulnerability information</title>
@@ -206,6 +206,15 @@
       <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
       <description>I have another new blog up on the Tripwire State of Security site: https://www.tripwire.com/state-of-security/how-integrate-fim-soar-platforms</description>
       <category>tripwire</category>
+    </item>
+    <item>
+      <title>ExampleText</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/example-post.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/example-post.html</guid>
+      <pubDate>Sat, 19 Oct 2024 00:00:00 +0000</pubDate>
+      <description>This is the first paragraph used as the homepage excerpt. It is intentionally a little longer so you can see how the homepage summary behaves.</description>
+      <category>Exampletag</category>
+      <category>Migration</category>
     </item>
     <item>
       <title>Security Automation – As Easy As Making Tea?</title>
@@ -416,14 +425,6 @@
       <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-04-27-define-reinforce-and-track-helping-develop-positive-cybersecurity-habits.html</guid>
       <pubDate>Tue, 27 Apr 2021 00:00:00 +0000</pubDate>
       <description>I've got a new Tripwire blog post up today: https://www.tripwire.com/state-of-security/define-reinforce-and-track-helping-develop-positive-cybersecurity-habits - it's all about</description>
-      <category>tripwire</category>
-    </item>
-    <item>
-      <title>Cloud-Based Storage Misconfigurations – Understanding the Security Risks and Responses</title>
-      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-03-02-cloud-based-storage-misconfigurations-understanding-the-security-risks-and-responses.html</link>
-      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-03-02-cloud-based-storage-misconfigurations-understanding-the-security-risks-and-responses.html</guid>
-      <pubDate>Tue, 02 Mar 2021 00:00:00 +0000</pubDate>
-      <description>A Tripwire blog from me is up! Check it out here: https://www.tripwire.com/state-of-security/cloud-misconfigurations-understanding-security-risks-and-responses</description>
       <category>tripwire</category>
     </item>
   </channel>

@@ -17,8 +17,8 @@ import markdown
 import yaml
 
 POSTS_PER_PAGE = 5
-SITE_TITLE = "Next...Next...Next...Finished"
-SITE_DESCRIPTION = "A technical blog by some one in IT Security"
+SITE_TITLE = "Next Next Next... Finished"
+SITE_DESCRIPTION = "A geeky blog about technical things"
 SITE_URL = "https://askjarv.github.io/nextnextnextfinishedblog"
 STYLE_FILE = "style.css"
 ASSETS_TO_COPY = ["images", "assets"]
@@ -202,6 +202,19 @@ def render_post_nav(post: Post) -> str:
     return f'<nav class="post-nav">{prev_html}{next_html}</nav>'
 
 
+def page_href(target_page: int, current_depth: int) -> str:
+    if target_page < 1:
+        target_page = 1
+    prefix = "../" * current_depth
+    if target_page == 1:
+        return f"{prefix}index.html"
+    return f"{prefix}page/{target_page}.html"
+
+
+def rss_href(current_depth: int) -> str:
+    return f"{'../' * current_depth}rss.xml"
+
+
 def build_post_pages(posts: list[Post], post_template: str) -> None:
     posts_dir = OUTPUT_DIR / "posts"
     posts_dir.mkdir(parents=True, exist_ok=True)
@@ -242,26 +255,28 @@ def render_post_list(posts: list[Post], prefix: str = "") -> str:
     return "\n".join(chunks)
 
 
-def render_pagination(current_page: int, total_pages: int, prefix: str = "") -> str:
+def render_pagination(current_page: int, total_pages: int, current_depth: int) -> str:
     if total_pages <= 1:
         return ""
 
-    prev_link = ""
-    next_link = ""
-
     if current_page > 1:
-        prev_href = "index.html" if current_page - 1 == 1 else f"page/{current_page - 1}.html"
-        prev_link = f'<a href="{prefix}{prev_href}">&larr; Newer</a>'
+        prev_link = f'<a href="{page_href(current_page - 1, current_depth)}">&larr; Newer</a>'
     else:
         prev_link = '<span class="disabled">&larr; Newer</span>'
 
     if current_page < total_pages:
-        next_href = f"page/{current_page + 1}.html"
-        next_link = f'<a href="{prefix}{next_href}">Older &rarr;</a>'
+        next_link = f'<a href="{page_href(current_page + 1, current_depth)}">Older &rarr;</a>'
     else:
         next_link = '<span class="disabled">Older &rarr;</span>'
 
-    return f'<nav class="pagination">{prev_link}<span>Page {current_page} of {total_pages}</span>{next_link}</nav>'
+    number_links = []
+    for page_num in range(1, total_pages + 1):
+        if page_num == current_page:
+            number_links.append(f'<span class="page-number current">{page_num}</span>')
+        else:
+            number_links.append(f'<a class="page-number" href="{page_href(page_num, current_depth)}">{page_num}</a>')
+
+    return f'<nav class="pagination">{prev_link}<span class="page-numbers">{"".join(number_links)}</span>{next_link}</nav>'
 
 
 def build_index_pages(posts: list[Post], index_template: str) -> None:
@@ -279,15 +294,23 @@ def build_index_pages(posts: list[Post], index_template: str) -> None:
                 "page_title": "Home",
                 "site_title": html.escape(SITE_TITLE),
                 "site_description": html.escape(SITE_DESCRIPTION),
-                "header_link": "index.html" if page_num == 1 else "../index.html",
+                "header_link": page_href(1, 0 if page_num == 1 else 1),
                 "post_list": render_post_list(page_posts, prefix="" if page_num == 1 else "../"),
-                "pagination": render_pagination(page_num, total_pages, prefix="" if page_num == 1 else "../"),
+                "pagination": render_pagination(page_num, total_pages, 0 if page_num == 1 else 1),
                 "stylesheet_path": STYLE_FILE if page_num == 1 else f"../{STYLE_FILE}",
+                "rss_path": rss_href(0 if page_num == 1 else 1),
             },
         )
 
-        output_file = OUTPUT_DIR / "index.html" if page_num == 1 else page_dir / f"{page_num}.html"
-        output_file.write_text(html_text, encoding="utf-8")
+        if page_num == 1:
+            output_files = [OUTPUT_DIR / "index.html"]
+        else:
+            nested_dir = OUTPUT_DIR / "page" / str(page_num)
+            nested_dir.mkdir(parents=True, exist_ok=True)
+            output_files = [page_dir / f"{page_num}.html", nested_dir / "index.html"]
+
+        for output_file in output_files:
+            output_file.write_text(html_text, encoding="utf-8")
 
 
 def build_tag_pages(posts: list[Post], index_template: str) -> None:
@@ -310,6 +333,7 @@ def build_tag_pages(posts: list[Post], index_template: str) -> None:
                 "post_list": render_post_list(tagged_posts, prefix="../"),
                 "pagination": "",
                 "stylesheet_path": f"../{STYLE_FILE}",
+                "rss_path": "../rss.xml",
             },
         )
         (tags_dir / f"{slugify(tag)}.html").write_text(html_text, encoding="utf-8")
