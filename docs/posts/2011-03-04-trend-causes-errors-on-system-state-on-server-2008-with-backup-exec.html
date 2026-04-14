@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Trend causes errors on System State on server 2008 with Backup Exec</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Trend causes errors on System State on server 2008 with Backup Exec</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/server-2008.html">server-2008</a><a class="tag" href="../tags/system-state.html">system-state</a></div>
+        <div class="content">
+          <p><strong>System State Backup Failures with Symantec Backup Exec</strong></p>
+<p>Posted on <a href="http://mikefrobbins.com/2009/12/17/windows-server-2008-system-state-backup-failure/">December 17, 2009</a> by <a href="http://mikefrobbins.com/author/mikefrobbins/">µ</a></p>
+<p>Problem:<br />
+You receive the message: “The job failed with the following error: A failure occurred accessing the object list.” in your backup job notification email when attempting to backup the system state of a Windows 2008 Server with Symantec Backup Exec. The actual error from the backup server job is: “e000fedd – A failure occurred accessing the object list.” and the error code is: “V-79-57344-65245”.</p>
+<p>Solution:<br />
+This error is fairly generic and can be caused by several different problems; the issue I encountered was specifically due to using the combination of Trend Micro Worry-Free Business Security Advanced (Antivirus), Symantec Backup Exec 12.5, and Microsoft Windows Server 2008. To resolve this problem, stop the “Trend Micro Unauthorized Change Prevention Service” if it is running and modify the following registry settings on the server you’re attempting to backup:</p>
+<p>Go to the following location in the registry:<br />
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TMBMServer</p>
+<p>Change the value of “HomeDir” from:<br />
+“C:\Program Files (x86)\Trend Micro\Client Server Security Agent\..\BM”<br />
+To:<br />
+“C:\Program Files (x86)\ Trend Micro\BM”</p>
+<p>Change the value of “ImagePath” from:<br />
+“C:\Program Files (x86)\Trend Micro\Client Server Security Agent\..\BM\TMBMSRV.exe” /service<br />
+To:<br />
+“C:\Program Files (x86)\Trend Micro\BM\TMBMSRV.exe” /service</p>
+<p>The above example is from a machine running a 64 bit operating system and a 32 bit version of Trend. The beginning of the path should be the same as the original and may differ on 32 bit and 64 bit operating systems. Once these registry settings are updated, the system state backups should complete successfully.</p>
+<p>For more information and for different problems that can cause this error see: <a href="http://www.symantec.com/business/support/knowledge_base_sli.jsp?umi=EvtID=V-79-57344-65245">http://www.symantec.com/business/support/knowledge_base_sli.jsp?umi=EvtID=V-79-57344-65245</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-trend-worry-free-business-disk-space-issues.html">&larr; Older: Trend worry free business disk space issues</a><a class="post-nav-link align-right" href="../posts/2011-03-04-script-to-migrate-some-user-profile-files.html">Newer: Script to migrate some user profile files &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

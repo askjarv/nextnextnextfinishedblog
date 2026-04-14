@@ -1,0 +1,12 @@
+---
+title: "Script to Extract Mailbox sizes from Exchange 2003"
+date: 2013-08-07
+---
+
+Helping to migrate a customer from 2003 to 2013 (via 2010) I was required to pull of a list of mailbox sizes and couldn't find a single script that did the trick in one hit- so I've stuck together the elements of this http://www.msexchange.org/articles-tutorials/exchange-server-2003/tools/Scripting-Exchange-VBScript-ADSI-Part3.html (which, for reasons beyond my understanding, outputs to screen- pretty useless) with an out put to text - for ease of reference I've posted it here!
+
+On Error Resume Next Dim cComputerName Const cWMINameSpace = "root/MicrosoftExchangeV2" Const cWMIInstance = "Exchange\_Mailbox" cComputerName = "BR-SRV-DC01" Set objFSO=CreateObject("Scripting.FileSystemObject")
+
+Dim strWinMgmts ' Connection string for WMI Dim objWMIExchange ' Exchange Namespace WMI object Dim listExchange\_Mailboxs ' ExchangeLogons collection Dim objExchange\_Mailbox ' A single ExchangeLogon WMI object
+
+' Create the object string, indicating WMI (winmgmts), using the ' current user credentials (impersonationLevel=impersonate), ' on the computer specified in the constant cComputerName, and ' using the CIM namespace for the Exchange provider. strWinMgmts = "winmgmts:{impersonationLevel=impersonate}!//"& \_ cComputerName&"/"&cWMINameSpace Set objWMIExchange = GetObject(strWinMgmts) ' Verify we were able to correctly set the object. If Err.Number 0 Then WScript.Echo "ERROR: Unable to connect to the WMI namespace." Else ' ' The Resources that currently exist appear as a list of ' Exchange\_Mailbox instances in the Exchange namespace. Set listExchange\_Mailboxs = objWMIExchange.InstancesOf(cWMIInstance) ' ' Were any Exchange\_Mailbox Instances returned? If (listExchange\_Mailboxs.count > 0) Then ' If yes, do the following: ' Iterate through the list of Exchange\_Mailbox objects. For Each objExchange\_Mailbox in listExchange\_Mailboxs ' ' Display the value of the Size property. ' WScript.echo objExchange\_Mailbox.MailboxDisplayName & "," & objExchange\_Mailbox.Size ' Add item to file outFile="c:\\mailboxes.txt" Set objFile = objFSO.CreateTextFile(outFile,True) objFile.Write objExchange\_Mailbox.MailboxDisplayName & "," & objExchange\_Mailbox.Size & vbCrLf ' objFile.Close ' Next Else ' If no Exchange\_Mailbox instances were returned, ' display that. WScript.Echo "WARNING: No Exchange\_Mailbox instances were returned." End If End If

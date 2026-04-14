@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>From nothing to graphs in 2 minutes straight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>From nothing to graphs in 2 minutes straight</h1>
+        <div class="meta">
+          <time datetime="2018-01-19">2018-01-19</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/data-visualisation.html">data-visualisation</a><a class="tag" href="../tags/graphs.html">graphs</a></div>
+        <div class="content">
+          <p>I've only just started dipping my toes back into Python again after spending a long away (version 3 is a breath of fresh air!). In recent months it's felt as if I could hardly surf the web without hitting a wave of python examples showing you how to do something neat but looking for something simple yet rewarding to get started on wasn't quite as simple as I hoped.</p>
+<p>So, after a bit of messing around (my preferred method of Rapid Development: Fail Until You Don't), I figured I'd share the steps to getting something nice out of Python that took me less than two minutes to setup. For now, we'll just generate a pretty looking graph based on random data, but hopefully you can see how you'd easily tweak this to run against any data you have handy...</p>
+<p>NB: For my purposes I was using the rather neat functionality of Ubuntu on Windows 10 (which is a massive time saving in comparison to my ancient practice of installing an OS on a VM every time I wanted a terminal session to work with)- if you want to follow along you can simply setup the Ubuntu shell as per Microsoft's install guide (https://docs.microsoft.com/en-us/windows/wsl/install-win10) and once you're at the command prompt you're good to go:</p>
+<ol>
+<li>Create a free account on ploty: <a href="https://plot.ly/feed/">https://plot.ly/feed/</a></li>
+<li>Then get your API key: <a href="https://plot.ly/settings/api">https://plot.ly/settings/api</a> (you’ll need to click regenerate a visible key)</li>
+<li>Logon to your Ubuntu box and get the dependencies:</li>
+</ol>
+<pre><code>sudo apt-get install imagemagick libmagickcore-dev libmagickwand-dev libmagic-dev
+
+sudo apt-get install imagemagick
+</code></pre>
+<p>4. Install plotly:</p>
+<pre><code>sudo pip3 install plotly
+
+pip3 install plotly –upgrade
+
+# Used to generate random
+
+pip3 install numpy
+</code></pre>
+<p>5. Launch python and test you can draw stuff:</p>
+<pre><code>python3
+
+import plotly
+
+plotly.tools.set_credentials_file(username='yourusername', api_key='yourAPIkeyHere')
+
+import plotly.plotly as py
+
+import plotly.graph_objs as go
+
+# Create random data with numpy
+
+import numpy as np
+
+N = 500
+
+random_x = np.linspace(0, 1, N)
+
+random_y = np.random.randn(N)
+
+# Create a trace
+
+trace = go.Scatter(
+
+    x = random_x,
+
+    y = random_y
+
+)
+
+data = [trace]
+
+py.iplot(data, filename='basic-line')
+</code></pre>
+<p>and you’ll get yourself a link to your plotly online profile and a resulting pretty graph which is surprisingly pleasing.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2018-01-16-the-apps-i-still-use.html">&larr; Older: The Apps I still use</a><a class="post-nav-link align-right" href="../posts/2018-01-28-android-development-quick-start-with-phonegap-part-1.html">Newer: Android Development - Quick Start with PhoneGap (Part 1) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

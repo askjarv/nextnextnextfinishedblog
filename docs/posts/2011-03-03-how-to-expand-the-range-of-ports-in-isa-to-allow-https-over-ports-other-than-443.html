@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>How to expand the range of ports in ISA to allow HTTPS over ports other than 443</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>How to expand the range of ports in ISA to allow HTTPS over ports other than 443</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/isa-server-2004.html">isa-server-2004</a><a class="tag" href="../tags/isa-server-2006.html">isa-server-2006</a><a class="tag" href="../tags/ssl.html">ssl</a></div>
+        <div class="content">
+          <p>If you ever have to set up ISA to allow ports other than 443 to accept SSL it’s a bit crazy – you need a third party app (note, this isn’t the case if you’re doing port redirection)- full instructions here (<a href="http://www.isaserver.org/articles/2004tunnelportrange.html">http://www.isaserver.org/articles/2004tunnelportrange.html</a>) but to summarise:</p>
+<p>“This application provides an easy to use graphical interface that allows you to extend the SSL tunnel port range. The figure below shows what the GUI for this application looks like.</p>
+<p>Just enter the first port and last port you want to include in the SSL tunnel port range in the <strong>LowPort</strong> and <strong>HighPort</strong> text boxes and click the <strong>Add Tunnel Range</strong> button. Then click the <strong>Refresh</strong> button to see the new SSL tunnel port range in the list.</p>
+<p>Note that if you have unbound the Web Proxy filter from the HTTP protocol, then Firewall and SecureNAT client connections made through the ISA firewall will not be redirected to the Web Proxy Filter. In this case, you can create a Protocol Definition for the alternate SSL port and then create an Access Rule allowing outbound access to that protocol.”</p>
+<p>FYI: The link they give on the page for the utility is WRONG- it’s actually: <a href="http://www.isatools.org/tools/ISAtrpe.zip">http://www.isatools.org/tools/ISAtrpe.zip</a> , but I’ve attached it for your reference!</p>
+<p>This also works on ISA 2006- but is untested (and potentially unrequired) on TMG.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-how-to-list-all-ports-that-are-listening-for-tcpudp-traffic.html">&larr; Older: How to list all ports that are listening for TCP/UDP traffic</a><a class="post-nav-link align-right" href="../posts/2011-03-03-how-to-disable-prompts-about-mixed-content-in-internet-explorer.html">Newer: How to Disable prompts about mixed content in Internet Explorer &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

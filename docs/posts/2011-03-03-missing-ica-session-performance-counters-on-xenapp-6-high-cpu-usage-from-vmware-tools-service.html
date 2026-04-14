@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Missing ICA Session Performance Counters on XenApp 6 / High CPU usage from VMware Tools Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Missing ICA Session Performance Counters on XenApp 6 / High CPU usage from VMware Tools Service</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a><a class="tag" href="../tags/perfomance-counters.html">perfomance-counters</a><a class="tag" href="../tags/vmware.html">vmware</a><a class="tag" href="../tags/xenapp.html">xenapp</a></div>
+        <div class="content">
+          <p>We've seen instances of high CPU utilisation from the "VMware Tools Service" on our 4 XenApp 6 whereby over time the CPU usage will grow after a reboot- as such this can typically be resolved temporarily by a reboot. The longer term fix appears to revolve around rebuilding the performance counters for XenApp- something Citrix has identifed here:</p>
+<p><a href="http://support.citrix.com/article/CTX127151">http://support.citrix.com/article/CTX127151</a></p>
+<p>On a XenApp 6 Server, after applying a XenApp 6 hotfix, the Performance Counter for <em>ICA Session</em> is removed. This can have an adverse effect on the operation of tools and processes which rely on these performance counters, such as HDX Experience Monitor for XenApp (CTX126491 - <a href="http://support.citrix.com/article/CTX126491">HDX Experience Monitor for XenApp</a>) and EdgeSight System Monitoring tools.</p>
+<p>Resolution: Apply the Limited Release Hotfix XA600W2K8R2X64023, CTX127269 – <a href="http://support.citrix.com/article/CTX127269">LIMITED RELEASE - Hotfix XA600W2K8R2X64023 - For Citrix XenApp 6.0 for Windows Server 2008 R2 - English</a> to resolve the issue. Although the recommended fix is to apply the above mentioned hotfix, the following steps may be followed to manually resolve the issue each time another hotfix is installed of applying the above hotfix:</p>
+<ul>
+<li>
+<p>Reregister the ICA Session Performance Counters by running the following command on the XenApp server effected: <strong>regsvr32 c:\windows\system32\icaperf.dll</strong> </p>
+<p>This command reregisters the performance counters in question.</p>
+</li>
+<li>
+<p>Before installing a hotfix, back up the registry hive <strong>HKLM\System\CurrentControlSet\Services\CitrixICA</strong> and restore it once the hotfix has been applied.</p>
+</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-ocs-to-cucm-integration.html">&larr; Older: OCS to CUCM integration</a><a class="post-nav-link align-right" href="../posts/2011-03-03-little-known-clariion-facts-and-trivia.html">Newer: little known Clariion facts and trivia :-) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WMI repository rebuild</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>WMI repository rebuild</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/wmi.html">wmi</a></div>
+        <div class="content">
+          <p>If you ever come across a Windows 200x Server system with a WMI repository that’s shot to pieces (with “Not found” or similar errors even when you try to connect to WMI Control locally) then here’s a simple but effective batch file that will delete and rebuild that repository for you quickly and easily:</p>
+<p>net stop winmgmt</p>
+<p>c:</p>
+<p>cd %systemroot%\system32\wbem</p>
+<p>rd /S /Q repository</p>
+<p>regsvr32 /s %systemroot%\system32\scecli.dll</p>
+<p>regsvr32 /s %systemroot%\system32\userenv.dll</p>
+<p>mofcomp cimwin32.mof</p>
+<p>mofcomp cimwin32.mfl</p>
+<p>mofcomp rsop.mof</p>
+<p>mofcomp rsop.mfl</p>
+<p>for /f %%s in ('dir /b /s *.dll') do regsvr32 /s %%s</p>
+<p>for /f %%s in ('dir /b *.mof') do mofcomp %%s</p>
+<p>for /f %%s in ('dir /b *.mfl') do mofcomp %%s</p>
+<p>echo DONE reboot</p>
+<p>pause</p>
+<p>Theoretically, the server requires a reboot to complete this repository rebuild successfully, but under Windows 2008 at least that shouldn’t actually be required – Windows 2003 typically isn’t quite so forgiving though.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-you-may-lose-the-default-gateway-on-sbs-2008-every-time-you-reboot.html">&larr; Older: You May Lose the Default Gateway on SBS 2008 Every Time You Reboot</a><a class="post-nav-link align-right" href="../posts/2011-03-03-windows-installer-verbose-log-analyser-wilogutl-exe.html">Newer: Windows Installer verbose log analyser (WILOGUTL.EXE) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

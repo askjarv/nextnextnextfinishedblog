@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>HP Management Agents on ESX servers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>HP Management Agents on ESX servers</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/esx.html">esx</a><a class="tag" href="../tags/hardware.html">hardware</a><a class="tag" href="../tags/hp.html">hp</a><a class="tag" href="../tags/snmp.html">snmp</a><a class="tag" href="../tags/vmware.html">vmware</a></div>
+        <div class="content">
+          <p>Hello All,</p>
+<p>I have been advised that installing the HP Management Agents on an ESX server will install an element called the CMAFCAD(Compaq Management Agent Fibre Channel Adaptor Daemon) which is only actually intended for use with the following adaptors:</p>
+<p>HP StorageWorks Modular Smart Array (MSA) 1000</p>
+<p>HP StorageWorks Modular Smart Array (MSA) 1500</p>
+<p>HP StorageWorks Modular Smart Array (MSA) 2000</p>
+<p>The result is a flooded log file, memory issues and problems accessing storage. The walkthrough to disable this element is here:</p>
+<p><a href="http://h20000.www2.hp.com/bizsupport/TechSupport/Document.jsp?lang=en&amp;cc=us&amp;objectID=c01519875&amp;jumpid=reg_R1002_USEN">http://h20000.www2.hp.com/bizsupport/TechSupport/Document.jsp?lang=en&amp;cc=us&amp;objectID=c01519875&amp;jumpid=reg_R1002_USEN</a></p>
+<p>Interestingly this is out of date. Where it references “/opt/compaq/cma.conf” it may mean “/opt/hp/hp-snmp-agents/cma.conf” and when it asks you to stop and start the services the command is "service hp-snmp-agents stop/start" not “service hpasm stop/start”.</p>
+<p>It is important to stop the services before editing the file because if you do not then the restart command will exclude the element you want to stop and you will be forced to reboot or stop the process manually.</p>
+<p>To stop the process manually you can identify the PID with “ps –auxwww | grep cmafcad” and then perform a kill -9 on the returned PID for instance:</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0027.jpg"><img alt="clip_image002" src="images/clip_image002_thumb5.jpg" title="clip_image002" /></a></p>
+<p>In the above example the PS command returned 2 PIDs, ignore the one which is the GREP command itself, in this case the correct process was 4114.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-installing-drivers-for-32-bit-clients-on-64-bit-servers.html">&larr; Older: Installing drivers for 32 bit clients on 64 bit servers.</a><a class="post-nav-link align-right" href="../posts/2011-03-04-how-to-troubleshoot-an-iis-event-id-1009-error.html">Newer: How to troubleshoot an IIS &amp;quot;Event ID: 1009&amp;quot; error. &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

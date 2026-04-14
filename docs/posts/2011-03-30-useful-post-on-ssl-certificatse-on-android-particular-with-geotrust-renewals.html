@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Useful post on SSL certificatse on Android (particular with Geotrust renewals)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Useful post on SSL certificatse on Android (particular with Geotrust renewals)</h1>
+        <div class="meta">
+          <time datetime="2011-03-30">2011-03-30</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/android.html">android</a><a class="tag" href="../tags/certificates.html">certificates</a><a class="tag" href="../tags/geotrust.html">geotrust</a></div>
+        <div class="content">
+          <p>It would appear as if the new root CA from Geotrust isn't natively trusted on Android devices - which means you can get cert errors even if your client facing cert seems 100% ok (this also appears to effect Windows Mobile 6.5) - basically there's a missing link in the chain- this link in the forums goes through the implications and the fix.</p>
+<p>http://code.google.com/p/android/issues/detail?id=10985</p>
+<p>Basically, you'll be looking to install the intermediary cert on your server:</p>
+<p><a href="https://knowledge.geotrust.com/support/knowledge-base/index?page=content&amp;actp=CROSSLINK&amp;id=SO15687">https://knowledge.geotrust.com/support/knowledge-base/index?page=content&amp;actp=CROSSLINK&amp;id=SO15687</a></p>
+<p>which isn't too much hassle for compatibility with your mobile devices again!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-30-windows-7-failing-to-boot-after-sp1-install-fatal-error-code-c0000034.html">&larr; Older: Windows 7 failing to boot after SP1 install - fatal error code c0000034</a><a class="post-nav-link align-right" href="../posts/2011-03-30-test-active-sync-online.html">Newer: Test Active Sync online &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

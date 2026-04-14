@@ -1,0 +1,22 @@
+---
+title: "Golden Rules of Good Support - Episode 1!"
+date: 2011-04-02
+categories: 
+  - "golden-rules-of-good-support"
+---
+
+After some miserable support recently from a company I’ve been working with (after a significant financial investment too and naming no names!) I’ve decided to do a series of posts on the “Golden Rules of Good Support”- some of these are bare minimums, some of them are “nice to see’s” – but I figured I’d put them on the net in the hope that other’s might take them on board!
+
+1)      Don’t close technical support issues/tickets without the customer’s agreement.
+
+This isn’t always possible- but generally you should always seek "positive" closure. This saves issues coming back (and an additional hassle of trying to find out why items weren’t fixed the first time, along with the associated customer apathy). An example of a failure I've seen recently was an email which went along the lines of
+
+"Thank you for reporting this issue to us. We have tested the scenario you describe, and are unable to recreate it. We are therefore closing your ticket. Many thanks."
+
+Great- so you can't recreate so presumably it's all in my mind? I'm actually more than happy to admit the fault might by my own (I may be using the system wrong, I might not meet minimum spec, etc) but closing my ticket because _you_ believe it isn't a problem just isn't playing the game- you need to at least attempt to pander to my potential stupidity!
+
+If you are going to automatically close down support ticket (say using a "three-strikes and your out" approach to no reply scenario's, or after XYZ period of time) try and make it clear from the offset that those are the rules so they don't come as a surprise.
+
+If you're really struggling to close a ticket because the issue changes over time, don't be afraid to be honest- tell the customer that you believe the initial issue is closed (and get them, if you can, to agree) and that you'll log a new incident for any other issues outstanding. Let's be clear on that as well- YOU'LL log a new incident- don't ask the customer to log another ticket- that's making them do work for your convenience! It shouldn't be that much hassle to log a second ticket for the customer and it means you can add additional, potentially useful, technical info just in case you don't get the ticket. Where possible, of course, it would be best if the same engineer deals with the same issue, although we all know that isn't always possible/best for the ticket. If that is the case (i.e. someone else will deal with the "remainder" issue/s) then tell the customer. Most customers will be happy for you to log another incident when you explain that it's to ensure it's dealt with in a timely fashion and by the best man/woman possible for the job.
+
+That's it for now- I'll keep adding these as they pop into my mind!

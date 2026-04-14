@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BT DNS MAIL ROUTING</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>BT DNS MAIL ROUTING</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/dns.html">dns</a><a class="tag" href="../tags/email.html">email</a><a class="tag" href="../tags/mail.html">mail</a></div>
+        <div class="content">
+          <p>I have just spent a while sorting out an issue with a customer.</p>
+<p>The customer has recently migrated from Nildram over to BT, when they did this they stopped receiving emails from people with BTConnect accounts.</p>
+<p>Any one with a BT Connect account would get a NDR similar to below:</p>
+<p>Your message did not reach some or all of the intended recipients.</p>
+<p>Subject: Test</p>
+<p>Sent: 20/01/2011 11:02</p>
+<p>The following recipient(s) could not be reached:</p>
+<p><a href="mailto:X@X.Co.UK">X@X.Co.UK</a> on 20/01/2011 11:02</p>
+<p>The e-mail account does not exist at the organization this message was sent to. Check the e-mail address, or contact the recipient directly to find out the correct address.</p>
+<p><HESA02UKER.HE.LOCAL #5.1.1></p>
+<p>After an amount of research it became apparent that the issue was not so much with the BTConnect sender as the Domain DNS registration.</p>
+<p>This customer has 2, one worked one did not.</p>
+<p>A call to BT proved fruitless, but I stumbled across an old email in the clients BTConnect email addy (comes free with the ADSL provision):</p>
+<p>*****************</p>
+<p>Subject</p>
+<p>Confirmation of your domain zone update</p>
+<p>Discussion Thread</p>
+<p>Response (Ian Lorimer) 11/17/2010 09:57 AM</p>
+<p>Dear X,</p>
+<p>Thank you for your email dated 17/11/10 regarding your domain.</p>
+<p>As you have pointed the primary MX record on your domain name away from BT's mail server (ibmr.btconnect.com) to <a href="mailto:X@x.co.uk">X@x.co.uk</a>, we have updated the domain name on your account to reflect this.</p>
+<p>If you have any further queries please feel free to reply to myself and I will endeavour to find a resolution to your enquiry.</p>
+<p>Best Regards,</p>
+<p>Ian Lorimer</p>
+<p>BT Business Domain Name Services Team</p>
+<p>Customer (Change This) 11/17/2010 09:13 AM</p>
+<p>BT Domains Centre</p>
+<p>***********************</p>
+<p>DEAR X</p>
+<p>You have recently changed your zone records for X.X.CO.UK</p>
+<p>The new zone record is: -</p>
+<p>Type Key Value Priority (MX)</p>
+<p>A * 216.21.224.203</p>
+<p>A @ 209.235.144.9</p>
+<p>CNAME www web08.rocktime.net</p>
+<p>MX @ MAIL.X.Co.UK 5</p>
+<p>A mail 81.142.110.252</p>
+<p>Best wishes</p>
+<p>BT DOMAINS TEAM</p>
+<p>*******************************************</p>
+<p>So I contacted these guys back with the addresses in the mail (<a href="mailto:btnamesadmin@btnames.com">btnamesadmin@btnames.com</a> &amp; <a href="mailto:repoints_zone_DNS@btconnect.com">repoints_zone_DNS@btconnect.com</a>) and asked them for assistance.  Within an hour the problem was resolved and the issue according to the DNS team is:</p>
+<p>Subject      </p>
+<p>Confirmation of your domain zone update                     </p>
+<p>Discussion Thread    </p>
+<p>Response (Ian Lorimer)                 01/20/2011 01:12 PM                  </p>
+<p>Dear X,</p>
+<p>Your reference number is 101117-000161.</p>
+<p>Basically what happens is when a domain name is Transferred into BT it's setup on our internal systems for WEB/MAIL.</p>
+<p>When you update the MX records our system has to be up updated to reflect you are using your own Mail Server, and shows as WEB/RELAY.</p>
+<p>When the system shows as WEB/MAIL and not WEB/RELAY it causes problems within the BT Network and that was the problem.</p>
+<p>Best Regards</p>
+<p>Ian Lorimer</p>
+<p>BT Domain Name Services Team</p>
+<p>Hopefully this information will help with similar issues.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-check-sql-version.html">&larr; Older: Check SQL Version</a><a class="post-nav-link align-right" href="../posts/2011-03-03-allow-citrix-client-to-see-local-drives.html">Newer: Allow Citrix client to see local drives &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

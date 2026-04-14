@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Trigger a scan with the CCM REST API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Trigger a scan with the CCM REST API</h1>
+        <div class="meta">
+          <time datetime="2025-11-07">2025-11-07</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>On the theme of recent posts about scripting (and automating scanning - if you're still doing this manually, you're doing something wrong IMHO!), here's a useful script I put together to help demo how to trigger a compliance scan with Tripwire's Configuration Compliance Manager</p>
+<pre><code># Details to connect to CCM server - remember the CCM API must be enabled in the management server XML first
+and IIS installed!
+$servername = &quot;YOUR-CCM-SERVER&quot;
+$RESTAPIUser = &quot;api_account&quot;
+$RESTAPIPassword = &quot;api_password&quot;
+# Device name you want to scan and scan profile you wish to run
+$devicetoscan = &quot;serverMcServer&quot;
+$scantoapply = &quot;AdvancedScan&quot;
+# Encode credentials to use as part of our header apyload
+$baseURL = &quot;https://&quot;+$servername+&quot;:443/api/v1&quot;
+$Header = @{&quot;Authorization&quot; = &quot;Basic &quot;+[System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes
+($RESTAPIUser+&quot;:&quot;+$RESTAPIPassword)); &quot;Origin&quot; = &quot;https://$servername&quot;}
+$Type = &quot;application/json&quot;
+# Disable SSL Verification (assuming you don't trust the CCM server
+if (-not ([System.Management.Automation.PSTypeName]'ServerCertificateValidationCallback').Type)
+ {$certCallback = @&quot;
+ using System;
+ using System.Net;
+ using System.Net.Security;
+ using System.Security.Cryptography.X509Certificates;
+ public class ServerCertificateValidationCallback
+ {public static void Ignore()
+ {if(ServicePointManager.ServerCertificateValidationCallback ==null)
+ {ServicePointManager.ServerCertificateValidationCallback += delegate
+ (Object obj,
+ X509Certificate certificate,
+ X509Chain chain,
+ SslPolicyErrors errors
+ )
+ {return true;};
+ }
+ }
+ }
+ &quot;@
+ Add-Type $certCallback
+}
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
+[ServerCertificateValidationCallback]::Ignore()
+# Get an asset (it's ID and associated network id)
+try
+ {
+ $get_asset_url = $baseurl+&quot;/asset/&quot;
+ $assets = Invoke-RestMethod -Uri $get_asset_url -Headers $Header -Method Get -ContentType $Type
+ $target_asset_id = $assets | where hostname -eq $devicetoscan | select -ExpandProperty id
+ $target_network_id = $assets | where hostname -eq $devicetoscan | select -ExpandProperty networkProfile
+| select -ExpandProperty id
+ }
+Catch
+ {$_.Exception.ToString()
+ $error[0] | Format-List -Force
+ }
+# Get a list of scan tasks for the device and then select the required scan
+try
+ {
+ $get_asset_scan_config_Url = $baseurl+&quot;/asset/&quot;+$target_asset_id+&quot;/scantasks&quot;
+ $scans = Invoke-RestMethod -Uri $get_asset_scan_config_Url -Headers $Header -Method Get -ContentType $Type
+ $scan_to_do = $scans | where name -eq $scantoapply | select -ExpandProperty id
+ }
+Catch
+ {$_.Exception.ToString()
+ $error[0] | Format-List -Force
+ }
+# Post the scan requirement
+# First, create our payload for the API:
+$body = @{
+ asset = @{
+ id = $target_asset_id
+ };
+ networkProfile = @{
+ id = $target_network_id
+ };
+} | ConvertTo-Json
+# Try scanning
+Try
+ {
+ $scan_asset = Invoke-RestMethod -Uri &quot;$baseURL/scantask/$scan_to_do/instances&quot; -Headers $Header -Method
+Post -ContentType $Type -Body $body
+ }
+Catch
+ {
+ $_.Exception.ToString()
+ $error[0] | Format-List -Force
+ }
+</code></pre>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-10-31-googles-unsigned-apk-crackdown.html">&larr; Older: Google&#x27;s Unsigned APK Crackdown</a><a class="post-nav-link align-right" href="../posts/2025-11-14-te-external-rule-elements-example.html">Newer: TE External Rule Elements Example &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

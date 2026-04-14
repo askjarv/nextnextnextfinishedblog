@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Load issues after upgrading ESX on Virtual XenApp6 Servers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Load issues after upgrading ESX on Virtual XenApp6 Servers</h1>
+        <div class="meta">
+          <time datetime="2012-09-09">2012-09-09</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>After doing an upgrade (from ESX4 to ESX 5) the first thing you ought to be thinking of is updating VMware tools- sure ICA/RDP should "handle" the desktop OK - but up-to-date VMware tools is beyond good practice/common sense- it's critical to ensure things "behave"- however, I've now seen a couple of instances whereby after doing the upgrade to 'tools the server will stay at 10000 load and not allow log ons- this seems to be fixed by:</p>
+<p>1.       Uninstall VMware tools all together</p>
+<p>2.       Reinstall VMware tools and deselect ‘Volume Shadow Copy Services Support’ (you cannot just remove this from the original install it must be uninstalled first)</p>
+<p>3.       Open Performance monitor</p>
+<p>4.       Close performance monitor</p>
+<p>5.       Open a command prompt and type “lodctr.exe /r” (this rebuilds the performance counters that the VMware tools issue has corrupted)</p>
+<p>6.       Restart the IMA</p>
+<p>You should now see (after about a minute) the ‘qfarm /load’ status of your server return to normal.</p>
+<p>Thanks to a colleague to pointing this one out to me!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2012-09-09-qnap-recovery.html">&larr; Older: QNAP recovery</a><a class="post-nav-link align-right" href="../posts/2012-09-09-issues-with-the-sap-reporter-plugin-in-citrix-or-any-plugin-for-excel-for-that-matter.html">Newer: Issues with the SAP Reporter Plugin in Citrix (or any plugin for Excel for that matter)? &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

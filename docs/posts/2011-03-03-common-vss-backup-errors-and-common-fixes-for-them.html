@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Common VSS backup errors and common fixes for them</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Common VSS backup errors and common fixes for them</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/vss.html">vss</a></div>
+        <div class="content">
+          <p>Useful for VSS issues:</p>
+<p>Suggestion 1: Install VSS rollup update</p>
+<p>------------------------------------------------</p>
+<p>940349 Availability of a Volume Shadow Copy Service (VSS) update rollup</p>
+<p>package for Windows Server 2003 to resolve some VSS snapshot issues</p>
+<p><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;940349">http://support.microsoft.com/default.aspx?scid=kb;EN-US;940349</a></p>
+<p>Suggestion 2: Configure MinDiffAreaFileSize registry key</p>
+<p>----------------------------------------------------------------------</p>
+<p>This problem may occur when the shadow copy storage area is used up. Please</p>
+<p>ensure that you have installed the latest SBS updates; in addition, please</p>
+<p>perform the following steps to configure higher MinDiffAreaFileSize</p>
+<p>registry value.</p>
+<p>a. Click Start -&gt; Run, type "regedit" in the text box, and press Enter.</p>
+<p>b. Locate the following registry key:</p>
+<p>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VolSnap</p>
+<p>c. On the Edit menu, pointed to New, and then clicked DWORD value.</p>
+<p>d. Typed MinDiffAreaFileSize , and then pressed ENTER.</p>
+<p>e. On the Edit menu, clicked Modify.</p>
+<p>f. Changed the size to 3000 (decimal), and then click OK.</p>
+<p>g. Reboot the server to test this issue again.</p>
+<p>For more information, please refer to the following Microsoft Knowledge</p>
+<p>Base article:</p>
+<p>826936 Time-out errors occur in Volume Shadow Copy service writers, and</p>
+<p>shadow copies are lost during backup and during times when there are high</p>
+<p>levels of input/output</p>
+<p><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;826936">http://support.microsoft.com/default.aspx?scid=kb;EN-US;826936</a></p>
+<p>Suggestion 3: Reset VSS configuration</p>
+<p>-------------------------------------------------</p>
+<p>If this problem continues, please perform the following steps to reset VSS</p>
+<p>configuration:</p>
+<p>1. Go into control panel and reset the com configuration.</p>
+<p>a. In control panel click "add remove programs".</p>
+<p>b. Click "Add remove windows components".</p>
+<p>c. Click the "Next" button (windows will re-initialize the COM</p>
+<p>configuration).</p>
+<p>2. Look in "Component Services" MMC and make sure that the MS Shadow Copy</p>
+<p>Provider does not show up as a COM+ application. The software provider</p>
+<p>should NOT show up in Component Services on Windows 2003 and above. If it</p>
+<p>is, you will have trouble initializing the VSS coordinator and provider</p>
+<p>instances.</p>
+<p>a. In the Component Services MMC, navigate to "Component Services\My</p>
+<p>Computer\COM+ Applications\"</p>
+<p>b. View the properties of the "MS Software Shadow Copy Provider" if it</p>
+<p>exists. In the "advanced" tab, uncheck the "Disable deletion" checkbox and</p>
+<p>then delete the "MS Software Shadow Copy Provider" from COM+ Applications.</p>
+<p>3. Run FIXVSS03.BAT to reset VSS configuration.</p>
+<p>rem FILENAME: FIXVSS03.BAT</p>
+<p>rem</p>
+<p>net stop "System Event Notification"</p>
+<p>net stop "COM+ Event System"</p>
+<p>net stop "Microsoft Software Shadow Copy Provider "</p>
+<p>net stop "Volume Shadow Copy"</p>
+<p>cd /d %windir%\system32</p>
+<p>net stop vss</p>
+<p>net stop swprv</p>
+<p>regsvr32 /s ole32.dll</p>
+<p>regsvr32 /s oleaut32.dll</p>
+<p>regsvr32 /s vss_ps.dll</p>
+<p>vssvc /register</p>
+<p>regsvr32 /s /i swprv.dll</p>
+<p>regsvr32 /s /i eventcls.dll</p>
+<p>regsvr32 /s es.dll</p>
+<p>regsvr32 /s stdprov.dll</p>
+<p>regsvr32 /s vssui.dll</p>
+<p>regsvr32 /s msxml.dll</p>
+<p>regsvr32 /s msxml3.dll</p>
+<p>regsvr32 /s msxml4.dll</p>
+<p>Cd /d %systemroot%\syswow64</p>
+<p>regsvr32 /s ole32.dll</p>
+<p>regsvr32 /s vss_ps.dll</p>
+<p>regsvr32 /s es.dll</p>
+<p>regsvr32 /s stdprov.dll</p>
+<p>regsvr32 /s msxml3.dll</p>
+<p>regsvr32 /s msxml.dll</p>
+<p>regsvr32 /s msxml4.dll</p>
+<p>net start "COM+ Event System"</p>
+<p>4. Disable VSS tracing if it is enabled.</p>
+<p>887013 How to enable the Volume Shadow Copy service's debug tracing</p>
+<p>features in Microsoft Windows Server 2003</p>
+<p><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;887013">http://support.microsoft.com/default.aspx?scid=kb;EN-US;887013</a></p>
+<p>5. Reboot the system to bring all writers into a stable state.</p>
+<p>How to enable the Volume Shadow Copy service's debug tracing features in</p>
+<p>Microsoft Windows Server 2003</p>
+<p><a href="http://support.microsoft.com/kb/887013">http://support.microsoft.com/kb/887013</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-configuring-nat-on-netgear-dg834n-with-firewall.html">&larr; Older: Configuring NAT on Netgear DG834N with Firewall</a><a class="post-nav-link align-right" href="../posts/2011-03-03-citrix-ica-access-control-list-on-citrix-access-gateway-5.html">Newer: Citrix - ICA Access Control List on Citrix Access Gateway 5 &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

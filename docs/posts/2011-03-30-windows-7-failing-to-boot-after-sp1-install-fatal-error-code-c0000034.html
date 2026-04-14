@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Windows 7 failing to boot after SP1 install - fatal error code c0000034</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Windows 7 failing to boot after SP1 install - fatal error code c0000034</h1>
+        <div class="meta">
+          <time datetime="2011-03-30">2011-03-30</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/sp1.html">sp1</a><a class="tag" href="../tags/windows-7.html">windows-7</a></div>
+        <div class="content">
+          <p>Windows 7 failing to boot after SP1 install - fatal error code c0000034 INSTRUCTIONS:</p>
+<p>01. Reboot your computer while it's starting up.</p>
+<p>02. When your computer starts up again, choose the option "Launch Startup Repair"  --&gt; PIC: http://notebooks.com/wp-content/uploads/2011/01/Recov-1.jpg</p>
+<p>03. When the Startup repair starts, click cancel.</p>
+<p>04. After you click cancel it will show a box. Click "Don't Send"  --&gt; PIC: http://i52.tinypic.com/xgjriw.png</p>
+<p>05. Click the link "View advanced options for recovery and support"</p>
+<p>06. In the new window click Command Prompt at the bottom.--&gt; PIC: http://i51.tinypic.com/50imu8.png</p>
+<p>07. In Command Prompt type this and press enter: %windir%\system32\notepad.exe</p>
+<p>08. Notepad will open. In notepad go to File--&gt;Open.</p>
+<p>09. Change the type of files notepad views from .txt to All Files (see pic)--&gt; PIC: http://i51.tinypic.com/35nd74z.png</p>
+<p>10. Now in Notepad, go to C:\Windows\winsxs\ (or whichever drive Windows is installed on)</p>
+<p>11. In that folder, find pending.xml and make a copy of it</p>
+<p>12. Now open the original pending.xml (it will load really slow because the file is huge)</p>
+<p>13. Press CNTRL+F and search for the following exactly: 0000000000000000.cdf-ms</p>
+<p>14. Delete the following text (yours will be a little different):<Checkpoint/><DeleteFile path="\\SystemRoot\\WinSxS\\FileMaps\\\_0000000000000000.cdf-ms"/><MoveFile source="\\SystemRoot\\WinSxS\\Temp\\PendingRenames\\e56db1db48d4cb0199440000b01de419.\_0000000000000000.cdf-ms" destination="\\SystemRoot\\WinSxS\\FileMaps\\\_0000000000000000.cdf-ms"/></p>
+<p>--&gt; PIC: http://i54.tinypic.com/adzpzp.png</p>
+<p>Your PC might not have all 3 sections of code (<Checkpoint>, <DeleteFile>, <MoveFile>). Just make sure you delete section "Checkpoint" and whatever other sections have "000000000000000.cdf-ms". They will be right next to eachother.</p>
+<p>15. Save the file, close notepad, close command prompt, restart your computer.</p>
+<p>Once your computer starts up, do a normal startup (it may stall for 5-10 minutes at the "starting windows" screen, but leave it going) and the Service Pack will install some more stuff and restart a few times and then everything should be working! For some people, it reverts everything and cancels the service pack installation. For other people, the service pack installation completes. Either result is better than not starting at all!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-30-windows-updates-fail-to-install-error-code-1625.html">&larr; Older: Windows Updates fail to install - Error code: 1625</a><a class="post-nav-link align-right" href="../posts/2011-03-30-useful-post-on-ssl-certificatse-on-android-particular-with-geotrust-renewals.html">Newer: Useful post on SSL certificatse on Android (particular with Geotrust renewals) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

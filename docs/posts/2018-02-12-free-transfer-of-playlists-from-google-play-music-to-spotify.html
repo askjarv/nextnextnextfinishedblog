@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Free transfer of playlists from Google Play Music to Spotify...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Free transfer of playlists from Google Play Music to Spotify...</h1>
+        <div class="meta">
+          <time datetime="2018-02-12">2018-02-12</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>After a lot of soul searching, I decide that I would try out Spotify after being a long term Google Play Music user. My motivation was simple- I was being mocked for my Amazon Echo's playlist being absolutely awful! Since most of my music lived in Google Play Music and there's no support (and unlikely to be given Amazon's recent tiffs with Google) for Alexa controlled playback, I figured I'd tried the other big player (and no, that's definitely not Amazon Music!).</p>
+<p>I figured it would be possible to move my playlists, thumbs up-ed tracks easily enough but Google are kind enough to make selecting all the items on a playlist not possible so I started a web hunt... and found I'd have to pay for the pleasure. I don't mind this as a business, but since I only have 200-300 items in total paying £10 pound (or more!) to move this seemed a bit over kill - especially since it would be a single run operation. Fortunately I did find a way:</p>
+<p>Starting with gmusic-playlist.js</p>
+<ol>
+<li>Grab chrome: tampermonkey extension</li>
+<li>Open the gmusic-playlist.user.js script in your browser and click the install button (https://github.com/soulfx/gmusic-playlist.js/)</li>
+<li>Open Google Play Music and click on the menu (top left)</li>
+<li>Chose Export Playlists to generate a CSV...</li>
+</ol>
+<p>Then use Playlist Convertor...</p>
+<ol>
+<li>Take your CSV file and import it to http://www.playlist-converter.net/#/</li>
+<li>Press convert and, once authorised, your playlists will be built</li>
+</ol>
+<p>Easy enough with the right tools!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2018-02-11-apis-for-fun-and-data-tripwire-ip360.html">&larr; Older: API&#x27;s for fun and data! Tripwire IP360</a><a class="post-nav-link align-right" href="../posts/2018-07-16-state-of-security-blog-post-itil.html">Newer: State of Security Blog Post - ITIL &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

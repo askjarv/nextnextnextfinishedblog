@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hosting a static website with Azure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Hosting a static website with Azure</h1>
+        <div class="meta">
+          <time datetime="2020-05-27">2020-05-27</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Whilst this might show my age a little, when I first set up a personal website one of the biggest challenges I faced was finding reliable low cost hosting. Many may remember hosting on "free" providers which would sneak in advertising content, whilst others would have periods of unannounced downtime or flaky upload services.</p>
+<p>After a while, I figured the only way to host a site was to pay for the service and, with most of the free providers going away anyway, I bought up the space I needed but with creeping costs for a site I rarely used I eventually gave up doing anything much with the few domain names I kept around (largely because I had email accounts that I wanted to keep!). But a few years ago I discovered I could easily host my site entirely for free* on Microsoft Azure - and they've actually continued to make it easier (albeit perhaps somewhat confusingly documented!) with various improvements to the platform - so this post is all about how to get started with hosting a simple (static) site on Azure for free!</p>
+<p><em>*Free, of course, is subject to some usage restrictions - not a challenge I'd like face as I noted here, but</em> <em>if you're doing the same it's worth reviewing the charging model for blob storage</em></p>
+<p>NB: For the time being, I'm setting this up as a HTTP site - not HTTPS - I'll talk about enabling HTTPS in a future post!</p>
+<h2 id="setup-storage-for-your-site">Setup storage for your site</h2>
+<ol>
+<li>First thing we need is to create some storage with Azure - Log into the Azure Portal and click on Storage Accounts.</li>
+</ol>
+<p><img alt="" src="images/image-3.png" /></p>
+<p>2. Click on Add and then enter in a suitable <strong>Subscription</strong>, R<strong>esource Group name</strong>, <strong>Storage Account Name</strong> and <strong>Location</strong>. You can check out the various other options available, but for my purposes I found the rest of the defaults on this page just fine!</p>
+<p><img alt="" src="images/image-5.png" /></p>
+<p>3. Click on Advanced and set the <strong>Secure Transfer Required</strong> to <strong>Disabled</strong> (for HTTP access, rather than HTTPS)</p>
+<p>4. Click on <strong>Review + Create</strong></p>
+<p>5. Once it's complete, you have your storage all set up and ready to go.</p>
+<h2 id="setup-your-site">Setup your site</h2>
+<ol>
+<li>Go to your Storage Store (created in the previous section) and click on <strong>Static Website</strong> (under Settings)</li>
+<li>Click <strong>Enable</strong>, and make a note of the settings here, we'll need them later - the most important part is the Index document name (that's our default page that you'll be serving up) and the <strong>Primary Endpoint</strong> (which we'll use for our cname creation process below).</li>
+</ol>
+<p><img alt="" src="images/image-2.png" /></p>
+<p>3. Click <strong>Save</strong></p>
+<p>4. Once that's set, we can upload our site - there's various ways to do this, but perhaps the simplest is to use the <strong>Storage Explorer</strong> preview - if you click on this and expand your BLOB CONTAINERS you'll find a new path called $web (the eagle eyed amongst you will have spotted that's the page mentioned when you set up the state website). You can simply use the upload button to upload the relevant content - including any images, files, etc you want - just make sure you have a page that matches with your index document name (index.html in step 2 above!).</p>
+<p><img alt="" src="images/image-6.png" /></p>
+<p>5. With that done, your website is live! But you'll only be able to access it on the address described as the <strong>Primary Endpoint</strong> above (although now is a good time to test it out! Next, we'll set up a CNAME so you can map your own address/</p>
+<h2 id="setup-your-dns">Setup your DNS</h2>
+<p>This activity has two activities wrapped up into one - one to verify the URL for Azure services (to prove you aren't just abusing the service) and another that actually sets the desired cname!</p>
+<ol>
+<li>I'm going to give examples from 123-Reg.co.uk, but other providers will offer similar features - we want to create a CNAME to the Azure storage. So I've logged into 123-Reg.co.uk and gone to Manage your DNS and gone to the Advanced DNS section</li>
+<li>We want to create a verification <strong>cname</strong> first - this should be <em>asverify.SUBDOMAIN</em> - e.g. if I wanted to have my website on <em>myweb.mydomain.com</em> my subdomain would be <em>myweb</em> and the cname hostname would be <em>asverify.myweb</em>.<br />
+    In the screenshot below you can see (the top entry) my asverify for <strong>www</strong>.mydomain.com.<br />
+    This entry in turn should have a destination/target that is the address from the previous section called <strong>Primary Endpoint</strong> - <em>with</em> asverify in front again - e.g. if your Primary Endpoint was called https://storageaccountname.z22.web.core.windows.net you would set your destination/target value to be asverify.storageaccountname.z22.web.core.windows.net</li>
+</ol>
+<p><img alt="" src="images/image-7.png" /></p>
+<p>3. Finally, I'm going to create my "final" CNAME - I create a second CNAME with simply <strong>www</strong> as the DNS entry, and the destination / target as the storage url - e.g. storageaccountname.z22.web.core.windows.net</p>
+<h2 id="link-your-cname">Link your CNAME</h2>
+<ol>
+<li>In Azure, go to your Storage Account, and, from the menu bar on the left, select <strong>Custom Domain</strong> (it's under Blob Service):  </li>
+</ol>
+<p><img alt="" src="images/image.png" /></p>
+<p>2. Set your domain name including your subdomain value - note that this time this is the actual subdomain you want to use, not including the "asverify" prefix - e.g.</p>
+<p><img alt="" src="images/image-1.png" /></p>
+<p>3. Ensure you check the box to use indirect CNAME validation.</p>
+<p>4. Click Save</p>
+<p>And that should be you - live!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2020-05-21-exploring-the-tripwire-ip360-api-with-python-3.html">&larr; Older: Exploring the Tripwire IP360 API with Python 3</a><a class="post-nav-link align-right" href="../posts/2020-09-17-building-your-team-up-to-win-the-security-arms-race.html">Newer: Building Your Team up to Win the Security Arms Race &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

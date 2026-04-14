@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Monitoring OpenGaussDB with Tripwire Enterprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Monitoring OpenGaussDB with Tripwire Enterprise</h1>
+        <div class="meta">
+          <time datetime="2026-03-25">2026-03-25</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/database.html">database</a><a class="tag" href="../tags/gaussdb.html">gaussdb</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>I've not done much with GaussDB/OpenGaussDB, so figured I'd post the process I used to setup some monitoring including the deployment itself.</p>
+<h3 id="installing-opengaussdb">Installing OpenGaussDB</h3>
+<p>Currently, it seems as if OpenGaussDB's preferred Linux version is a Centos 7.6 build, so I started with a quick deployment. From there we can:</p>
+<ul>
+<li>
+<p>Download the installation media (<a href="https://opengauss.org/en/download/">https://opengauss.org/en/download/</a>) and unzip to somewhere appropriate.</p>
+</li>
+<li>
+<p>Quick off the installer from the simpleInstall path with <em>sh install.sh -w "MyPasswordHere"</em></p>
+</li>
+<li>
+<p>NB: From the wizard, I deployed their test DB's when prompted (if you want to follow on exactly)!</p>
+</li>
+<li>
+<p>Given I'd not done any other setup on the host, to get going I also need to install OpenSSL by downloading teh zip (in this case, for compatibility, I went old - I'd recommend to others using what's appropriate for you) and unpacking and deploying it: <em>./config --prefix=/usr --openssldir=/etc/ssl --libdir=lib no-shared zlib-dynamic</em></p>
+</li>
+<li>
+<p>From there, I could hop into the guassdb bin directory and run ./gs_ctl query -D /mypath/single_node.</p>
+</li>
+</ul>
+<h3 id="checking-our-command-output-capture-rules-will-work-from-our-agent">Checking our Command Output Capture Rules will work from our agent</h3>
+<p>With that all set, I can configure some basic Command Output Capture Rules to capture relevant audit output info - let's start with checking our DB structure:</p>
+<pre><code>./gsql school -P pager=OFF -c &quot;SELECT table_schema, table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'&quot;
+</code></pre>
+<p>should give us a simple list of tables in the school DB - note the <em>-P pager=OFF</em> - we don't our data paged in Tripwire since this is going to be collected non-interactively! Our sample DB doesn't include a lot of exciting data - but we can, of course, do an audit of, say, a particular table:</p>
+<pre><code>./gsql school -P pager=OFF -c &quot;SELECT * from course&quot;
+</code></pre>
+<p>or, from the other sample DB we could collect card data- of course, we probably wouldn't do this for change audit:</p>
+<pre><code>./gsql finance -P pager=OFF -c &quot;SELECT * from bank_card&quot;
+</code></pre>
+<p>Since our typical goal is auditing, instead, we can use some of the following queries:</p>
+<h2 id="authentication-access-control">Authentication &amp; Access Control</h2>
+<h3 id="list-all-roles-and-attributes">List all roles and attributes</h3>
+<pre><code>SELECT rolname,       rolsuper,       rolcreaterole,       rolcreatedb,       rolcanlogin,       rolreplication,       rolbypassrlsFROM pg_rolesORDER BY rolname;
+</code></pre>
+<h3 id="roles-with-superuser-privileges-high-risk">Roles with superuser privileges (high risk)</h3>
+<pre><code>SELECT rolnameFROM pg_rolesWHERE rolsuper = true;
+</code></pre>
+<h3 id="roles-that-can-login">Roles that can login</h3>
+<pre><code>SELECT rolnameFROM pg_rolesWHERE rolcanlogin = true;
+</code></pre>
+<h3 id="check-password-validity-expiry-if-configured">Check password validity / expiry (if configured)</h3>
+<pre><code>SELECT rolname, rolvaliduntilFROM pg_authidWHERE rolcanlogin = true;
+</code></pre>
+<hr />
+<h1 id="privileges-permissions">Privileges &amp; Permissions</h1>
+<h3 id="database-level-privileges">Database-level privileges</h3>
+<pre><code>SELECT datname,       pg_catalog.pg_get_userbyid(datdba) AS owner,       dataclFROM pg_database;
+</code></pre>
+<h3 id="schema-privileges">Schema privileges</h3>
+<pre><code>SELECT nspname,       nspowner,       nspaclFROM pg_namespace;
+</code></pre>
+<h3 id="table-privileges-who-can-access-what">Table privileges (who can access what)</h3>
+<pre><code>SELECT grantee,       table_schema,       table_name,       privilege_typeFROM information_schema.role_table_grantsORDER BY grantee, table_name;
+</code></pre>
+<h3 id="detect-overly-permissive-tables-public-access">Detect overly permissive tables (PUBLIC access)</h3>
+<pre><code>SELECT table_schema, table_nameFROM information_schema.role_table_grantsWHERE grantee = 'PUBLIC';
+</code></pre>
+<h1 id="configuration-hardening">Configuration &amp; Hardening</h1>
+<h3 id="key-security-related-settings">Key security-related settings</h3>
+<pre><code>SELECT name, settingFROM pg_settingsWHERE name IN (  'password_encryption',  'ssl',  'log_connections',  'log_disconnections',  'log_statement',  'log_min_duration_statement',  'pgaudit.log');
+</code></pre>
+<h3 id="check-ssl-enforcement">Check SSL enforcement</h3>
+<pre><code>SHOW ssl;
+</code></pre>
+<h3 id="check-password-encryption-method">Check password encryption method</h3>
+<pre><code>SHOW password_encryption;
+</code></pre>
+<h3 id="check-listening-addresses-exposure-surface">Check listening addresses (exposure surface)</h3>
+<pre><code>SHOW listen_addresses;
+</code></pre>
+<h1 id="logging-auditing">Logging &amp; Auditing</h1>
+<h3 id="check-logging-configuration">Check logging configuration</h3>
+<pre><code>SELECT name, settingFROM pg_settingsWHERE name LIKE 'log_%'ORDER BY name;
+</code></pre>
+<h3 id="check-if-pgaudit-extension-is-installed">Check if pgAudit extension is installed</h3>
+<pre><code>SELECT * FROM pg_extension WHERE extname = 'pgaudit';
+</code></pre>
+<h3 id="active-sessions-who-is-connected-now">Active sessions (who is connected now)</h3>
+<pre><code>SELECT usename,       datname,       client_addr,       application_name,       stateFROM pg_stat_activity;
+</code></pre>
+<h1 id="network-exposure-connections">Network Exposure &amp; Connections</h1>
+<h3 id="current-connections-by-user">Current connections by user</h3>
+<pre><code>SELECT usename, count(*)FROM pg_stat_activityGROUP BY usename;
+</code></pre>
+<h3 id="remote-connections-only">Remote connections only</h3>
+<pre><code>SELECT usename, client_addrFROM pg_stat_activityWHERE client_addr IS NOT NULL;
+</code></pre>
+<h1 id="data-integrity-ownership">Data Integrity &amp; Ownership</h1>
+<h3 id="tables-without-primary-keys-risk-for-integrityaudit">Tables without primary keys (risk for integrity/audit)</h3>
+<pre><code>SELECT relnameFROM pg_classWHERE relkind = 'r'AND NOT EXISTS (  SELECT 1  FROM pg_index  WHERE pg_index.indrelid = pg_class.oid  AND pg_index.indisprimary);
+</code></pre>
+<h3 id="table-ownership">Table ownership</h3>
+<pre><code>SELECT schemaname,       tablename,       tableownerFROM pg_tables;
+</code></pre>
+<h1 id="default-privileges-often-overlooked">Default Privileges (often overlooked)</h1>
+<pre><code>SELECT defaclrole::regrole,       defaclnamespace::regnamespace,       defaclobjtype,       defaclaclFROM pg_default_acl;
+</code></pre>
+<h2 id="making-it-a-template">Making it a template</h2>
+<p>Rather than using all these as one-liner COCR's which are hard to read, we can install pass in the SQL command as a parameter with a "Scripted" COCR - effectively :</p>
+<pre><code>gsql dbname -P pager=OFF &lt; $(ScriptFile).sql
+</code></pre>
+<p>This makes it easy to duplicate and use as a template for setting up all your custom queries- you can even set a node level parameter for your DB so you can set it per host for ease!</p>
+<p>I hope that helps you plan some of our future monitoring!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2026-03-23-integrating-virustotal-with-fortras-tripwire-enterprise-in-two-minutes.html">&larr; Older: Integrating VirusTotal with Fortra&#x27;s Tripwire Enterprise in two minutes</a><a class="post-nav-link align-right" href="../posts/2026-03-27-monitoring-amazon-s3-with-cli-based-file-integrity-monitoring.html">Newer: Monitoring Amazon S3 with CLI-Based File Integrity Monitoring &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Integrating IP360 with AWS Lambda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Integrating IP360 with AWS Lambda</h1>
+        <div class="meta">
+          <time datetime="2022-10-04">2022-10-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>I built the below script to allow users to easily scale our vulnerability management monitoring of servers deployed in AWS with automated exceptions being pulled from an S3 bucket and automatically added to Tripwire IP360 via a AWS Lambda call:</p>
+<pre><code>import boto3
+from botocore.config import Config
+import os
+from base64 import b64decode
+from botocore.exceptions import ClientError
+import requests
+import urllib3
+import json
+import uuid
+import ipaddress
+import struct
+import time
+import os
+import sys
+import argparse
+&quot;&quot;&quot;
+Functions - AWS
+&quot;&quot;&quot;
+def GET_EXCEPTION_AWS_S3(s3_bucket,filename):
+ # Set up session not show warnings/errors for the self-signed cert
+ s3 = boto3.resource('s3',verify=False)
+ # Capture some info about session in case it's required
+ client = boto3.client(&quot;sts&quot;)
+ account_id = client.get_caller_identity()[&quot;Account&quot;]
+ verified_ip_list = []
+ # Get data
+ try:
+ obj = s3.Object(s3_bucket,filename)
+ body = obj.get()['Body'].read()
+ print(&quot;Retrieved&quot;)
+ if (body != &quot;&quot;):
+ # Content exists, validate format
+ ip_list = body.decode(&quot;utf-8&quot;).split(&quot;\r\n&quot;)
+ for ip in ip_list:
+ try:
+ ipaddress.ip_address(ip)
+ verified_ip_list.append(ip)
+ except:
+ print(&quot;Not a valid IP&quot;)
+ return verified_ip_list
+ except:
+ print(&quot;Failed to retrieve data as &quot;+ str(account_id))
+&quot;&quot;&quot;
+Functions - IP360
+&quot;&quot;&quot;
+# Set up Session() to not show warnings/errors for the self-signed cert
+session = requests.Session()
+session.verify = False
+urllib3.disable_warnings()
+session.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;
+})
+def ip360baseurl(ip360vnehost):
+ ip360baseurl = &quot;https://&quot;+ip360vnehost+&quot;/rest/v1&quot;
+ return ip360baseurl
+def GET_IP360_NETWORK(network_name,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ # Login
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ # Check for existing network
+ try:
+ network = s.get(url=&quot;https://%s/rest/v1/networks?name=%s&quot; % (ip360vnehost,network_name))
+ return network
+ except:
+ print(&quot;Network not found&quot;)
+def GET_IP360_POOL(pool_name,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ # Login
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ # Check for existing network
+ try:
+ pool = s.get(url=&quot;https://%s/rest/v1/appliance_pools?name=%s&quot; % (ip360vnehost,pool_name))
+ return pool
+ except:
+ print(&quot;Pool not found&quot;)
+def GET_IP360_SCAN_PROFILE(profile_name,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ # Login
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ # Check for existing network
+ try:
+ profile = s.get(url=&quot;https://%s/rest/v1/scan_profiles?search=%s&quot; % (ip360vnehost,profile_name))
+ return profile
+ except:
+ print(&quot;Scan Profile not found&quot;)
+def GET_IP360_CREDENTIAL(credential_name,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ # Login
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ # Check for existing network
+ try:
+ credential = s.get(url=&quot;https://%s/rest/v1/credentials?name=%s&quot; % (ip360vnehost,credential_name))
+ return credential
+ except:
+ print(&quot;Scan Profile not found&quot;)
+def SET_IP360_NETWORK(network_name,included_ips,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ # !!! Disables SSL validation for self signed certs- NOT RECOMMENDED !!!
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ # Login
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ # Check for existing network
+ networks = s.get(url=&quot;https://%s/rest/v1/networks?search=%s&quot; % (ip360vnehost,network_name))
+ #print(&quot;Matching name network found (count):&quot;+json.loads(networks.content)[&quot;count&quot;])
+ if (json.loads(networks.content)[&quot;count&quot;] &gt; 0):
+ # If we get this far, the network exists, so we need to patch it instead:
+ print(&quot;Existing network with matching name found, updating&quot;)
+ networks = json.loads(networks.content)
+ network_to_update = networks[&quot;results&quot;][0]
+ payload = {
+ &quot;url&quot;: network_to_update[&quot;url&quot;],
+ &quot;name&quot;: network_to_update[&quot;name&quot;],
+ &quot;asset_value&quot;: network_to_update[&quot;asset_value&quot;],
+ #&quot;notes&quot;: network_to_update[&quot;notes&quot;]+&quot;. Updated by API&quot;,
+ &quot;include_ips&quot;: network_to_update[&quot;include_ips&quot;]+ &quot;,&quot; + included_ips,
+ #&quot;exclude_ips&quot;: network_to_update[&quot;exclude_ips&quot;]+ &quot;,&quot; + excluded_ips,
+ &quot;exclude_ips&quot;: &quot;&quot;,
+ &quot;virtual_hosts&quot;: [],
+ &quot;network_type&quot;: &quot;default&quot;,
+ &quot;effective_ranges&quot;: network_to_update[&quot;effective_ranges&quot;],
+ }
+ try:
+ patch_network = s.patch(url=network_to_update[&quot;url&quot;], data=payload, auth=(ip360username,
+ip360password))
+ except:
+ print(&quot;Failed to update existing network: &quot;+ network_name +&quot;, check permissions/network
+configuration&quot;)
+ else:
+ # Post a new network :
+ payload = {
+ &quot;name&quot;: network_name,
+ &quot;active&quot;: True,
+ &quot;notes&quot;: &quot;Created by API&quot;,
+ &quot;include_ips&quot;: included_ips,
+ #&quot;exclude_ips&quot;: excluded_ips,
+ &quot;exclude_ips&quot;: &quot;&quot;,
+ &quot;host_tracking&quot;: &quot;{\&quot;correlation_threshold\&quot;: 90, \&quot;correlation_method\&quot;: \&quot;Static IP\&quot;, \&quot;
+correlation_values\&quot;: {\&quot;DNS Name\&quot;: 0.0, \&quot;OS Fingerprint\&quot;: 0.0, \&quot;NetBIOS Name\&quot;: 0.0, \&quot;Apparent MAC
+Address\&quot;: 0.0, \&quot;Port Signature\&quot;: 0.0, \&quot;IP Address\&quot;: 100.0, \&quot;Operating System\&quot;: 0.0}}&quot;,
+ }
+ print(&quot;Network config:&quot;)
+ print(payload)
+ try:
+ post_new_network = s.post(url=&quot;%s/networks&quot; % (ip360baseurl(ip360vnehost)), data=payload, auth=
+(ip360username,ip360password))
+ print(&quot;Added new network: &quot;+network_name)
+ except:
+ print(&quot;Failed to add a new network - check access and network parameters&quot;)
+ print(&quot;Adding/updating network complete for &quot;+network_name)
+def REPLACE_IP360_NETWORK(network_name,included_ips,excluded_ips,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ try:
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ except:
+ print(&quot;Failed log in - check credentials and network access&quot;)
+ networks = s.get(url=&quot;https://%s/rest/v1/networks?search=%s&quot; % (ip360vnehost,network_name), auth=
+(ip360username, ip360password))
+ if (json.loads(networks.content)[&quot;count&quot;] &gt; 0):
+ # network exists - so remove it first
+ print(&quot;Removing existing duplicate network&quot;)
+ networks = json.loads(networks.content)
+ network_to_update = networks[&quot;results&quot;][0]
+ payload = {
+ &quot;url&quot;: network_to_update[&quot;url&quot;],
+ &quot;name&quot;: network_to_update[&quot;name&quot;],
+ }
+ try:
+ delete_network = s.delete(url=network_to_update[&quot;url&quot;], data=payload, auth=(ip360username,
+ip360password))
+ except:
+ print(&quot;Failed to remove existing network: &quot;+ network_name +&quot;, check scan task is not in
+progress / locked&quot;)
+ payload = {
+ &quot;name&quot;: network_name,
+ &quot;active&quot;: True,
+ &quot;notes&quot;: &quot;Created by API&quot;,
+ &quot;include_ips&quot;: included_ips,
+ &quot;exclude_ips&quot;: excluded_ips,
+ &quot;host_tracking&quot;: &quot;{\&quot;correlation_threshold\&quot;: 90, \&quot;correlation_method\&quot;: \&quot;Static IP\&quot;, \&quot;
+correlation_values\&quot;: {\&quot;DNS Name\&quot;: 0.0, \&quot;OS Fingerprint\&quot;: 0.0, \&quot;NetBIOS Name\&quot;: 0.0, \&quot;Apparent MAC
+Address\&quot;: 0.0, \&quot;Port Signature\&quot;: 0.0, \&quot;IP Address\&quot;: 100.0, \&quot;Operating System\&quot;: 0.0}}&quot;,
+ }
+ print(payload)
+ try:
+ post_new_network = s.post(url=&quot;%s/networks&quot; % (ip360baseurl(ip360vnehost)), data=payload, auth=
+(ip360username,ip360password))
+ print(&quot;Added new network: &quot;+network_name)
+ except:
+ print(&quot;Failed to add a new network - check access and network parameters&quot;)
+def EXECUTE_IP360_ADHOC_SCAN(network,pool,scanprofile,ip360vnehost,ip360username,ip360password):
+ network_set = GET_IP360_NETWORK(network,ip360vnehost,ip360username,ip360password)
+ pool_set = GET_IP360_POOL(pool,ip360vnehost,ip360username,ip360password)
+ profile_set = GET_IP360_SCAN_PROFILE(scanprofile,ip360vnehost,ip360username,ip360password)
+ print(&quot;Sending ahoc scan request to %s as %s&quot; % (ip360baseurl(ip360vnehost), ip360username))
+ PAYLOAD={
+ &quot;debug&quot;: False,
+ &quot;name&quot;: &quot;Adhoc Automated Scan&quot;,
+ &quot;network&quot;: json.loads(network_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;pool&quot;: json.loads(pool_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;scan_profile&quot;: json.loads(profile_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;special_scan&quot;: False
+ }
+ postscan = session.post(url=&quot;%s/audits&quot; % (ip360baseurl(ip360vnehost)), auth=(ip360username, ip360password),
+json=PAYLOAD)
+ print(postscan.content)
+ postscan.connection.close()
+def SET_IP360_SCHEDULED_SCAN(network,pool,scanprofile,ip360vnehost,ip360username,ip360password):
+ # Get Network
+ network_set = GET_IP360_NETWORK(network,ip360vnehost,ip360username,ip360password)
+ # Get appliance pool
+ pool_set = GET_IP360_POOL(pool,ip360vnehost,ip360username,ip360password)
+ # Get scan profile
+ profile_set = GET_IP360_SCAN_PROFILE(scanprofile,ip360vnehost,ip360username,ip360password)
+ # Check for existing scan
+ config_name = &quot;Auto-&quot; + json.loads(network_set.content)[&quot;results&quot;][0][&quot;name&quot;] + json.loads(profile_set.
+content)[&quot;results&quot;][0][&quot;name&quot;] + &quot; Scan&quot;
+ scheduledscans = session.get(url=&quot;https://%s/rest/v1/scan_configs?name=%s&quot; % (ip360vnehost,config_name),
+auth=(ip360username, ip360password))
+ # Unforunately filtering for network names isn't consistent in older versions of IP360, so we need to check
+our scan names to verify it doesn't already exist
+ for scans in json.loads(scheduledscans.content)[&quot;results&quot;]:
+ if (scans[&quot;name&quot;] == config_name):
+ # Update existing scheduled scan
+ print(&quot;Scheduled Scan already exists - no action taken&quot;)
+ break
+ else:
+ # Post scheduled scan
+ print(&quot;Sending scan scheduling request to %s as %s&quot; % (ip360baseurl(ip360vnehost), ip360username))
+ PAYLOAD={
+ &quot;active&quot;: True,
+ &quot;name&quot;: &quot;Auto-&quot; + json.loads(network_set.content)[&quot;results&quot;][0][&quot;name&quot;] + json.loads
+(profile_set.content)[&quot;results&quot;][0][&quot;name&quot;] + &quot; Scan&quot;,
+ &quot;network&quot;: json.loads(network_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;pool&quot;: json.loads(pool_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;scan_profile&quot;: json.loads(profile_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ }
+ postscan = session.post(url=&quot;%s/scan_configs&quot; % (ip360baseurl(ip360vnehost)), auth=(ip360username,
+ip360password),json=PAYLOAD)
+ postscan.connection.close()
+def SET_IP360_CREDENTIAL(credential_name,credential_username,credential_password,credential_domain,
+credential_auth_algo,ip360network,exceptionip,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ # !!! Disables SSL validation for self signed certs- NOT RECOMMENDED !!!
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ payload = {&quot;name&quot;:credential_name, &quot;username&quot;:credential_username, &quot;password&quot;:credential_password,
+&quot;domain&quot;:credential_domain, &quot;minimum_auth_algorithm&quot;:credential_auth_algo}
+ try:
+ POSTCREDS = s.post(url=&quot;%s/credential/windows&quot; % (ip360baseurl(ip360vnehost)), data=payload, auth=
+(ip360username,ip360password))
+ JSONCREDS = json.loads(POSTCREDS.text)
+ payload = {&quot;credential&quot;: JSONCREDS[&quot;url&quot;], &quot;network&quot;: ip360network, &quot;ip_ranges&quot;: exceptionip}
+ try:
+ POSTCREDBIND = s.post(url=&quot;%s/credential/bindings&quot; % (ip360baseurl(ip360vnehost)),
+data=payload, auth=(ip360username,ip360password))
+ except:
+ print(&quot;Failed to bind credential to a network&quot;)
+ except:
+ print(&quot;Failed to add credential to IP360&quot;)
+ print(&quot;Finished!&quot;)
+def BIND_IP360_CREDENTIAL(credential_name,ip360network,ipbind,ip360vnehost,ip360username,ip360password):
+ with requests.Session() as s:
+ # !!! Disables SSL validation for self signed certs- NOT RECOMMENDED !!!
+ s.verify = False
+ urllib3.disable_warnings()
+ s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;Referer&quot;: ip360baseurl(ip360vnehost)
+ })
+ payload = {&quot;login&quot; : ip360username, &quot;password&quot; : ip360password, &quot;auth_type&quot; : &quot;internal&quot;,
+&quot;auth_server_id&quot; : &quot;0&quot;, &quot;do&quot;: &quot;auth&quot;}
+ login = s.post(url=&quot;https://%s/index.ice&quot; % (ip360vnehost), data=payload)
+ credential = GET_IP360_CREDENTIAL(credential_name,ip360vnehost,ip360username,ip360password)
+ network = GET_IP360_NETWORK(ip360network,ip360vnehost,ip360username,ip360password)
+ JSONnetwork = json.loads(network.text)
+ JSONCREDS = json.loads(credential.text)
+ payload = {&quot;credential&quot;: JSONCREDS[&quot;results&quot;][0][&quot;url&quot;], &quot;network&quot;: JSONnetwork[&quot;results&quot;][0][&quot;url&quot;],
+&quot;ip_ranges&quot;: ipbind}
+ try:
+ POSTCREDBIND = s.post(url=&quot;%s/credential/bindings&quot; % (ip360baseurl(ip360vnehost)), data=payload,
+auth=(ip360username,ip360password))
+ except:
+ print(&quot;Failed to post credential&quot;)
+ print(&quot;Finished!&quot;)
+def initiate_adhoc_scan(network,pool,range,scanprofile,ip360baseurl,ip360username,ip360password):
+ print(&quot;Sending ahoc scan request to %s as %s&quot; % (ip360username, ip360password))
+ PAYLOAD={
+ &quot;debug&quot;: False,
+ &quot;name&quot;:&quot;Test100&quot;,
+ &quot;network&quot;:ip360baseurl+&quot;/networks/3&quot;,
+ &quot;pool&quot;:ip360baseurl+&quot;/appliance_pools/1&quot;,
+ &quot;range&quot;: range,
+ &quot;scan_profile&quot;: ip360baseurl+&quot;/scan_profiles/5&quot;,
+ &quot;scan_profile_type&quot;: &quot;Discovery&quot;,
+ &quot;scan_type&quot;: &quot;Partial&quot;,
+ &quot;special_scan&quot;: False
+ }
+ postscan = session.post(url=&quot;%s/audits&quot; % (ip360baseurl), auth=(ip360username, ip360password),json=PAYLOAD)
+ print(postscan.content)
+ postscan.connection.close()
+def DO_IP360_ADHOC_SCAN(network,iptoscan,pool,scanprofile,ip360vnehost,ip360username,ip360password):
+ # Get Network
+ network_set = GET_IP360_NETWORK(network,ip360vnehost,ip360username,ip360password)
+ # Get appliance pool
+ pool_set = GET_IP360_POOL(pool,ip360vnehost,ip360username,ip360password)
+ # Get scan profile
+ profile_set = GET_IP360_SCAN_PROFILE(scanprofile,ip360vnehost,ip360username,ip360password)
+ # Check for existing scan
+ config_name = &quot;Auto-&quot; + json.loads(network_set.content)[&quot;results&quot;][0][&quot;name&quot;] + json.loads(profile_set.
+content)[&quot;results&quot;][0][&quot;name&quot;] + &quot; Scan&quot;
+ # Post scheduled scan
+ print(&quot;Sending scan scheduling request to %s as %s&quot; % (ip360baseurl(ip360vnehost), ip360username))
+ PAYLOAD={
+ &quot;debug&quot;:False,
+ &quot;name&quot;: &quot;Auto-&quot; + json.loads(network_set.content)[&quot;results&quot;][0][&quot;name&quot;] + json.loads
+(profile_set.content)[&quot;results&quot;][0][&quot;name&quot;] + &quot; Scan&quot;,
+ &quot;network&quot;: json.loads(network_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;range&quot;:iptoscan,
+ &quot;pool&quot;: json.loads(pool_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;scan_profile&quot;: json.loads(profile_set.content)[&quot;results&quot;][0][&quot;url&quot;],
+ &quot;scan_type&quot;: &quot;Partial&quot;,
+ &quot;special_scan&quot;: False
+ }
+ try:
+ postscan = session.post(url=&quot;%s/audits&quot; % (ip360baseurl(ip360vnehost)), auth=(ip360username,
+ip360password),json=PAYLOAD)
+ except:
+ print(&quot;Failed to create Adhoc Scan&quot;)
+ postscan.connection.close()
+def get_secret():
+ secret_name = &quot;/tripwire/vnepw&quot;
+ region_name = &quot;eu-west-1&quot;
+ # Create a Secrets Manager client
+ sm_session = boto3.session.Session()
+ sm_client = sm_session.client(
+ service_name='secretsmanager',
+ region_name=region_name,
+ config=Config(
+ proxies={'https': os.environ['PROXY']}
+ )
+ )
+ #Get the secret password from Secrets Manager
+ try:
+ get_secret_value_response = sm_client.get_secret_value(
+ SecretId=secret_name
+ )
+ except ClientError as e:
+ print(e)
+ if e.response['Error']['Code'] == 'DecryptionFailureException':
+ # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+ # Deal with the exception here, and/or rethrow at your discretion.
+ raise e
+ elif e.response['Error']['Code'] == 'InternalServiceErrorException':
+ # An error occurred on the server side.
+ # Deal with the exception here, and/or rethrow at your discretion.
+ raise e
+ elif e.response['Error']['Code'] == 'InvalidParameterException':
+ # You provided an invalid value for a parameter.
+ # Deal with the exception here, and/or rethrow at your discretion.
+ raise e
+ elif e.response['Error']['Code'] == 'InvalidRequestException':
+ # You provided a parameter value that is not valid for the current state of the resource.
+ # Deal with the exception here, and/or rethrow at your discretion.
+ raise e
+ elif e.response['Error']['Code'] == 'ResourceNotFoundException':
+ # We can't find the resource that you asked for.
+ # Deal with the exception here, and/or rethrow at your discretion.
+ raise e
+ else:
+ # Decrypts secret using the associated KMS CMK.
+ # Depending on whether the secret is a string or binary, one of these fields will be populated.
+ if 'SecretString' in get_secret_value_response:
+ secret = get_secret_value_response['SecretString']
+ return secret
+ else:
+ decodedBinarySecret = base64.b64decode(get_secret_value_response['SecretBinary'])
+ return decodedBinarySecret
+def lambda_handler(event, context):
+ DEBUG = os.environ['DEBUG']
+ VNEIP = os.environ['VNEIP']
+ IP360DP = os.environ['IP360DP']
+ IP360PROFILE = os.environ['IP360PROFILE']
+ IP360NETWORK = os.environ['IP360NETWORK']
+ VNEUSER = os.environ['VNEUSER']
+ CUSTOMERS = os.environ['CUSTOMERS'].split(&quot;,&quot;)
+ MPCAWSEXCEPTIONLIST = os.environ['MPCAWSEXCEPTIONLIST'].split(&quot;,&quot;)
+ EXCEPTIONLISTBUCKET = os.environ['EXCEPTIONLISTBUCKET']
+ ENVIRONMENT = os.environ['ENVIRONMENT']
+ IPSCANLIST = []
+ try:
+ SINGLE_IP = event['SingleIP']
+ except:
+ SINGLE_IP = 'NOIP'
+ IPSCANLIST = []
+ if DEBUG == &quot;True&quot;:
+ print (SINGLE_IP)
+ # setup connection to AWS
+ kms_client = boto3.client(
+ 'kms',
+ config=Config(
+ proxies={'https': os.environ['PROXY']}
+ )
+ )
+ sts_client = boto3.client(
+ 'sts',
+ config=Config(
+ proxies={'https': os.environ['PROXY']}
+ )
+ )
+ if SINGLE_IP == &quot;NOIP&quot;:
+ # event contains all information about uploaded object
+ if DEBUG == &quot;True&quot;:
+ print(&quot;Event :&quot;, event)
+ # Bucket Name where file was uploaded
+ source_bucket_name = event['Records'][0]['s3']['bucket']['name']
+ # Filename of object (with path)
+ file_key_name = event['Records'][0]['s3']['object']['key']
+ if DEBUG == &quot;True&quot;:
+ print (source_bucket_name)
+ print (file_key_name)
+ # Read the exception list
+ s3_exceptionlist_Resource=boto3.resource(
+ 's3',
+ config=Config(
+ proxies={'https': os.environ['PROXY']}
+ ),
+ )
+ s3_exceptionlist_obj = s3_exceptionlist_Resource.Object(EXCEPTIONLISTBUCKET, 'tripwire_exceptions.txt')
+ exceptionlist = s3_exceptionlist_obj.get()['Body'].read().decode('utf-8').splitlines()
+ print(exceptionlist)
+ # Read the post patching input file
+ s3_post_patching_Resource=boto3.resource(
+ 's3',
+ config=Config(
+ proxies={'https': os.environ['PROXY']}
+ )
+ )
+ s3_post_patching_obj = s3_post_patching_Resource.Object(source_bucket_name, file_key_name)
+ post_patching_scanlist = s3_post_patching_obj.get()['Body'].read().decode('utf-8').splitlines()
+ #print (post_patching_scanlist)
+ for post_patching_scanline in post_patching_scanlist:
+ if post_patching_scanline != &quot;&quot;:
+ CUSTOMERCODE = post_patching_scanline.split(',')[0]
+ FQDN = post_patching_scanline.split(',')[1]
+ IP_ADDRESS = post_patching_scanline.split(',')[2]
+ if CUSTOMERCODE.upper() in CUSTOMERS:
+ if IP_ADDRESS not in exceptionlist:
+ if FQDN not in MPCAWSEXCEPTIONLIST:
+ if DEBUG == &quot;True&quot;:
+ print (&quot;IP: &quot; + IP_ADDRESS + &quot; FQDN: &quot; + FQDN)
+ IPSCANLIST.append(IP_ADDRESS)
+ else:
+ IPSCANLIST.append(SINGLE_IP)
+ #Check scan list
+ if DEBUG == &quot;True&quot;:
+ print (IPSCANLIST)
+ IPCOMMASEPERATED = &quot;&quot;
+ for IP in IPSCANLIST:
+ IPCOMMASEPERATED = IPCOMMASEPERATED + IP + &quot;,&quot;
+ IPCOMMASEPERATED = IPCOMMASEPERATED[:-1]
+ if DEBUG == &quot;True&quot;:
+ print (IPCOMMASEPERATED)
+ if ENVIRONMENT == &quot;QA&quot;:
+ #Check connectivity to VNE
+ response = requests.get('https://' + VNEIP, verify=False)
+ print (&quot;VNE connection status code: &quot; + str(response.status_code))
+ else:
+ #Get the secret password from Secrets Manager
+ ip360password = (json.loads(get_secret()))['VNEPassword']
+ REPLACE_IP360_NETWORK(IP360NETWORK,IPCOMMASEPERATED,&quot;&quot;,VNEIP,VNEUSER,ip360password)
+ EXECUTE_IP360_ADHOC_SCAN(IP360NETWORK,IP360DP,IP360PROFILE,VNEIP,VNEUSER,ip360password)
+ print (&quot;Tripwire scan initiated&quot;)
+</code></pre>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2022-04-19-regulatory-compliance-holding-security-back-or-forcing-us-to-reassess-old-biases.html">&larr; Older: Regulatory Compliance – Holding Security Back or Forcing us to Reassess old biases?</a><a class="post-nav-link align-right" href="../posts/2022-10-20-place-your-budgets-on-the-right-cybersecurity-for-your-business.html">Newer: Place your budgets on the right cybersecurity for your business &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

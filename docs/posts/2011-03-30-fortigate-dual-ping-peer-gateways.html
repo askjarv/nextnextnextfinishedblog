@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fortigate Dual Ping Peer gateways</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Fortigate Dual Ping Peer gateways</h1>
+        <div class="meta">
+          <time datetime="2011-03-30">2011-03-30</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/gateway.html">gateway</a><a class="tag" href="../tags/ping.html">ping</a><a class="tag" href="../tags/pingpeer.html">pingpeer</a></div>
+        <div class="content">
+          <p>Following some successful testing I have determined that adding two ping servers, reduces the amount of false positives for the Fortigate alert, PING PEER down</p>
+<p>The below commands can be used to update the device.　 The catch being that this only can be set and seen at CLI level.</p>
+<p>config system interface</p>
+<p>edit WAN1</p>
+<p>set gwdetect enable</p>
+<p>set detectserver 8.8.8.8 208.67.222.222 next edit WAN2</p>
+<p>set gwdetect enable</p>
+<p>set detectserver 8.8.8.8 208.67.222.222 next</p>
+<p>end</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-30-rebuilding-logical-disk-performance-counters.html">&larr; Older: Rebuilding logical disk performance counters</a><a class="post-nav-link align-right" href="../posts/2011-04-02-golden-rules-of-good-support-episode-1.html">Newer: Golden Rules of Good Support - Episode 1! &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

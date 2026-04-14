@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Building a to-do app on Azure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Building a to-do app on Azure</h1>
+        <div class="meta">
+          <time datetime="2019-01-02">2019-01-02</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>It's the new year and many of us are making new year's resolutions to do something new so I figured I'd try the same thing - starting with a new project to build a to-do list app that tracks and encourages my progress. Based on the (very popular at the moment) "don't break the chain" method (or, the <a href="https://lifehacker.com/5886128/how-seinfelds-productivity-secret-fixed-my-procrastination-problem">Seinfeld method</a>) of making sure you always add an entry indicating that you're keeping on track (whether that's by doing something or not doing something is up to you), my intention is to build the app in the open, sharing my code, method, and thoughts as I go.</p>
+<p>So, with that in mind, where did I start? Well a few decisions needed to be made:</p>
+<ul>
+<li>Platform(s): This one was easy - web. I hesitated for a brief moment, thinking about building an Android app (since I haven't built one in years) but then I remembered that for some of the things I wanted to track progress for (updating my blog for example!) I'd already be on my PC. A web app would give me the option of updating my to-do list on whatever platform I wanted, reducing friction which, I hoped, would encourage me (and other users) to stick with it.</li>
+<li>Back-end: I knew I wanted to use a "modern" DB (I've spent a lot of time working with MySQL and MS-SQL over the years, but rarely looked into newer options) - MongoDB looks like the winner at the moment. Node.JS was a no-brainer again for the same reason as MongoDB - a modern platform that would be useful to learn!</li>
+<li>Front-end: I wanted to use a modern web framework for my front end - again, I've been building websites for years, but rarely dove into the world of modern frameworks to simplify set up... at the moment Angular is looking highly likely as my choice (since it's often used in my day job too!).</li>
+</ul>
+<p>With those out of the way (at least for now), I wanted to start thinking about what I wanted my app to be like. I know that the market place is already filled with similar ideas- some of which I liked, some of which I wasn't so keen on:</p>
+<ul>
+<li>I'd used <a href="https://chains.cc/">https://chains.cc/</a> in the past, but eventually lost interest- it failed to keep my attention, and was clunky on mobile.</li>
+<li>Day by Day on Android (<a href="https://play.google.com/store/apps/details?id=com.leoncvlt.daybyday">https://play.google.com/store/apps/details?id=com.leoncvlt.daybyday</a>) and found it effective, if rather simplistic. Unfortunately, one day it decided just to break, losing all my progress so I quit!</li>
+<li>Loop Habit Tracker - <a href="https://play.google.com/store/apps/details?id=org.isoron.uhabits">https://play.google.com/store/apps/details?id=org.isoron.uhabits</a> - I'd seen, but not tried - this seems like a nice little app. It also made me think about creating a simple "widget" (or button press, perhaps using some puck.js I have lying around) to add to my tally easily.</li>
+<li>Habitica (<a href="https://habitica.com/static/home">https://habitica.com/static/home</a>) also tempted me for a brief period - but was overly complicated for my liking - I wanted something that would be quick to enter data into and didn't require much thinking about- Habitica is definitely a neat solution, but not the right fit for me.</li>
+<li>Habitbull (<a href="http://www.habitbull.com/">http://www.habitbull.com/</a>) also tempted me but failed to keep my interest for long - I knew I needed something more to keep my interest than just trying to keep my score close to 100 to motivate me.</li>
+<li>I also did a very quick google image search (!) for The Seinfeld method. I know this may appear like a some what random approach to market research, but a Google Image search sometimes lets you quickly spot novel approaches to the problem area that you hadn't considered before... but in this case, it largely revealed "manual methods" (paper versions) - I travel a lot, so big wall calendars don't do me much good (in fact, I've ended up making it an excuse not to engage with it), I'm not a big fan of potentially messy things (which I fear this would become) and... I want to build an app!</li>
+</ul>
+<p>With that in mind, I had a couple of ideas in mind:</p>
+<ul>
+<li>A "chat based" app, that framed your daily entries as conversations with an encouraging "coach", sending you "messages" to see how you're getting on with a goal</li>
+<li>A more visual based approach, putting building blocks together to construct something in order to drive me to keep my progress going</li>
+<li>A game-ified style approach, that involved a simple narrative (to collect something, like spells, parts to a car engine, etc) that would reveal something new to me each day (and, in order to keep this interesting, it would have to reveal something I hadn't seen before)</li>
+<li>Or, as an alternative to the initial game-ified approach noted above, I debated a literal game portal, that unlocked new games or stories each day as a reward for completing jobs. This seemed like an impossible option to achieve (to build the content) until I realised I could "feed" it my Pocket Backlog, Amazon wishlist, itch.io wishlist, etc so I could literally reward myself for my work.</li>
+</ul>
+<p>I liked all of these ideas so I decided my next step would be to sketch out what each would look like as hand-drawn prototypes tomorrow and see which appealed to me.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2018-12-18-from-gdpr-to-meltdown-guest-quote-on-the-tripwire-blog.html">&larr; Older: From GDPR to Meltdown - guest quote on the Tripwire Blog</a><a class="post-nav-link align-right" href="../posts/2019-01-04-how-do-you-measure-your-investment-in-security.html">Newer: How Do You Measure Your Investment in Security? &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

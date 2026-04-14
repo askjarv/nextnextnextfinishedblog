@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Posting a Tripwire IP360 ASPL update with Python</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Posting a Tripwire IP360 ASPL update with Python</h1>
+        <div class="meta">
+          <time datetime="2025-10-24">2025-10-24</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/python.html">python</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>This one initially threw me, so I figured I'd post the script here for others in case they run into issues:</p>
+<pre><code>#-*- coding: utf-8 -*-
+&quot;&quot;&quot;
+@author: Chris Hudson
+&quot;&quot;&quot;
+&quot;&quot;&quot;
+DEPENDENCIES:
+&quot;&quot;&quot;
+&quot;&quot;&quot; Required for sys calls such as exit() &quot;&quot;&quot;
+import sys
+&quot;&quot;&quot; Required to do all HTTP request calls to the API: Run 'pip install requests' to add this to your Python
+installation. &quot;&quot;&quot;
+import requests
+import urllib3
+from requests.auth import HTTPDigestAuth
+import json
+&quot;&quot;&quot;
+GLOBAL VARIABLES:
+&quot;&quot;&quot;
+# These are the static parameters needed for the IP360 environment connection
+IP360HOST=&quot;YourVnEHostname&quot;
+IP360USERNAME=&quot;UsernameHere&quot;
+IP360PASS=&quot;PasswordHere&quot;
+IP360BASEURL=&quot;https://&quot;+IP360HOST+&quot;/rest/v1&quot;
+# Set up Session() to not show warnings/errors for the self-signed cert
+s = requests.Session() s.verify = False
+urllib3.disable_warnings()
+s.headers.update({
+ &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+ &quot;X-Requested-With&quot;: &quot;required&quot;,
+ &quot;referer&quot;: &quot;https://&quot;+IP360HOST+&quot;/rest/v1/updates&quot;
+})
+# Do a login:
+payload = {&quot;login&quot; : IP360USERNAME, &quot;password&quot; : IP360PASS, &quot;do&quot;: &quot;auth&quot;}
+login = s.post(url=&quot;https://%s/index.ice&quot; % (IP360HOST), data=payload)
+# For demo purposes, we initially make a call to retrieve the current update status
+response = s.get(url=&quot;%s/updates/status&quot; % (IP360BASEURL))
+print(response.content)
+# Posting a new ASPL
+# In order to do a POST, we most set the CSRF token we got for the session
+myheaders = s.headers
+myheaders.update({'X-CSRFToken': login.cookies.get('csrftoken')})
+# Now we can pass the ASPL/Ontology we wish to send - we should open this as a binary (rb) and make sure the
+&quot;name&quot; is set appropraitely
+files = {'file': ('vert-ontology-4-943.noarch.rpm', open('vert-ontology-4-943.noarch.rpm', 'rb'))}
+# Now we can post to the API
+response = s.post(url=&quot;%s/updates&quot; % (IP360BASEURL), files=files, headers=myheaders)
+print(response.content)
+# Clean up and close the session
+response.connection.close()
+</code></pre>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-10-17-change-audit-for-network-devices.html">&larr; Older: Change Audit for Network Devices</a><a class="post-nav-link align-right" href="../posts/2025-10-31-googles-unsigned-apk-crackdown.html">Newer: Google&#x27;s Unsigned APK Crackdown &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

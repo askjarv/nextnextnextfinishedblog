@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ page_title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ stylesheet_path }}">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="{{ home_link }}">{{ site_title }}</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>{{ title }}</h1>
+        <div class="meta">
+          <time datetime="{{ date }}">{{ date }}</time>
+        </div>
+        <div class="tags">{{ tags }}</div>
+        <div class="content">
+          {{ content }}
+        </div>
+      </article>
+      {{ post_nav }}
+    </main>
+  </div>
+</body>
+</html>

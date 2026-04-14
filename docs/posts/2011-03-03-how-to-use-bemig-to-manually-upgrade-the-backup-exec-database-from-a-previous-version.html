@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>How to use BEMIG to manually upgrade the Backup Exec database from a previous version</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>How to use BEMIG to manually upgrade the Backup Exec database from a previous version</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/utils.html">utils</a></div>
+        <div class="content">
+          <h5 id="problem">Problem</h5>
+<p>Need to manually upgrade Backup Exec from a previous version.</p>
+<h5 id="solution">Solution</h5>
+<p>The recommended upgrade method is to allow the Backup Exec (BE) installer upgrade BE and its database during the installation. If that fails to occur or a saved database from a previous BE version needs to be added to a newer BE version, the BEMIG tool can be used. This tool follows the same upgrade version rules that the BE installer has. This is noted in the chart below.</p>
+<p>Note: If the .mdf and .ldf files are from an older version of Backup Exec installed on a different server then please do not follow the procedure below if any of the following are true:</p>
+<ul>
+<li>Backup Exec is clustered.</li>
+<li>The Backup Exec Shared Storage Option (SSO) is installed.</li>
+<li>The Backup Exec Server Free Option is installed.</li>
+<li>The computer where Backup Exec is installed and the computer where it will be installed are running two different versions of the Windows Operating System.</li>
+<li>If planning to move Backup Exec to a different drive/directory on the server.</li>
+<li>If upgrading from one version/revision (build) of Backup Exec to another</li>
+</ul>
+<p>Steps:<br />
+1. Confirm BE is working in its current database first.<br />
+2. Stop the all Backup Exec services (including the  SQL(BKUPEXEC) service)</p>
+<p>3. Open the \Program Files\Symantec\Backup Exec Directory.  Copy the Data folder and paste it in the same location. Rename the "Copy of Data" to "Data-'TodaysDate' or "Data-Version#-New"<br />
+4. Copy the saved Database from the previous BE version into the Backup Exec\Data folder.<br />
+   This will be <strong>bedb_dat.mdf</strong> and <strong>bedb_log.ldf</strong> files.<br />
+5. If the Catalogs have been saved also, rename the Catalogs to Catalogs.old, then copy/move the saved catalogs under Backup Exec.<br />
+6. Start the SQL service.<br />
+7. Set the registry keys for BEMIG.<br />
+<strong><em>Warning</em>:</strong> <em>Incorrect use of the Windows registry editor may prevent the operating system from functioning properly. Great care should be taken when making changes to a Windows registry. Registry modifications should only be carried-out by persons experienced in the use of the registry editor application. It is recommended that a complete backup of the registry and workstation be made prior to making any registry changes.</em></p>
+<p>7a. Launch the Registry Editor (Start, Run, Regedt32).  <br />
+     Navigate to <strong>HKLM | Software | Symantec | Backup Exec for Windows | Backup Exec | <em>"VersionNumber"</em> | Install</strong><br />
+<img alt="" src="images/287063.jpg" /><br />
+7b. Modify the value of "Upgrade" to 1. 
+      (Create as a Dword if it is not present)<br />
+7c. Modify the value of  "Upgrade Version" to the version of the DB being imported. See chart.<br />
+      (Create as a String value if not present) <br />
+<strong>Please refer the following Table while setting the value for Upgrade version Key.<br />
+</strong></p>
+<p><strong>PRODUCT VERSION</strong><br />
+<strong>UPGRADE VERSION</strong><br />
+<strong>10</strong><br />
+<strong>10D</strong><br />
+<strong>11</strong><br />
+<strong>11D</strong><br />
+<strong>12.0</strong><br />
+<strong>12.5</strong><br />
+<strong>2010</strong><br />
+<strong>2010 R2</strong></p>
+<p>9.1 revison 4691<br />
+9.1.4691.0<br />
+X<br />
+X<br />
+X</p>
+<p>10.0 revison 5484<br />
+10.0.5484.0<br />
+X<br />
+X<br />
+X</p>
+<p>10.0 revison 5520<br />
+10.0.5520.0<br />
+X<br />
+X</p>
+<p>10.1 (10d) revison 5629<br />
+10.1.5629.0<br />
+X<br />
+X<br />
+X</p>
+<p>11 revison 6235<br />
+11.0.6235.0<br />
+X<br />
+X</p>
+<p>11 (11d) revison 7170<br />
+11.0.7170.0<br />
+X<br />
+X<br />
+X<br />
+X</p>
+<p>12.0 revison 1364<br />
+12.0.1364.0<br />
+X<br />
+X<br />
+X</p>
+<p>12.5 revison 2213<br />
+12.5.2213.0<br />
+X<br />
+X</p>
+<p>2010 revison 2896<br />
+13.0.2896.0<br />
+X</p>
+<p>2010 R2 revison 4164<br />
+13.0.4164.0</p>
+<p>8.Open a CMD command prompt to \Program Files\Symantec\Backup Exec<br />
+  Run BEMIG<br />
+  Wait for it to fully complete and return to a new prompt.<br />
+9. Start BE services and open the BE console.<br />
+Note, if the services fail to start, you may need to do additional steps of:</p>
+<ol>
+<li>Stop the SQL(BKUPEXEC) service</li>
+<li>Copy the BEDB database files from the Data folder to the desktop</li>
+<li>Start the SQL(BKUPEXEC) service</li>
+<li>Run BEutility Copy Database to import the desktop BEDB files. This will correct any Environmental changes effecting the database.  <br />
+               Copy Database Document -  <a href="http://support.veritas.com/docs/286093">http://support.veritas.com/docs/286093</a></li>
+</ol>
+<h5 id="article-url-httpwwwsymanteccomdocstech50537">Article URL <a href="http://www.symantec.com/docs/TECH50537">http://www.symantec.com/docs/TECH50537</a></h5>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-iis-with-multiple-versions-of-asp-net.html">&larr; Older: IIS with multiple versions of asp.net</a><a class="post-nav-link align-right" href="../posts/2011-03-03-how-to-list-all-ports-that-are-listening-for-tcpudp-traffic.html">Newer: How to list all ports that are listening for TCP/UDP traffic &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

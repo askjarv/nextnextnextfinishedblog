@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Search Bookmarklets for Autotask</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Search Bookmarklets for Autotask</h1>
+        <div class="meta">
+          <time datetime="2012-04-04">2012-04-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/autotask.html">autotask</a></div>
+        <div class="content">
+          <p>Hi All,</p>
+<p>Not sure if this is off any use to anyone, but I figured I should share the two bookmarklets I've written to make it easier to find tickets and projects in Autotask (<strong>www.autotask.net</strong>):</p>
+<p><a href="https://community.autotask.com/forums/AddPost.aspx?ForumID=12" title="TicketSearch">AT Ticket Search</a> - Searches for the highlighted text in your Autotask ticket list</p>
+<p><a href="https://community.autotask.com/forums/AddPost.aspx?ForumID=12" title="AT Project Search">AT Project Search</a>- Searches for whatever text is highlighted in your browser against your Autotask Project number list (useful if you have a couple of related projects).</p>
+<p>- just drag and drop the links above into your bookmarks bar and then, when you highlight some text, or a project number in a page, click on the required bookmark to search for the ticket or project number</p>
+<p>The actual bookmark  javascript details are below for reference:</p>
+<p>Ticket Search: javascript:q = "" + (window.getSelection ? window.getSelection() : document.getSelection ? document.getSelection() : document.selection.createRange().text); if (!q) q = prompt("Search for tickets with the words", ""); if (q!=null) location="<a href="http://ww4.autotask.net/serviceDesk/TicketsList/search_requests.asp?TopNavSearch=1&amp;Action=Generate&amp;nc=1&amp;searchtext">http://ww4.Autotask.net/serviceDesk/TicketsList/search_requests.asp?TopNavSearch=1&amp;Action=Generate&amp;nc=1&amp;searchtext</a>\=" + escape(q).replace(/ /g, "+"); void 0</p>
+<p>Project Number Search: javascript:q = "" + (window.getSelection ? window.getSelection() : document.getSelection ? document.getSelection() : document.selection.createRange().text); if (!q) q = prompt("Search words", ""); if (q!=null) location="https://ww4.autotask.net/projects/views/listview/projWinBot.asp?projectnumber=" + escape(q).replace(/ /g, "+"); void 0</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2012-02-12-example-documents-especially-for-sharepoint-libraries.html">&larr; Older: Example documents (especially for Sharepoint libraries)</a><a class="post-nav-link align-right" href="../posts/2012-04-09-from-the-book-of-this-should-be-easier-than-it-is-mysql-in-sharepoint-2010-foundation.html">Newer: From the book of &quot;this should be easier than it is!&quot; - MySql in Sharepoint 2010 Foundation &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Outlook Deployment on Citrix via Transofmraiton Files</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Outlook Deployment on Citrix via Transofmraiton Files</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a><a class="tag" href="../tags/office-2003.html">office-2003</a></div>
+        <div class="content">
+          <p>Create mst using ORK toolkit - <a href="http://office.microsoft.com/en-us/office-2003-resource-kit/CH001149686.aspx">http://office.microsoft.com/en-us/office-2003-resource-kit/CH001149686.aspx</a></p>
+<p>Run this command to install office on Citrix server – this could overwrite existing mail profiles so use with caution! – only generally do this when a clean install of office on ts/ctx server</p>
+<p><a href="///\Office2003">\\Office2003</a> MSI\setup.exe" TRANSFORMS="<a href="///\advantage\deployment\GPO\Office2000%20MSI\NoOutlook.MST">\\advantage\deployment\GPO\Office2000 MSI\NoOutlook.MST</a>" /qb</p>
+<p>NB: Change path to mst</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-pdf-spam-on-the-rise-how-to-filter.html">&larr; Older: PDF SPam on the rise- how to filter</a><a class="post-nav-link align-right" href="../posts/2011-03-03-office-home-and-business-2010-install-on-windows-2008-r2-rds-server.html">Newer: Office Home and Business 2010 install on Windows 2008 R2 RDS server &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

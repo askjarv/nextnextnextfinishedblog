@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Resolving common windows time errors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Resolving common windows time errors</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/ntp.html">ntp</a><a class="tag" href="../tags/time.html">time</a><a class="tag" href="../tags/windows.html">windows</a></div>
+        <div class="content">
+          <p>Time is critical to many elements within a domain because it can impact trusts between machines which is a key(spud pun intended) to authentication and access control.</p>
+<p>There will be a few alerts and one will look like this:</p>
+<p><em>Event Log: System Event Source: W32Time Event ID: 29 Research <br />
+Severity: Error <br />
+Details: The time provider NtpClient is configured to acquire time from one or more <br />
+time sources, however none of the sources are currently accessible. <br />
+No attempt to contact a source will be made for 960 minutes. <br />
+NtpClient has no source of accurate time.</em></p>
+<p>This means that the host has a source of time but cannot reach it. You can determine a hosts time source with the following command:</p>
+<p>NET TIME /QUERYSNTP</p>
+<p>Often this will be time.windows.com,0x1 which is bogus. Domain members should generally have no time source because they will sync with a server further up the time hierarchy. To reset the time source to default you can do the following:</p>
+<p>NET STOP W32TIME</p>
+<p>W32TM /UNREGISTER</p>
+<p>W32TM /REGISTER</p>
+<p>NET START W32TIME</p>
+<p>W32TM /RESYNC</p>
+<p>All domains do require a valid time source though, for the most part this should be the PDC for the domain. If you see the PDC experience the above then you must determine whether the time source is valid with:</p>
+<p>NET TIME /QUERYSNTP</p>
+<p>And if not set it with:</p>
+<p>NET TIME /SETSNTP:UK.POOL.NTP.ORG</p>
+<p>After setting this restart the Windows Time Service:</p>
+<p>NET STOP W32TIME &amp;&amp; NET START W32TIME</p>
+<p>And check the event logs to see if there are any issues, if there are remember that this host needs to have a NAT’d outbound rule which allows UDP 123 to at least UK.POOL.NTP.ORG.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-script-sets-the-last-printer-as-the-default.html">&larr; Older: Script sets the last printer as the default</a><a class="post-nav-link align-right" href="../posts/2011-03-04-re-citrix-published-apps-opening-in-full-desktop-solved.html">Newer: RE: Citrix Published apps opening in full desktop - Solved &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

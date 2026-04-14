@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Monitoring Amazon S3 with CLI-Based File Integrity Monitoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Monitoring Amazon S3 with CLI-Based File Integrity Monitoring</h1>
+        <div class="meta">
+          <time datetime="2026-03-27">2026-03-27</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/aws.html">aws</a><a class="tag" href="../tags/s3.html">s3</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>Cloud object storage introduces a subtle but critical challenge for File Integrity Monitoring (FIM):<br />
+there is no “file system” in the traditional sense. But that doesn't mean you shouldn't be monitoring it (given it's even more exposed than your on-premise architecture in many cases, I'd argue, you actually be monitoring it <em>more</em>) and it definitely doesn't mean that you can't be effective using Tripwire Enterprise to monitor it.</p>
+<p>This post outlines a pragmatic approach to monitoring <strong>Amazon S3</strong> and <strong>Azure Blob Storage</strong> using:</p>
+<ul>
+<li>
+<p><strong>AWS CLI</strong></p>
+</li>
+<li>
+<p><strong>Azure CLI</strong></p>
+</li>
+<li>
+<p>Structured command outputs suitable for ingestion into a FIM platform (i.e. Tripwire Enterprise!)</p>
+</li>
+</ul>
+<h3 id="why-cli-based-monitoring-works-well">Why CLI-Based Monitoring Works Well</h3>
+<p>First off, this is a chance for me to remind everyone that Tripwire Enterprise's flexibility really shines through because of our Command Output Capture Rules - rules that let you capture the output of a command or a script and use it to determine if anything has changed.</p>
+<p>Using CLI commands as a data source provides:</p>
+<ul>
+<li>
+<p>Deterministic, scriptable outputs - easy to test outside of TE, then deploy directly (and benefit from TE's own rule monitoring so you know when a rule's script configuration has been changed)</p>
+</li>
+<li>
+<p>No reliance on cloud-native alerting pipelines - reducing the risk of accidental (or deliberate) tampering</p>
+</li>
+<li>
+<p>Cross-cloud consistency in approach - ensuring that if you're multi-platform, you remain covered.</p>
+</li>
+</ul>
+<h3 id="architecture-overview">Architecture Overview</h3>
+<p>At a high level, here's how this type of monitoring works</p>
+<ul>
+<li>
+<p>A designated "collection" <strong>node</strong> executes CLI commands using Tripwire Enterprise's rules (defining what you're capturing for monitoring) and tasks (defining when the node gathers your monitoring info)</p>
+</li>
+<li>
+<p><strong>Outputs</strong> are captured (I tend to prefer JSON here, as it's easier to do side-by-side comparisons in TE, as well as to process with policies (though, I will concede, that might be because I've never come to love xpath which TE is quite happy with too!))</p>
+</li>
+<li>
+<p><strong>Drift</strong> is detected via comparison of the outputs over multiple <strong>check tasks</strong> (/time)</p>
+</li>
+</ul>
+<p>This is works especially well where:</p>
+<ul>
+<li>
+<p>You need <strong>vendor-agnostic monitoring patterns</strong></p>
+</li>
+<li>
+<p>Native cloud logging is inconsistent</p>
+</li>
+<li>
+<p>You want <strong>centralised compliance visibility</strong></p>
+</li>
+</ul>
+<h2 id="monitoring-amazon-s3">Monitoring Amazon S3</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Install and configure the AWS CLI on your collection node:</p>
+<pre><code>aws configure
+</code></pre>
+<p>Ensure the IAM identity has at least:</p>
+<ul>
+<li>
+<p><code>s3:ListBucket</code></p>
+</li>
+<li>
+<p><code>s3:GetBucketPolicy</code></p>
+</li>
+<li>
+<p><code>s3:GetBucketAcl</code></p>
+</li>
+<li>
+<p><code>s3:GetBucketEncryption</code></p>
+</li>
+<li>
+<p><code>s3:GetPublicAccessBlock</code></p>
+</li>
+<li>
+<p><code>s3:GetBucketVersioning</code></p>
+</li>
+</ul>
+<p>and that you have suitable network access in place.</p>
+<h3 id="aws-s3-monitoring-cli-rules">AWS S3 Monitoring CLI Rules</h3>
+<p>Starting with some basics - detecting your buckets:</p>
+<p>aws s3api list-buckets --output json</p>
+<p>This is helpful, even if you're creating buckets regularly, since you can supress alerts (setting severity to zero) but use it to correlate other changes (i.e. new bucket = new permission set)</p>
+<h4 id="public-access-block-for-all-buckets">Public Access Block for all buckets</h4>
+<p>OK, a simple but important one next - checking public access - since we want to do this for all buckets, rather than just one, we're into the world of scripted command output capture rules (rather than one liners) and, as a result, we may need to use a different syntax if our collection node is Windows (PowerShell) or Linux (Bash) - so here's both</p>
+<pre><code>#!/usr/bin/env bash
+set -u
+for BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=public-access-block ===&quot;
+  aws s3api get-public-access-block --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>Or PowerShell:</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;
+foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=public-access-block ===&quot;
+    aws s3api get-public-access-block --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-encryption-for-all-buckets">Bucket encryption for all buckets</h4>
+<p>Encryption is key! So here's the Bash and PowerShell versions</p>
+<pre><code>#!/usr/bin/env bash
+set -u
+
+for BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=encryption ===&quot;
+  aws s3api get-bucket-encryption --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>or</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;
+
+foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=encryption ===&quot;
+    aws s3api get-bucket-encryption --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-versioning">Bucket versioning</h4>
+<pre><code>#!/usr/bin/env bash
+set -u
+
+for BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=versioning ===&quot;
+  aws s3api get-bucket-versioning --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>or powershell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;
+
+foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=versioning ===&quot;
+    aws s3api get-bucket-versioning --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-logging">Bucket logging</h4>
+<p>Bash</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=logging ===&quot;
+  aws s3api get-bucket-logging --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=logging ===&quot;
+    aws s3api get-bucket-logging --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-acl-for-all-buckets">Bucket ACL for all buckets</h4>
+<p>Bash version:</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=acl ===&quot;
+  aws s3api get-bucket-acl --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=acl ===&quot;
+    aws s3api get-bucket-acl --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-policy-for-all-buckets">Bucket policy for all buckets</h4>
+<p>Bash</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=policy ===&quot;
+  aws s3api get-bucket-policy --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=policy ===&quot;
+    aws s3api get-bucket-policy --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<h4 id="bucket-policy-status-for-all-buckets">Bucket policy status for all buckets</h4>
+<p>This can be useful if you want to identify whether a bucket is considered publicly accessible by policy evaluation.</p>
+<p>Bash</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=policy-status ===&quot;
+  aws s3api get-bucket-policy-status --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=policy-status ===&quot;
+    aws s3api get-bucket-policy-status --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<hr />
+<h4 id="bucket-ownership-controls-for-all-buckets">Bucket ownership controls for all buckets</h4>
+<p>This is a good modern check for S3, especially where ACL usage should be constrained.</p>
+<p>Bash</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=ownership-controls ===&quot;
+  aws s3api get-bucket-ownership-controls --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=ownership-controls ===&quot;
+    aws s3api get-bucket-ownership-controls --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<hr />
+<h4 id="bucket-website-configuration-for-all-buckets">Bucket website configuration for all buckets</h4>
+<p>This is useful because accidental or unauthorised static website exposure can matter.</p>
+<p>Bash</p>
+<pre><code>#!/usr/bin/env bash
+set -ufor BUCKET in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  echo &quot;=== bucket=$BUCKET check=website ===&quot;
+  aws s3api get-bucket-website --bucket &quot;$BUCKET&quot; --output json 2&gt;&amp;1
+  echo
+done
+</code></pre>
+<p>PowerShell</p>
+<pre><code>$Buckets = (aws s3api list-buckets --query &quot;Buckets[].Name&quot; --output text 2&gt;&amp;1) -split &quot;`t&quot;foreach ($Bucket in $Buckets) {
+    Write-Output &quot;=== bucket=$Bucket check=website ===&quot;
+    aws s3api get-bucket-website --bucket $Bucket --output json 2&gt;&amp;1
+    Write-Output &quot;&quot;
+}
+</code></pre>
+<p>I'll be back again soon with some options for Azure CLI!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2026-03-25-monitoring-opengaussdb-with-tripwire-enterprise.html">&larr; Older: Monitoring OpenGaussDB with Tripwire Enterprise</a><a class="post-nav-link align-right" href="../posts/2026-03-31-monitoring-azure-blob-storage-with-cli-based-file-integrity-monitoring.html">Newer: Monitoring Azure Blob Storage with CLI-Based File Integrity Monitoring &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

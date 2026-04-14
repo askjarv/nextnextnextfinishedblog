@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Exploring the Tripwire IP360 API with Python 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Exploring the Tripwire IP360 API with Python 3</h1>
+        <div class="meta">
+          <time datetime="2020-05-21">2020-05-21</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/api.html">api</a><a class="tag" href="../tags/python3.html">python3</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>I've been busy re-familiarizing myself with Python now that Python 3 has tweaked the syntax just enough that I kept getting frustrated that I had to double check my syntax! At the same time, Tripwire has added some great new functionality in the REST API for Tripwire IP360, the Vulnerability Management solution, and it seemed natural to start building up a repository of useful scripts exploring and leveraging the Tripwire IP360 API as a result.</p>
+<p>Getting Started</p>
+<p>So let's get start with some simple functionality - logging in and getting some basic data out of the API.</p>
+<p>First off, there's a few useful imports we'll end up using (I think this will cover all of my goals so whilst I may not use all these features in this post, we'll likely come back and use these in time!):</p>
+<pre><code>#-*- coding: utf-8 -*-
+&quot;&quot;&quot;
+@author: Chris Hudson
+&quot;&quot;&quot;
+
+&quot;&quot;&quot;
+DEPENDENCIES:
+&quot;&quot;&quot;
+
+&quot;&quot;&quot; Required for sys calls such as exit() &quot;&quot;&quot;
+import sys
+
+&quot;&quot;&quot; Required to do all HTTP request calls to the API: Run 'pip install requests' to add this to your Python installation. &quot;&quot;&quot;
+import requests
+import urllib3
+
+&quot;&quot;&quot; Not explicitly required, but definitely polite to be able to not echo password input from the user. &quot;&quot;&quot;
+import getpass
+
+&quot;&quot;&quot; Required to confirm server hostname exists and is resolveable and validate IP's&quot;&quot;&quot;
+import socket,struct
+
+&quot;&quot;&quot; Required to pull SSL certs down from the TE console &quot;&quot;&quot;
+#import ssl
+
+&quot;&quot;&quot; Required to decode and display content of SSL certs for verification &quot;&quot;&quot;
+#import OpenSSL
+
+import json
+
+</code></pre>
+<p>OK, now we have our pre-reqs in place, I'm going to define some variables we'll use for our connection for our testing - of course, you'll want these to to reflect your IP360 instance. Note that I'm taking the IP360 host and creating a new string with the full URL for the REST API - <strong>"https://"+IP360HOST+"/rest/v1"</strong></p>
+<pre><code>&quot;&quot;&quot;
+GLOBAL VARIABLES:
+&quot;&quot;&quot;
+# These are the static parameters needed for the IP360 environment connection
+IP360HOST=&quot;192.168.0.72&quot;
+IP360USERNAME=&quot;ip360@tripwire.com&quot;
+IP360PASS=&quot;Tripwire&quot;
+IP360BASEURL=&quot;https://&quot;+IP360HOST+&quot;/rest/v1&quot;
+</code></pre>
+<p>With our variables and imports done, I can get ready to connect. My lab environment is using a self-signed cert (I replace it regularly, although I do realise that's no excuse for not using a proper cert!) - to handle the SSL errors I'll use the following:</p>
+<pre><code>&quot;&quot;&quot;
+BEGIN CODE:
+&quot;&quot;&quot;
+
+# Set up Session() to not show warnings/errors for the self-signed cert
+session = requests.Session()
+session.verify = False
+urllib3.disable_warnings()
+session.headers.update({
+    &quot;accept&quot;: &quot;application/json, text/plain&quot;,
+    &quot;X-Requested-With&quot;: &quot;required&quot;
+})
+</code></pre>
+<p>OK - let's try getting some data! The following code snippets will gather users, networks, scan profiles and scan configs - some of the most common things you'd be interested in gathering:</p>
+<pre><code># Get users
+response = session.get(url=&quot;%s/users&quot; % (IP360BASEURL), auth=(IP360USERNAME, IP360PASS))
+response.connection.close()
+
+# Get networks
+networks = session.get(url=&quot;%s/networks&quot; % (IP360BASEURL), auth=(IP360USERNAME, IP360PASS))
+networks.connection.close()
+
+# Get Scan Profiles
+profiles = session.get(url=&quot;%s/scan_profiles&quot; % (IP360BASEURL), auth=(IP360USERNAME, IP360PASS))
+profiles.connection.close()
+
+# Get Scan Configs
+configs = session.get(url=&quot;%s/scan_configs&quot; % (IP360BASEURL), auth=(IP360USERNAME, IP360PASS))
+configs.connection.close()
+</code></pre>
+<p>And that's it - let's leave it for today - I'll be back with more soon!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2020-04-23-expert-thoughts-on-how-infosec-pros-can-make-the-most-of-working-from-home.html">&larr; Older: Expert Thoughts on How Infosec Pros Can Make the Most of Working From Home</a><a class="post-nav-link align-right" href="../posts/2020-05-27-hosting-a-static-website-with-azure.html">Newer: Hosting a static website with Azure &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

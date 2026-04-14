@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Exchange GRT restore Fails (Backup Exec)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Exchange GRT restore Fails (Backup Exec)</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/exchange-2003.html">exchange-2003</a><a class="tag" href="../tags/exchange-2007.html">exchange-2007</a><a class="tag" href="../tags/exchange-2010.html">exchange-2010</a><a class="tag" href="../tags/grt.html">grt</a><a class="tag" href="../tags/restore.html">restore</a></div>
+        <div class="content">
+          <p>After spending what seemed like an eternity with an extremely charismatic Symantec engineer looking at this issue, we found that the problem was that Trend was scanning the C:\temp folder (default location for the GRT staging) during the backups.</p>
+<p>This then caused issues in BE and was causing the jobs to fail.</p>
+<p>The hotfix mentioned below was supposed to resolve this, but clearly does not always work.</p>
+<p>All we did was add an exclusion to the Trend Real-Time scan to ignore this folder (C:\temp) on the backup server and the backups started working with GRT turned on again.</p>
+<p>Fortunately it’s also very easy (and better form) to modify where the GRT staging takes place (since the temp path is often exploited by viruses, etc)</p>
+<p>You just need to create a new location for this to use (I just used C:\Program Files\Symantec\GRT temp)</p>
+<p>Then point Backup Exec to use this as the default location: Tools | Options, under the backup section at the bottom.</p>
+<p>Once this is done, in Trend you just need to create the exception for the real-time scan in the Trend console, I used the drop down in the top left to modify the real-time scan settings for the backup servers only then added the exclusion as normal.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-finding-physical-nic-port-using-ms-iscsi-initiators.html">&larr; Older: Finding Physical NIC Port using MS iSCSI Initiators</a><a class="post-nav-link align-right" href="../posts/2011-03-03-exchange-2010-dag-failover-breaks-backup-exec-access.html">Newer: Exchange 2010 DAG FAILOVER breaks backup exec access &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

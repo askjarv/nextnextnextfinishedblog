@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Script to Extract Mailbox sizes from Exchange 2003</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Script to Extract Mailbox sizes from Exchange 2003</h1>
+        <div class="meta">
+          <time datetime="2013-08-07">2013-08-07</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Helping to migrate a customer from 2003 to 2013 (via 2010) I was required to pull of a list of mailbox sizes and couldn't find a single script that did the trick in one hit- so I've stuck together the elements of this http://www.msexchange.org/articles-tutorials/exchange-server-2003/tools/Scripting-Exchange-VBScript-ADSI-Part3.html (which, for reasons beyond my understanding, outputs to screen- pretty useless) with an out put to text - for ease of reference I've posted it here!</p>
+<p>On Error Resume Next Dim cComputerName Const cWMINameSpace = "root/MicrosoftExchangeV2" Const cWMIInstance = "Exchange_Mailbox" cComputerName = "BR-SRV-DC01" Set objFSO=CreateObject("Scripting.FileSystemObject")</p>
+<p>Dim strWinMgmts ' Connection string for WMI Dim objWMIExchange ' Exchange Namespace WMI object Dim listExchange_Mailboxs ' ExchangeLogons collection Dim objExchange_Mailbox ' A single ExchangeLogon WMI object</p>
+<p>' Create the object string, indicating WMI (winmgmts), using the ' current user credentials (impersonationLevel=impersonate), ' on the computer specified in the constant cComputerName, and ' using the CIM namespace for the Exchange provider. strWinMgmts = "winmgmts:{impersonationLevel=impersonate}!//"&amp; _ cComputerName&amp;"/"&amp;cWMINameSpace Set objWMIExchange = GetObject(strWinMgmts) ' Verify we were able to correctly set the object. If Err.Number 0 Then WScript.Echo "ERROR: Unable to connect to the WMI namespace." Else ' ' The Resources that currently exist appear as a list of ' Exchange_Mailbox instances in the Exchange namespace. Set listExchange_Mailboxs = objWMIExchange.InstancesOf(cWMIInstance) ' ' Were any Exchange_Mailbox Instances returned? If (listExchange_Mailboxs.count &gt; 0) Then ' If yes, do the following: ' Iterate through the list of Exchange_Mailbox objects. For Each objExchange_Mailbox in listExchange_Mailboxs ' ' Display the value of the Size property. ' WScript.echo objExchange_Mailbox.MailboxDisplayName &amp; "," &amp; objExchange_Mailbox.Size ' Add item to file outFile="c:\mailboxes.txt" Set objFile = objFSO.CreateTextFile(outFile,True) objFile.Write objExchange_Mailbox.MailboxDisplayName &amp; "," &amp; objExchange_Mailbox.Size &amp; vbCrLf ' objFile.Close ' Next Else ' If no Exchange_Mailbox instances were returned, ' display that. WScript.Echo "WARNING: No Exchange_Mailbox instances were returned." End If End If</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2013-06-12-citrix-receiver-3-1-does-not-allow-you-to-add-non-secure-url.html">&larr; Older: Citrix Receiver 3.1 does not Allow you to Add Non-Secure URL</a><a class="post-nav-link align-right" href="../posts/2014-07-07-new-role-new-post.html">Newer: New Role, new Post &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

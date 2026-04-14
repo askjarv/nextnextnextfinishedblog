@@ -1,0 +1,23 @@
+---
+title: "Useful Software for 2015"
+date: 2015-01-14
+categories: 
+  - "useful-software"
+tags: 
+  - "software"
+  - "tools"
+---
+
+Avoiding the tradition of many blogs that use the end of year to capture the best X of the last year, I'm posting an article on my top software tools/essentials that not just helped me get through 2014 but I expect to keep me productive in 2015 too:
+
+- Windows 8.1 - Many may disagree, but Windows 8.1 has proven to be a solid operating for me - crash free, robust, and fast, Windows 8.1 rarely gets in my way- which is exactly what I want out of my operating system. I will confess that the App Store is awful (to the point that I'm only likely to enter it once a quarter) and I remain frustrated with the mess of Control Panel and settings locations - but these are minor gripes that just remind me of what I feel should be the core operating system experience- a reliable core upon which applications run, with good hardware compatibility, and a UI which takes a back seat and lets me focus on my work- which 8.1 (and, indeed, 10 by all impressions) does well.
+- Microsoft Office 2013 - In a world filled with competition (at last) for productivty apps and webapps trying to catch up, Microsoft Office for me remains the best application for producing good quality documents in a small amount of time. Between the neat UI, easy access to formating options and powerful functionality (Excel in particular) it's hard to find fault with the product- especially now subscription offers and low cost editions are becoming cheaper. I'd love to say I like Google Docs or Open Office, but both applications lack a lot of the smart features I use day-to-day and just plain messy in places which stops me making the leap - and I suspect the status quo may last for a few years still.
+- Microsoft Visual Studio - Another Microsoft app but I won't apologise for this in the slightest- I've yet to find my perfect IDE (Sublime Text get's a honourable mention as my go-to-editor on the move)- but whilst Visual Studio is overly heavy for a lot of tasks, it's still a great toolset for rapid application development.
+- Adobe Creative Cloud - Again, another industry standard application (much loathed for similar reasons)- Creative Cloud is finally affordable to "the norms" interested in digital imaging without the hassle of piracy or a rather large bill. And now that I can afford to buy it, I'm hooked- Photoshop is simply the best tool for so many jobs (again, like Office, other apps often lack the full featureset or have obscure interfaces for normal functions) and the rest of the suite are solid offerings - plus I can't resist mentioning some of the amazing research and app releases Adobe have managed this year that push the boundaries of graphical apps (intelligent fill, edge finding, etc).
+- Evernote - The web app (which I'll cover in another post) now surpasses the design of the Windows app (which was only recently tidied up) but the Windows app remains useful for offline knowledge base posts with quick search and easy tagging- with the web clipper (which is light years ahead of the OneNote equivlant - come on Microsoft!) it's a brilliant tool for idea capture.
+- VMware Workstation / Virtual Box - Being able to run a virtual machine sandbook, or a development machine which roams with me everywhere on a USB drive has changed my life and comes highly recommended for the same reason!
+- Google Chrome - Between the plugins and non-intrusive toolbars, Chrome is my perfect browser - a window into the World Wide Web. Bookmark syncing, search within the settings (where is that in ALL other applications?) and good rendering/compatibility are all icing on the cake. This last year I've had a few stability issues but FireFox, Safari and IE have also failed to make any functional improvements to make me want to shift so I suspect Chrome will stay with me for some time to come..
+- Unity - OK, it crashes too often for my liking, but when it's running, it's a solid game development tool which has allowed thousands of indies to get into 3D gaming- thank you Unity (although don't scare me again this year with news of possible buyouts!).
+- Steam - I'm trying to reduce my Steam addiction this year... but Steam still deserves a mention as a solid platform - although discovery of new games is going to become harder and harder in 2015 and beyond.
+
+I'm hoping to do a follow up posts on "mini-apps", webapps and mobile apps soon - as well as my wishlist for 2015 too - so keep checking back!

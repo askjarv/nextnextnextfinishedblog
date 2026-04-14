@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>2 Hour Exchange 2007 SP1 Single Server Install</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>2 Hour Exchange 2007 SP1 Single Server Install</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/exchange-2007.html">exchange-2007</a><a class="tag" href="../tags/guide.html">guide</a><a class="tag" href="../tags/install.html">install</a></div>
+        <div class="content">
+          <h5 id="a-newbies-guide-to-getting-exchange-configured">A Newbies Guide to Getting Exchange Configured</h5>
+<p>By Ian Matthews, Up &amp; Running Technologies Inc, April 19, 2008 <br />
+Last Updated October 1, 2009</p>
+<p>You should know four things before you start:</p>
+<p>a. I am a definite newbie to Exchange, which is why this I thought I could do a good job creating this documentation for newbies.</p>
+<p>b. I am writing this primarily for myself as a cookbook for future Exchange installations.  It is provided WITHOUT WARRENTY OR GUARANTY OF ANY SORT.  USE AT YOUR OWN RISK!</p>
+<p>c. It will take longer than two hours to complete because of the delays waiting for your Certificate.  However, the actual work can be completed in the stated time.</p>
+<p>d. You need to have a basic knowledge of Windows, Active Directory, and mail servers to get through this.</p>
+<p>e. Be sure to check out our page on adding Footers/Disclaimers, Adding Junk Email Retention Policies, Attachment Size Limits, Backup/Restore Exchange 2007, Export to .PST, and use common easy scripts.  All of this and more is on our <a href="http://www.commodore.ca/windows/exchange/exchange_2007_advanced_topics.htm"><strong>A Newbies Guide to Configuring Exchange - ADVANCED TOPICS</strong></a></p>
+<p>The idea is to create down and dirty, point form instructions on how to get Exchange 2007 FULLY operational with just two hours of work.  To make this more difficult, I did my install on a Windows Server 2008 64 bit platform but I believe these instructions will function on Vista 64 bit or Server 2003 64 bit.  Yes, 64 Bit is required for Exchange 2007 in production.  The 32 bit version is for test labs only and is NOT supported by Microsoft. </p>
+<p>The other thing I did to make this more realistic, is to name the internal domain something completely different from the email domain (i.e. CORPDOMAIN.LOCAL vs ABCDEDOMAIN.COM). </p>
+<p>Lets get to it.</p>
+<p><strong>A - PREWORK:</strong></p>
+<p>1. Install Windows 2008 64 Bit on a new box and run Microsoft Update to patch it to whatever is current.</p>
+<p>2. Make sure IPv6 is DISABLED PRIOR to the install of Exchange.  NOTE: Unchecking the IPv6 checkbox on the network card, will not cut it.  See <a href="http://technet.microsoft.com/en-us/library/cc671176.aspx">THIS</a> and <a href="http://support.microsoft.com/kb/952842">THIS</a> and <a href="http://technet.microsoft.com/en-us/library/dd439392.aspx">THIS</a> for details..</p>
+<p>3. If the server is not already a Domain Controller, you need to run DCPROMO to make it so.  Exchange 2007 must be on a network with Active Directory.  DCPROMO will install required DNS for most config's.</p>
+<p>4. There are 4 DNS changes you should make:</p>
+<p>o Create your EXTERNAL DNS' MX records for the email domains in question to point to this new Exchange Server's IP Address</p>
+<p>o Create an A Record in DNS for AUTODISCOVER.YOURMAILDOMAIN.COM for your servers IP</p>
+<p>o Create a REVERSE LOOKUP (RDNS) entry for your Exchange servers IP </p>
+<p>o Create a Sender Policy Framework (<a href="http://en.wikipedia.org/wiki/Sender_Policy_Framework">SPF</a>) entry for your Exchange servers IP</p>
+<p>Note that <strong>only the MX record is required</strong> to get Exchange to function.  The last three are NOT required but you will likley want them so why not do it now?  Also you will have to wait for those settings to replicate throughout the internet (usually 12 hours). </p>
+<p>o For example, if your internal domain is CORPDOMAIN.LOCAL and your email domain is ABCDEDOMAIN.COM, you need to make sure that whoever is hosting the "authoritative DNS" for ABCDEDOMAIN.COM has an MX (i.e Mail Exchanger) record as well as an "A" record for AUTODISCOVER.ABCDEDOMAIN.COM, pointed to your new Exchange servers IP address.</p>
+<p>5. I ran my Server 08 live on the internet, relying solely on its integrated firewall.  This is great for testing because when you install Exchange, it will automatically open required the holes in the firewall.  If you have an external/hardware/real firewall you will need to poke your own holes in it!</p>
+<p><strong>B - EXCHANGE INSTALL:</strong></p>
+<p>1. Install "Exchange Service Pack 1"</p>
+<p>o This is largely a "click next" affair but but it will perform a pile of "preinstallation checks" to make you have the prerequisites; you won't.  So just do exactly what it tells you.  For example it will tell you to install IIS and IIS 6 MANAGEMENT CONSOLE, so do that.  Below are screen shots of my test servers ROLES and also a shot of IIS7 FEATURES.</p>
+<p>§ The one additional FEATURE to what is Exchange tells you to do is RPC OVER HTTP.  I will mention it later, so if you don't install it now, don't worry about it</p>
+<p><a href="http://www.commodore.ca/windows/exchange/server2008_roles_for_exchange_2007.jpg"><img alt="clip_image001" src="images/clip_image0013.jpg" title="clip_image001" /></a><a href="http://www.commodore.ca/windows/exchange/iis7_services_for_exchange.jpg"><img alt="clip_image002" src="images/clip_image0024.jpg" title="clip_image002" /></a></p>
+<p>o Ignore the following error: (as per <a href="http://support.microsoft.com/kb/556055">Microsoft article 556055</a>)<br />
+Warning: Setup cannot detect an SMTP or Send connector with an address space of '*'.<br />
+Mail flow to the Internet may not work properly.".</p>
+<p>o Service Pack 1 for Exchange is the FULL version of Exchange, not a bunch of new hot fix binary bits and so you can install it directly.  You do not need to install Exchange 07 and then patch it.  If that isn't clear enough know that Windows Server 08 will not let you install the original RTM version of Exchange 2007.</p>
+<p>o This process will require at least one reboot after installing pre-req's.</p>
+<p>2. Run Microsoft Update and make sure it includes <a href="http://www.microsoft.com/Downloads/details.aspx?familyid=C29A6AA8-CA44-43EA-A88F-7500C4BD3D31&amp;displaylang=en">Roll Up 1 for SP1</a> and then reboot.</p>
+<p>3. Users created in ACTIVE DIRECTORY USERS AND COMPUTERS do not have email accounts automatically created for them.  As such you may want to create new users via RECEPIENT CONFIGURATION, NEW MAILBOX.<br />
+<a href="http://www.commodore.ca/windows/exchange/exchange_2007_new_user.jpg"><img alt="clip_image003" src="images/clip_image0031.jpg" title="clip_image003" /></a></p>
+<p>4. From the server surf to <a href="https://127.0.0.1/owa/">https://127.0.0.1/owa/</a> (this is the <strong>O</strong>utlook <strong>W</strong>eb <strong>A</strong>ccess page) and sign in as ADMINISTRATOR (or the account you created in step 3) to make sure the core is functional then log out.  From a different PC surf to <a href="https://your">https://mail.yourdomain.com/owa</a> .</p>
+<p>o At this point you won't be able to do much other than see that your Exchange is installed properly.</p>
+<p>5. Go to ORGANIZATION CONFIGURATION, HUB TRANSPORT, ACCEPTED DOMAINS, and set the default.</p>
+<p>6. Go to ORGANIZATION CONFIGURATION, HUB TRANSPORT, EMAIL ADDRESS POLICIES and create a entry for your primary domain.</p>
+<p>7. Create a wild card (*) SEND CONNECTOR (As per Microsoft article <a href="http://support.microsoft.com/kb/556055)">556055</a>)</p>
+<p>8. Exchange Server 2007 Hub Transport, by default, allow only secure authenticated connections.  If you don't have an Edge server in front of the Hub Transport server (i.e. you are setting up Exchange to function completely from a single server, like we are in this article) , you will need tell Exchange to accept anonymous connections from other mail servers and clients on the web.<br />
+You <strong>cannot</strong> set this change through GUI (only when creating new connectors), so you'll need to open the Exchange Management Shell and enter (just copy and paste this text then go back and edit the <SERVERNAME> :</p>
+<p><strong><em>set-ReceiveConnector "Default <Servername>" -permissiongroups:"ExchangeUsers,ExchangeServers,ExchangeLegacyServers,AnonymousUsers"</em></strong></p>
+<p>o Be sure sure to get rid of the &lt; and &gt; brackets:</p>
+<p>o <a href="http://forums.msexchange.org/m_1800412705/mpage_1/key_/tm.htm">http://forums.msexchange.org/m_1800412705/mpage_1/key_/tm.htm</a> <a href="http://forums.microsoft.com/TechNet/ShowPost.aspx?PostID=703467&amp;SiteID=17">http://forums.microsoft.com/TechNet/ShowPost.aspx?PostID=703467&amp;SiteID=17</a></p>
+<p>9. Surf to the OWA site (i.e. <a href="https://127.0.0.1/owa">https://127.0.0.1/owa</a>) and send an email to a remote address then reply to that message and make sure you receive it back</p>
+<p><strong>C - OUTLOOK ANYWHERE:</strong></p>
+<p><strong>Outlook Anywhere, which was named RPC OVER HTTP in Exchange 2003 SP2, is the system that lets you connect Outlook clients to your inhouse Exchange server without first requiring a VPN.  This will be important for your mobile workers.</strong></p>
+<p>1. If you did not already install RPC OVER HTTP as mentioned in step 1 in the section above, now is the time.   Simply launch Server 2008 Server Manager, click on FEATURES then ADD FEATURE.  When you are done your FEATURES should look like.<br />
+<a href="http://www.commodore.ca/windows/exchange/server2008_roles_for_exchange_2007.jpg"><img alt="clip_image004" src="images/clip_image0043.jpg" title="clip_image004" /></a></p>
+<p>2. SERVER CONFIGURATION, CLIENT ACCESS, OUTLOOK ANYWHERE WIZARD, in the Action Pane on the FAR RIGHT and choose BASIC AUTHENTICATION.  (This is safe because we will encrypt your communications later on in the process.)<br />
+<a href="http://www.commodore.ca/windows/exchange/outlook_anywhere.jpg"><img alt="clip_image005" src="images/clip_image0052.jpg" title="clip_image005" /></a></p>
+<p>3. The following is the hardest part of this whole adventure; buying the certificate!  You need a real cert to allow Outlook clients to connect.  Exchange 2007 uses a new type of cert alternately called a Universal Communications Certificate (UCC) or Subject Alternative Name (SAN) certificate.   All this means is that you can bundle more than one domain name into a single cert. </p>
+<p>o If you don't know what you are doing with certificates or Exchange 2007, <a href="http://www.msexchange.org/articles_tutorials/exchange-server-2007/mobility-client-access/securing-exchange-2007-client-access-server-3rd-party-san-certificate.html">read this</a> excellent explanation but do NOT carry out the instructions because they skip over the installation of an "Intermediate Certificate" which will be required by most of us.</p>
+<p>o From my experience, blog reading and conversations with Microsoft support staff, I suggest you buy your cert from <a href="https://www.godaddy.com/gdshop/ssl/ssl.asp">GoDaddy.com</a> .  I found GoDaddy's process and seriously cluttered webpages to be quite difficult to follow, but they have three things going for them: they are the second cheapest I can find; they have free dedicated, qualified, SSL PHONE support (480-505-8852); and as an added bonus their certs actually work! <br />
+<a href="http://www.commodore.ca/windows/exchange/godaddy_ucc_san_cert_for_exchange2007.jpg"><img alt="clip_image006" src="images/clip_image0062.jpg" title="clip_image006" /></a><br />
+The biggest question is: What names do you put into this multi-name cert, and here is the answer:</p>
+<table>
+<thead>
+<tr>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mx record   Root domain name   Autodiscover record   Local server FQDN   Server Host Name</td>
+<td>mail.commodore.ca   commodore.ca   autodiscover.commodore.ca   svr08box.insidecorpdomain.local   svr08box</td>
+</tr>
+</tbody>
+</table>
+<p>· The next question is: How do I create the Certificate Request (CSR)?  I was going to type the command directly into the Exchange Power Shell (as per the help files) but an MS Exchange Support tech, suggested I use <a href="https://www.digicert.com/easy-csr/exchange2007.htm">this site</a> to create the command line for me:<br />
+<a href="http://www.commodore.ca/windows/exchange/digicert_ucc_exchange_2007_csr_generator.jpg"><img alt="clip_image007" src="images/clip_image0071.jpg" title="clip_image007" /></a></p>
+<p>· As per the DigiCert instructions, just "Click Start &gt; Programs &gt; Microsoft Exchange Server 2007 &gt; Exchange Management Shell Paste the New-ExchangeCertificate command from this page into the Exchange Management Shell window and press Enter Your CSR file should now be in C:\ on your server (as named by the -Path option in the command itself.)"</p>
+<p>· Go to <a href="https://www.godaddy.com/gdshop/ssl/ssl.asp">GoDaddy.com</a> and spend an hour trying to figure out their pages and processes to submit the CSR and receive the cert.  Note that at the end of their process it says that they have just sent you an email which you are required to open and respond to in order to receive your cert... ya, they haven't.  After three phone calls and 9 hours, my email showed up.</p>
+<p>o NOTE: When you are submitting the CSR to GoDaddy, you will be prompted (at the bottom right of the page) to select the type of server this cert will be used on.  Even though Exchange CSR's are not generated using IIS, you must select IIS.</p>
+<p>· If you used GoDaddy you will have to install and "Intermediate Certificate"  (also called a "Chained Certificate".  This is an additional step, not covered in most explanations/blogs/help files.  Fortunately it is quite easy to complete:<br />
+<a href="http://www.commodore.ca/windows/exchange/godaddy_intermediate_cert_install.jpg"><img alt="clip_image008" src="images/clip_image008.jpg" title="clip_image008" /></a> <a href="http://www.commodore.ca/windows/exchange/intermediate_certificate_import.JPG"><img alt="clip_image009" src="images/clip_image0091.jpg" title="clip_image009" /></a></p>
+<p>o <strong>DO NOT</strong> follow the UCC CERTIFICATE INSTALLATION instructions as the end of this screen shot. Just see the next bullet for an easier way.  The text <a href="https://certs.godaddy.com/ExchangeServer_alt.go">instructions are here</a> and GoDaddy updated their <a href="http://help.godaddy.com/topic/742/article/4877">Exchange cert instructions</a> in Sept 2009 and they are also now "correct".</p>
+<p>· After you get your cert, launch the Exchange Power Shell and type the following to install and enable the cert, in one fell swoop:<br />
+<strong><em>Import-ExchangeCertificate –Path c:\<MYCERT>.p7b | Enable-ExchangeCertificate –Services "SMTP, IMAP, IIS, POP"</em></strong>When this is complete run:<strong>_<br />
+</strong>Get-ExchangeCertificate | FL<strong><br />
+_</strong>and make sure everything looks as you expect</p>
+<p>4. After your UCC Certificate (and any required Intermediate Certificates) are installed, you can try surfing to your Outlook Web Access site <a href="https://your">https://mail.yourdomain.com/owa</a> and confirm that the UCC  certificate is operational.<br />
+<a href="http://www.commodore.ca/windows/exchange/owa_exchange_2007_cert.jpg"><img alt="clip_image010" src="images/clip_image0101.jpg" title="clip_image010" /></a><br />
+You can also easily check your connectivity using <a href="https://www.testexchangeconnectivity.com/Default.aspx">www.testexchangeconnectivity.com</a> .</p>
+<p>5. Next you need to configure your Outlook clients.  I used Outlook 2007 exclusively but the process is apparently the same for Outlook 2007 if it has SP2. Start a new Outlook profile and get start a NEW ACCOUNT.  Then there are two ways to finish:</p>
+<p>o MANUAL: Choose to manually configure my settings. Select EXCHANGE, type in the external name of your mail server (i.e. mail.commodore.ca ) and your username (i.e. fwillis), click MORE SETTINGS set the PROXY settings to what you see in the screen shot below (obviously adjusting the name for your domain). <br />
+<a href="http://www.commodore.ca/windows/exchange/outlook_2007_configuration_exchange_2007_using_proxy_.jpg"><img alt="clip_image011" src="images/clip_image0111.jpg" title="clip_image011" /></a><br />
+The odd setting is ONLY CONNECT TO SERVERS WITH THE PRINCPLE NAME... and using a setting beginning with msstd://mail.abcdedomaincom  .  On the off chance you care, MSSTD in an acronym for Microsoft Standard Form.<br />
+When you click OK and close the dialog boxes, you will be prompted to sign in and your servername will become underscored.</p>
+<p>o AUTODISCOVER:  If you just let Outlook 2007 try to perform an autoconfig, it should create all of the above settings for you (yes, including the proxy).  If your autoconfig is not working, make sure you have a DNS A Record for AUTODISCOVER.YOURMAILDOMAIN.COM.</p>
+<p>Thats all folks!  Wasn't that easy and fun for the whole family? </p>
+<p><strong>D - EXCHANGE ANTISPAM:</strong></p>
+<p>1. Start Exchange Power Shell, change into the file location where Exchange was installed and then into the SCRIPTS folder.  Then run:<br />
+<strong><em>Install-AntispamAgents.ps1</em></strong>and restart the MISCROSOFT EXCHANGE TRANSPORT SERVICE.  See <a href="http://www.petri.co.il/install-anti-spam-exchange-2007.htm">this</a> and <a href="http://support.microsoft.com/kb/555924">this</a> for more details if you need them.</p>
+<p>2. Go to the ORGANIZATION CONFIGURATION and then HUB TRANSPORT and find the ANTISPAM tab and double click on IP BLOCK LIST PROVIDERS (a.k.a. RBL, Real-Time Blackhole Lists, DNSRBL, Real-Time Block Lists) and add a few such as:<br />
+<a href="http://www.commodore.ca/windows/exchange/exchange_2007_antispam_rbl.gif"><img alt="clip_image012" src="images/clip_image012.gif" title="clip_image012" /></a><br />
+I suggest you also read up on each RBL (like <a href="http://www.spamhaus.org/zen/index.lasso">SpamHaus' ZEN server</a>) to make sure you understood what it is blocking. </p>
+<p>3. A few hours later (or the next day) you should check to see if the blocking is doing anything by starting the Exchange Power Shell, change into the file location where Exchange was installed and then into the SCRIPTS folder and running:<br />
+<strong><em>get-AntispamTopRBLProviders.ps1</em></strong>  and then  <strong><em>get-AntispamTopRecipients.ps1<br />
+</em></strong><a href="http://www.commodore.ca/windows/exchange/exchange2007_antispam_counts_script.gif"><img alt="clip_image013" src="images/clip_image013.gif" title="clip_image013" /></a><br />
+You can see from my example that NJABL did not stop a single message after two days of use so I removed it from the IP BLOCK LIST PROVIDERS .  Note that there are many excellent AntiSpam scripts in this folder and you should play with them all.</p>
+<p>4. You should also review the ORGANIZATION CONFIGURATION, HUB TRANSPORT, ANTISPAM, SENDER CONFIDENCE item.  I made no changes to mine and all seems well, but you should understand what it does.</p>
+<p>5. Run Microsoft/Windows Update and notice that there is a EXCHANGE SERVER SPAM DEF'N patch that comes out apparently every day.  I have installed this update on mine server several times now without incident.</p>
+<p>6. If you have more questions about <a href="http://technet.microsoft.com/en-us/library/aa996604(EXCHG.80).aspx">MS' AntiSpam, this is the offiicial guide</a>.</p>
+<p>I like <a href="http://www.pcmag.com/encyclopedia_term/0,2542,t=greylisting&amp;i=55541,00.asp">Greylisting</a> to handle spam but I do not use it on Exchange because Exchange 07 does not natively support it and much to my surprise and to Microsoft's credit, I just don't needed it!  If you want Greylisting you need an add-on product and two free ones are recommended (by associates of mine):</p>
+<p>1. <a href="http://www.proxmea.com/index.php?q=node/11">JEPs</a> which looks pretty damn good to me</p>
+<p>2. <a href="http://assp.sourceforge.net/">ASSP</a> which I understand to be more complex and requires PERL, but does a good job.</p>
+<p>If you like to buy your antispam, <a href="http://www.msexchange.org/articles/Server_Based_Antispam_Comparison.html">this page</a> provides a nice grid of AntiSpam software options and costs.</p>
+<p><strong>E - POP3:</strong></p>
+<p>On the off chance you care about POP3, follow these three simple steps:</p>
+<p>1. Start the MICROSOFT EXCHANGE POP3 Service on the Server<br />
+<a href="http://www.commodore.ca/windows/exchange/pop3_services_server.JPG"><img alt="clip_image014" src="images/clip_image0141.jpg" title="clip_image014" /></a></p>
+<p>2. If you want to block POP3 users from using "Exchange mail" disable MAPI.  This is step is only required if you want to use the Outlook 2007 AUTOCONFIGURE feature (or you just don't want POP users burning up storage on your server)<br />
+<a href="http://www.commodore.ca/windows/exchange/disable_exchange_mapi_server.JPG"><img alt="clip_image015" src="images/clip_image0151.jpg" title="clip_image015" /></a></p>
+<p>3. If you followed step 2 then when you create a new mail account in Outlook, the autoconfigure will take care of the rest.  If you did not follow step 2, then you will setup the POP account like any other and then go into your Advanced Account Settings and turn on MY OUTGOING SERVER REQUIRES AUTHENTICATION and THIS SERVER REQUIRES ENCRYPTED SSL CONNECTION<br />
+<a href="http://www.commodore.ca/windows/exchange/smtp_requires_authentication_client.JPG"><img alt="clip_image016" src="images/clip_image0161.jpg" title="clip_image016" /></a> <a href="http://www.commodore.ca/windows/exchange/pop3_encrypted_connection_client.JPG"><img alt="clip_image017" src="images/clip_image0171.jpg" title="clip_image017" /></a></p>
+<p><strong>F - VERIFICATION:</strong></p>
+<p>After you have everything running to your satisfaction you should run a couple of simple and fast system checks:</p>
+<p>1. In the Exchange Management Console, click TOOLBOX, BEST PRACTICES ANALYZER, approve any updates and checks that it wants to do and then click GO TO WELCOME SCREEN.  Then start a HEALTH CHECK as per the obvious screen shots below.  Be sure to read the results and make whatever changes it suggests.<br />
+<a href="http://www.commodore.ca/windows/exchange/BPA-NewScan.jpg"><img alt="clip_image018" src="images/clip_image018.jpg" title="clip_image018" /></a><a href="http://www.commodore.ca/windows/exchange/BPA-HealthCheck.jpg"><img alt="clip_image019" src="images/clip_image0191.jpg" title="clip_image019" /></a></p>
+<p>2. In the Exchange Management Shell, you should run:<br />
+<strong><em>get-OrganizationConfig</em></strong>and then you should run:<strong>_<br />
+</strong>Test-SystemHealth<strong><br />
+_</strong>and make sure everything looks as you expect it should.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-active-directory-design-guideline-changes.html">&larr; Older: Active Directory Design Guideline Changes</a><a class="post-nav-link align-right" href="../posts/2011-03-09-enabling-root-ssh-login-on-an-esx-host.html">Newer: Enabling root SSH login on an ESX host &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

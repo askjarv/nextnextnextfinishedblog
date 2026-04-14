@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fortigate Flash Memory Errors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Fortigate Flash Memory Errors</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/boot-error.html">boot-error</a></div>
+        <div class="content">
+          <p>Attached is the procedure to scan block of flash.  Once complete, format the flash and load firmware as per these instructions: <a href="http://kb.fortinet.com/kb/microsites/search.do?cmd=displayKC&amp;docType=kc&amp;externalId=10338&amp;sliceId=1&amp;docTypeID=DT_KCARTICLE_1_1&amp;dialogID=909631&amp;stateId=0%200%20911473">http://kb.fortinet.com/kb/microsites/search.do?cmd=displayKC&amp;docType=kc&amp;externalId=10338&amp;sliceId=1&amp;docTypeID=DT_KCARTICLE_1_1&amp;dialogID=909631&amp;stateId=0%200%20911473</a></p>
+<p>FGT50B (11:04-02.28.2007)</p>
+<p>Ver:04000007</p>
+<p>Serial number:FGT50B3G06500433</p>
+<p>RAM activation</p>
+<p>Total RAM: 256MB</p>
+<p>Enabling cache...Done.</p>
+<p>Scanning PCI bus...Done.</p>
+<p>Allocating PCI resources...Done.</p>
+<p>Enabling PCI resources...Done.</p>
+<p>Zeroing IRQ settings...Done.</p>
+<p>Verifying PIRQ tables...Done.</p>
+<p>Enabling Interrupts...Done.</p>
+<p>Boot up, boot device capacity: 64MB.</p>
+<p>Press any key to display configuration menu...</p>
+<p>..</p>
+<p>[G]:  Get firmware image from TFTP server.</p>
+<p>[F]:  Format boot device.</p>
+<p>[I]:  Configuration and information.</p>
+<p>[Q]:  Quit menu and continue to boot with default firmware.</p>
+<p>[H]:  Display this list of options.</p>
+<p>Enter Selection [G]:</p>
+<p>Enter G,F,I,Q,or H: d      ---------------- Press “d” to debug menu</p>
+<p>dr:             Disable onboard RAM.</p>
+<p>rt:             Start RAM test.</p>
+<p>offc:           Turn off cache.</p>
+<p>onc:            Turn on cache.</p>
+<p>lpci:           List all PCI devices.</p>
+<p>spci:           Set PCI configuration registers.</p>
+<p>clk:            Display real time clock.</p>
+<p>q:              Quit debug mode.</p>
+<p>h:              Display this command list.</p>
+<p>:k        ---------------  Press “k” to scan the flash</p>
+<p>Flash CS0 is configured as a I/O based NAND controller at address=FF80h</p>
+<p>Flash I/O not enabled in MSR_DIVIL_BALL_OPTS</p>
+<p>ID NAND device returned ... AD 76 AD 76 AD 76 AD 76</p>
+<p>ROM manufacturer=AD device=76</p>
+<p>The ROM is a 64 MB Hynix HY27US08121M device</p>
+<p>Scan and verify Nand flash's block(Blocks=0X1000)--&gt;</p>
+<p>List existing bad block(s):</p>
+<p>------------------------------</p>
+<p>------------------------------</p>
+<p>start_block--&gt;0x000          ------------ Input “000” as the start block</p>
+<p>end_block--&gt;0xfff             ------------  Input “fff” as the end block</p>
+<p>Testing block: 0X0000~0X0FFF of 0X0401</p>
+<p>Block[0X0401]-&gt;Error at offset:0X006C, written:0XB6, read:0XB4</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0089, written:0X1A, read:0X0A</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0129, written:0XB1, read:0X91</p>
+<p>Block[0X0401]-&gt;Error at offset:0X012F, written:0X0E, read:0X0A</p>
+<p>Block[0X0401]-&gt;Error at offset:0X04DD, written:0XA6, read:0XA4</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0532, written:0X67, read:0X47</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0537, written:0XDB, read:0X5B</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0593, written:0X9A, read:0X8A</p>
+<p>Block[0X0401]-&gt;Error at offset:0X05C4, written:0XE1, read:0XC1</p>
+<p>Block[0X0401]-&gt;Error at offset:0X07E4, written:0X7C, read:0X5C</p>
+<p>Block[0X0401]-&gt;Error at offset:0X092F, written:0XC5, read:0XC1</p>
+<p>Block[0X0401]-&gt;Error at offset:0X0C85, written:0XDC, read:0X9C</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1085, written:0XD0, read:0X90</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1485, written:0XE4, read:0XA4</p>
+<p>Block[0X0401]-&gt;Error at offset:0X17E4, written:0X20, read:0X00</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1885, written:0X5E, read:0X1E</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1891, written:0XB6, read:0X36</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1C85, written:0XF8, read:0XB8</p>
+<p>Block[0X0401]-&gt;Error at offset:0X1FE4, written:0X68, read:0X48</p>
+<p>Block[0X0401]-&gt;Error at offset:0X2085, written:0XD1, read:0X91</p>
+<p>Block[0X0401]-&gt;Error at offset:0X2C85, written:0XC2, read:0X82</p>
+<p>Block[0X0401]-&gt;Error at offset:0X3485, written:0X47, read:0X07</p>
+<p>Block[0X0401]-&gt;Error at offset:0X3885, written:0X73, read:0X33</p>
+<p>Block[0X0401]-&gt;Error at offset:0X3C85, written:0XF7, read:0XB7</p>
+<p>Testing block: 0X0000~0X0FFF of 0X0FFF</p>
+<p>At least one block verification failed!</p>
+<p>Nand flash chip's block status:</p>
+<p>Failed block of verification: 0401         ------- Found one bad block</p>
+<p>Want to mark the above block(s) as bad blocks?... (y/n)y    --------- Press “y” to mark this block as bad block</p>
+<p>------------------------------</p>
+<p>Bad block already: 0X0401</p>
+<p>------------------------------</p>
+<p>Mark failed block(s) of verification as bad block(s)!</p>
+<p>Recreate bad block table) - (y/n)y          ---- Input “y” to recreat the bad block table.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-fortigate-ipsec-vpn-nat.html">&larr; Older: FortiGate IPSec VPN NAT</a><a class="post-nav-link align-right" href="../posts/2011-03-03-formula-to-find-numbers-within-a-cell-containing-text-numbers-and-spaces.html">Newer: Formula to find numbers within a cell containing text, numbers and spaces. &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

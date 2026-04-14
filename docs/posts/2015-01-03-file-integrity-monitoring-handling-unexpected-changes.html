@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>File Integrity Monitoring - Handling Unexpected Changes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>File Integrity Monitoring - Handling Unexpected Changes</h1>
+        <div class="meta">
+          <time datetime="2015-01-03">2015-01-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/process.html">process</a><a class="tag" href="../tags/security.html">security</a></div>
+        <div class="content">
+          <p>With last year's security breaches reaching new heights in the general media, security of IT assets has never been more important. Many of you will know I've recently moved into an IT consultancy role in the security sector, and I wanted to start a series on various security processes that can be adopted to improve your security profile.</p>
+<p>File Integrity Monitoring is a key part of most good security practices - but how do you manage FIM? From scripts that notify on critical file changes to full product suites dedicated to FIM and on to data leak protection products, there's various tools that will enable you to achieve FIM but few businesses share their practices for how best to manage the products once they're in place - so just what should you do when your FIM product highlights a change - and just how robust a process do you have around your FIM alerts?</p>
+<p>Of course, there's no one system fits all - customisation to your business needs is essential, but at it's most basic you'll have:</p>
+<ul>
+<li>Alert</li>
+<li>Assessment</li>
+<li>Response</li>
+</ul>
+<p>Each of these can phases can be further broken down and additional steps and processes and documentation added to give you a robust system - consideration might need to be given, for example, to when alerts should be generated (priorities, owner of the system, etc), to whom should the alert be sent, and by what means (email, SMS, IM could all be used, and in each case you may want to have resiliency).</p>
+<p>So rather than get bogged down in ALL the possible customisations for now, let's take a look an example workflow which I've proposed to a client recently - I won't use anything product specific, so it's easy to adapt to your own needs with some minor changes depending on your logging tool - and may even make you think about how to enhance or customise your logging in the future:</p>
+<ul>
+<li>Initial Detection: Unexpected Change detected. Email notification generation.</li>
+<li>Initial Assessment: Assessment of initial Information captured by FIM product (Timestamp, Owner, File Path, File Contents (if applicable)). If unidentified proceed to secondary analysis, otherwise go to step 7.</li>
+<li>Detailed Data Capture: Add additional data if possible from Tripwire Enterprise by expanding the monitored path, monitored elements (hash, etc) to get a better picture of the source of the change.</li>
+<li>Security Analysis: initial threat verification achieved through AV scans, etc.</li>
+<li>Application Assessment: Use other tools to identify the associated application (SysInternals, etc) to evaluate the<ol>
+<li>Source Application (what application triggers the change)</li>
+<li>Source Application Event (what EVENT within the application triggers the change)</li>
+<li>Exception scenarios (in what cases that the exception doesn’t occur).</li>
+</ol>
+</li>
+<li>Vendor engagement (if file generation is classified as a bug, or errant/unexplainable behaviour and deemed to be sufficiently undesirable)</li>
+<li>Revaluation and rule tuning/configuration as required.</li>
+</ul>
+<p>As you can see, even a basic workflow should include detailed assessment and response steps- I'll go on into greater depth on each of these in a future post.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2015-01-02-part-two-raspberry-pi-ambilight-build.html">&larr; Older: Part two: Raspberry Pi &quot;Ambilight&quot; Build</a><a class="post-nav-link align-right" href="../posts/2015-01-12-getting-productive.html">Newer: Getting Productive &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

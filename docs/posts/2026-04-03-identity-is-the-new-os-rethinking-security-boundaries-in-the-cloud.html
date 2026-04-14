@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Identity is the New OS: Rethinking Security Boundaries in the Cloud</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Identity is the New OS: Rethinking Security Boundaries in the Cloud</h1>
+        <div class="meta">
+          <time datetime="2026-04-03">2026-04-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/aws.html">aws</a><a class="tag" href="../tags/azure.html">azure</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>In traditional infrastructure, the operating system was the security boundary.</p>
+<ul>
+<li>
+<p>You hardened the OS</p>
+</li>
+<li>
+<p>You monitored file integrity</p>
+</li>
+<li>
+<p>You controlled access via local users and groups</p>
+</li>
+</ul>
+<p>With the move to cloud platforms like AWS and Azure, that boundary has fundamentally shifted, often making identity the primary control plane. So whilst an EC2 instance or VM can be ephemeral, containers may exist for seconds and serverless functions don’t even expose an OS, it's identity that persists - and IAM <strong>policies</strong> become crown jewels. Tripwire Enterprise has long known that just monitoring files or systems alone isn't enough (hence we've got functionality for auditing traditional identity structures such as Active Directory) - but in a cloud era building rules to monitoring your IAM policies is is important since:</p>
+<ul>
+<li>
+<p>They define <em>what is allowed</em></p>
+</li>
+<li>
+<p>They define <em>blast radius</em></p>
+</li>
+<li>
+<p>They define <em>attack paths</em></p>
+</li>
+</ul>
+<p>If an attacker gains access to an overly permissive identity, the OS no longer matters - so let's talk a bit about the whys and hows of monitoring IAM with TE.</p>
+<hr />
+<h3 id="why-identity-is-the-new-security-boundary">Why Identity is the New Security Boundary</h3>
+<p>When I talk about rules in Tripwire, I often want to say <em>why</em> I'm monitoring something first. So let’s translate IAM change monitoring parallels we might want to consider:</p>
+<table>
+<thead>
+<tr>
+<th>Traditional Risk</th>
+<th>Cloud Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Root access to server</td>
+<td>Admin IAM role</td>
+</tr>
+<tr>
+<td>SUID binary abuse</td>
+<td>Privilege escalation via IAM</td>
+</tr>
+<tr>
+<td>Weak file permissions</td>
+<td>Wildcard IAM policies</td>
+</tr>
+<tr>
+<td>Local persistence</td>
+<td>Token reuse / role chaining</td>
+</tr>
+</tbody>
+</table>
+<p>With the control plane now API-driven, and IAM as the gatekeeper something like this IAM policy</p>
+<pre><code>{  &quot;Effect&quot;: &quot;Allow&quot;,  &quot;Action&quot;: &quot;*&quot;,  &quot;Resource&quot;: &quot;*&quot;}
+</code></pre>
+<p>becomes</p>
+<blockquote>
+<p>“root access to the entire cloud estate”</p>
+</blockquote>
+<p>So we'd better make sure that our monitoring is covering <em>both.</em></p>
+<p>Now most FIM/SCM tooling, including traditional Tripwire deployments, tends to focus on:</p>
+<ul>
+<li>
+<p>Files</p>
+</li>
+<li>
+<p>Registry</p>
+</li>
+<li>
+<p>OS configurations</p>
+</li>
+</ul>
+<p>But in cloud environments, the equivalent of <code>/etc/sudoers</code> looks more like:</p>
+<ul>
+<li>
+<p>AWS IAM policies</p>
+</li>
+<li>
+<p>Azure RBAC role assignments</p>
+</li>
+<li>
+<p>Identity trust relationships</p>
+</li>
+</ul>
+<hr />
+<h3 id="tripwire-enterprise-approach-treat-iam-as-configuration-state">Tripwire Enterprise Approach: Treat IAM as Configuration State</h3>
+<p>Fortunately Tripwire Enterprise is up to the challenge. In fact, it's not massively different from the model we've always used for change detection and policy evaluation - it's just the object that's monitored that changes.</p>
+<ul>
+<li>
+<p><strong>Object monitored</strong> ( IAM configuration output )</p>
+</li>
+<li>
+<p><strong>Change detection</strong> ( CLI output comparison )</p>
+</li>
+<li>
+<p><strong>Policy evaluation</strong> ( Regex-based validation )</p>
+</li>
+</ul>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<p><a href="https://nextnextnextfinished.wordpress.com/wp-content/uploads/2026/03/image-2.png"><img alt="" src="images/image-2.png" /></a></p>
+<h3 id="flow">Flow</h3>
+<ol>
+<li>
+<p>Tripwire executes CLI commands via:</p>
+<ul>
+<li>
+<p>Agent (Linux/Windows)</p>
+</li>
+<li>
+<p>Agentless SSH</p>
+</li>
+</ul>
+</li>
+<li>
+<p>CLI tools (such as AWSCLI or AzureCLI) outputs IAM configuration</p>
+</li>
+<li>
+<p>Output stored as element version</p>
+</li>
+<li>
+<p>Policy tests evaluate:</p>
+<ul>
+<li>
+<p>Wildcards</p>
+</li>
+<li>
+<p>Escalation paths</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Pass/Fail recorded in TE</p>
+</li>
+</ol>
+<p>So let's have a look at an approach that could work for AWS.</p>
+<hr />
+<h3 id="aws-implementation">AWS Implementation</h3>
+<h4 id="1-a-general-extract-iam-policies-rule-rule">1. A general "Extract IAM Policies Rule" rule</h4>
+<p>This is a good starting place for change monitoring:</p>
+<pre><code>aws iam list-policies --scope Local --query 'Policies[].Arn' --output text | tr '\t' '\n' | while read policy; do  aws iam get-policy-version \    --policy-arn &quot;$policy&quot; \    --version-id $(aws iam get-policy --policy-arn &quot;$policy&quot; --query 'Policy.DefaultVersionId' --output text) \    --query 'PolicyVersion.Document' \    --output jsondone
+</code></pre>
+<h4 id="2-detect-wildcards-passfail-output">2. Detect Wildcards (PASS/FAIL Output)</h4>
+<p>Taking it a step further though, we can start building "pass/fail" policy output:</p>
+<pre><code>aws iam list-policies --scope Local --query 'Policies[].Arn' --output text | tr '\t' '\n' | while read policy; do  doc=$(aws iam get-policy-version \    --policy-arn &quot;$policy&quot; \    --version-id $(aws iam get-policy --policy-arn &quot;$policy&quot; --query 'Policy.DefaultVersionId' --output text) \    --query 'PolicyVersion.Document' \    --output json)  if echo &quot;$doc&quot; | grep -q '&quot;Action&quot;: &quot;\*&quot;\|&quot;Resource&quot;: &quot;\*&quot;'; then    echo &quot;FAIL | $policy | Wildcard detected in Action or Resource&quot;  else    echo &quot;PASS | $policy | No wildcards detected&quot;  fidone
+</code></pre>
+<h4 id="3-detect-privilege-escalation-paths">3. Detect Privilege Escalation Paths</h4>
+<p>And we can go further for common escalation escalation indicators such as :</p>
+<ul>
+<li>
+<p><code>iam:PassRole</code></p>
+</li>
+<li>
+<p><code>sts:AssumeRole</code></p>
+</li>
+<li>
+<p><code>iam:AttachRolePolicy</code></p>
+</li>
+<li>
+<p><code>iam:PutRolePolicy</code></p>
+</li>
+</ul>
+<pre><code>ESCALATION_ACTIONS=&quot;iam:PassRole|sts:AssumeRole|iam:AttachRolePolicy|iam:PutRolePolicy&quot;aws iam list-policies --scope Local --query 'Policies[].Arn' --output text | tr '\t' '\n' | while read policy; do  doc=$(aws iam get-policy-version \    --policy-arn &quot;$policy&quot; \    --version-id $(aws iam get-policy --policy-arn &quot;$policy&quot; --query 'Policy.DefaultVersionId' --output text) \    --query 'PolicyVersion.Document' \    --output json)  if echo &quot;$doc&quot; | grep -Eiq &quot;$ESCALATION_ACTIONS&quot;; then    echo &quot;FAIL | $policy | Potential privilege escalation permissions detected&quot;  else    echo &quot;PASS | $policy | No escalation paths detected&quot;  fidone
+</code></pre>
+<hr />
+<h3 id="azure-implementation">Azure Implementation</h3>
+<p>Similar to AWS, we can audit Azure easily with Command Output Capture Rules to:</p>
+<h4 id="1-extract-role-assignments">1. Extract Role Assignments</h4>
+<pre><code>az role assignment list --all --query '[].{principal:principalName, role:roleDefinitionName, scope:scope}' --output json
+</code></pre>
+<h4 id="2-detect-wildcard-permissions">2. Detect Wildcard Permissions</h4>
+<p>Azure wildcards typically appear in custom roles.</p>
+<pre><code>az role definition list --custom-role-only true --output json | jq -c '.[]' | while read role; do  if echo &quot;$role&quot; | grep -q '&quot;actions&quot;:.*&quot;\*&quot;'; then    name=$(echo &quot;$role&quot; | jq -r '.roleName')    echo &quot;FAIL | $name | Wildcard action detected&quot;  else    name=$(echo &quot;$role&quot; | jq -r '.roleName')    echo &quot;PASS | $name | No wildcard actions&quot;  fidone
+</code></pre>
+<h4 id="3-detect-privilege-escalation-risks">3. Detect Privilege Escalation Risks</h4>
+<p>Look for:</p>
+<ul>
+<li>
+<p><code>Microsoft.Authorization/*</code></p>
+</li>
+<li>
+<p>Role assignment write permissions</p>
+</li>
+</ul>
+<pre><code>az role definition list --custom-role-only true --output json | jq -c '.[]' | while read role; do  if echo &quot;$role&quot; | grep -Eiq 'Microsoft.Authorization/roleAssignments/write'; then    name=$(echo &quot;$role&quot; | jq -r '.roleName')    echo &quot;FAIL | $name | Role can assign privileges (escalation risk)&quot;  else    name=$(echo &quot;$role&quot; | jq -r '.roleName')    echo &quot;PASS | $name | No privilege escalation actions&quot;  fidone
+</code></pre>
+<h3 id="tripwire-enterprise-policy-tests-regex-examples">Tripwire Enterprise Policy Tests (Regex Examples)</h3>
+<p>You can map the script output into TE policy tests like:</p>
+<table>
+<thead>
+<tr>
+<th>Policy Test Name</th>
+<th>Regex (PASS condition)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No wildcard actions</td>
+<td><code>^PASS \| .* \| No wildcards detected$</code></td>
+</tr>
+<tr>
+<td>No escalation paths</td>
+<td><code>^PASS \| .* \| No escalation paths detected$</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fail-condition-captured-output">Fail Condition (captured output)</h3>
+<pre><code>^FAIL \| (?&lt;policy&gt;.*?) \| (?&lt;reason&gt;.*)$
+</code></pre>
+<p>This allows:</p>
+<ul>
+<li>
+<p>Reporting by policy</p>
+</li>
+<li>
+<p>Clear audit trail</p>
+</li>
+<li>
+<p>Direct remediation targeting</p>
+</li>
+</ul>
+<hr />
+<h2 id="why-all-this-matters">Why All This Matters</h2>
+<p>If you only monitor:</p>
+<ul>
+<li>
+<p>OS drift</p>
+</li>
+<li>
+<p>File changes</p>
+</li>
+</ul>
+<p>…but ignore IAM you may end up monitoring symptoms, and not the causes. And remember that attackers don’t need persistence on disk if they can:</p>
+<ul>
+<li>
+<p>Create new roles</p>
+</li>
+<li>
+<p>Assume privileged identities</p>
+</li>
+<li>
+<p>Modify policies dynamically</p>
+</li>
+</ul>
+<p>The OS used to be the castle but it's quickly become just a disposable container for many cloud first environments - but to I'm hoping this post highlights how Tripwire doesn't stop at the file system (especially if you're talking with myself or one of the consultancy team!) - IAM is just another audit surface that you can monitor.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2026-03-31-monitoring-azure-blob-storage-with-cli-based-file-integrity-monitoring.html">&larr; Older: Monitoring Azure Blob Storage with CLI-Based File Integrity Monitoring</a><a class="post-nav-link align-right" href="../posts/2026-04-06-building-an-mcp-server-for-tripwire-ip360-vulnerability-information.html">Newer: Building an MCP server for Tripwire IP360 vulnerability information &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

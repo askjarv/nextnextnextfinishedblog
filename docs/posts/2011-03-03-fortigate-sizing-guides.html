@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fortigate sizing guides</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Fortigate sizing guides</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Please be aware that using the model number to determine the device capacity should <strong>not</strong> be done.  You should be using the Product Sizing Tool available within the partner portal (<a href="https://competitive.myfortinet.com/product_sizing">https://competitive.myfortinet.com/product_sizing</a>).</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image001.jpg"><img alt="clip_image001" src="images/clip_image001_thumb.jpg" title="clip_image001" /></a></p>
+<p>Below is a PowerPoint slide showing what Fortinet suggest at present…</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image003.gif"><img alt="clip_image003" src="images/clip_image003_thumb.gif" title="clip_image003" /></a></p>
+<p>Another factor should also be considered is the “Web Proxy”, which is not shown in either the Sizing Tool or Slide.  If planning to use this, you’ll need to times the user count by 4 as the feature uses a greater amount of processing time and memory.</p>
+<p>The “Web Proxy” can be used in place of ISA, IWSS, etc. and now can be utilised from Citrix XenApp environment at a per user basis.</p>
+<p>· System &gt; Network &gt; Interface = Choose the relevant interface, select “Enable Explicit Web Proxy”</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0042.jpg"><img alt="clip_image004" src="images/clip_image004_thumb2.jpg" title="clip_image004" /></a></p>
+<p>· System &gt; Network &gt; Web Proxy = Enable “Enable Explicit Web Proxy” and choose preferences such as port etc…</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0051.jpg"><img alt="clip_image005" src="images/clip_image005_thumb1.jpg" title="clip_image005" /></a></p>
+<p>+</p>
+<p>· Firewall &gt; Policy &gt; Policy= Create new policy from source “Web-Proxy”</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0061.jpg"><img alt="clip_image006" src="images/clip_image006_thumb1.jpg" title="clip_image006" /></a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-how-to-add-pictures-to-active-directory-and-contacts-to-lync-using-utils.html">&larr; Older: How to add pictures to active directory and contacts to Lync using utils</a><a class="post-nav-link align-right" href="../posts/2011-03-03-fortigate-ipsec-vpn-nat.html">Newer: FortiGate IPSec VPN NAT &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

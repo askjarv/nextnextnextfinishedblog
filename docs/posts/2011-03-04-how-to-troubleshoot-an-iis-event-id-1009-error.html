@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>How to troubleshoot an IIS &amp;quot;Event ID: 1009&amp;quot; error.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>How to troubleshoot an IIS &amp;quot;Event ID: 1009&amp;quot; error.</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/error.html">error</a></div>
+        <div class="content">
+          <p><strong>How to troubleshoot an IIS "Event ID: 1009" error.</strong></p>
+<p>An error that most IIS 6.0 administrators have probably encountered is "Event ID: 1009" which usually leads to a "503 Service Unavailable" error being displayed in a browser. "503" usually indicates the Application Pool has been disabled for some reason. The IIS support team frequently gets support calls to help resolve this issue and over the years I have compiled a list of steps I use to troubleshoot this. If the following information seems too confusing please let me know and I'll clarify any confusing points. The follow list is broken down into different sections for the various "exit codes" that are in the Event 1009.</p>
+<p>&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;</p>
+<p>*** Problem Description ***<br />
+Many times when an IIS6 application pool terminates the following will be logged.</p>
+<p>1. The Name of the App Pool<br />
+  2. The PID<br />
+  3. The exit code.<br />
+The <strong><em>exit code</em></strong> is the most useful part of the event entry.</p>
+<p>Event Type: Warning<br />
+  Event Source: W3SVC<br />
+  Event Category: None<br />
+  Event ID: 1009<br />
+  Date:  1/29/2004<br />
+  Time:  10:01:14 AM<br />
+  User:  N/A<br />
+  Computer: COMPUTERNAME<br />
+  Description:<br />
+  A process serving application pool 'DefaultAppPool' terminated unexpectedly. The<br />
+process id was '3908'. The process exit code was '0x80'.</p>
+<p>&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;</p>
+<p>*** Resolution ***</p>
+<p>Constants:</p>
+<p>// the WAS killed the worker process  </p>
+<h1 id="define-killed_worker_process_exit_code-0xfffffffd">define KILLED_WORKER_PROCESS_EXIT_CODE 0xFFFFFFFD</h1>
+<p>// the worker process exited ok  </p>
+<h1 id="define-clean_worker_process_exit_code-0xfffffffe">define CLEAN_WORKER_PROCESS_EXIT_CODE  0xFFFFFFFE</h1>
+<p>// the worker process exited due to a fatal error  </p>
+<h1 id="define-error_worker_process_exit_code-0xffffffff">define ERROR_WORKER_PROCESS_EXIT_CODE  0xFFFFFFFF</h1>
+<p>----------------------------------------------------------- 
+Concepts that apply to exit codes of both 0x80 and 0xffffffff<br />
+  · Make sure "Network Service" and "IWAM_MACHINE" are members of IIS_WPG<br />
+  · If a custom identity is being used for the app pool ensure it is in IIS_WPG<br />
+  · Make sure that IIS_WPG is included somehow in these User Rights assignments<br />
+(example: Everyone group includes IIS_WPG so that is sufficient)<br />
+      a. Access this computer from network<br />
+      b. Log on as batch job<br />
+      c. Bypass traverse checking<br />
+  · Ensure that IIS_WPG or members of that group are not in any of the<br />
+corresponding "Deny" User Rights<br />
+  · Ensure that "NT AUTHORITY\Authenticated Users" and "NT AUTHORITY\Interactive"<br />
+are part of the "Users" group.<br />
+  · Use FileMon.exe and RegMon.exe to identify ACC DENIED's.<br />
+  · If customer has more than ~60 app pools with unique identities, set the<br />
+following key:<br />
+      HKLM\System\CurrentControlSet\Services\W3SVC\Parameters\UseSharedWPDesktop<br />
+(REG_DWORD with value of 1)<br />
+----------------------------------------------------------- 
+The process exit code was '0x80'.<br />
+  In certain cases when w3wp.exe goes away IIS will attempt to determine the exit code by calling the "GetExitCodeProcess" API.<br />
+  If the reason cannot be determined by this API then the code returned is 0x80. 
+  "0x80" means "ERROR_WAIT_NO_CHILDREN" which means "There are no child processes to wait for"</p>
+<p>This <em>typically</em> means the W3WP.exe never started at all which could be User-Rights related or<br />
+NTFS permissions.<br />
+  If it is NTFS permissions, that means the AppPool identity doesn't have read<br />
+permission to the w3wp.exe file and/or supporting DLLs<br />
+  - Use FileMon to troubleshoot<br />
+  If it is User Rights related then the AppPool identity failed to logon.<br />
+  - Check the 3 User Rights listed above.<br />
+----------------------------------------------------------- 
+The process exit code was '0xffffffff'.<br />
+  Means the W3WP.exe process partially started but could not load a dependancy for<br />
+some reason.<br />
+  This is either permissions/security related or due to mismatched DLL's.<br />
+  Try running the AppPool as "Local System"<br />
+  - If this works it is a permissions problem for the AppPool Identity. Check the<br />
+following "Scenarios" section then follow the "concepts" section above<br />
+  - If this fails using System it is a mismatch or missing DLL problem. Check<br />
+scenario #1 below then follow the "Loader Snaps" section</p>
+<p>Scenarios for 0xffffffff</p>
+<p>1. The first thing that should be checked is whether a Windows Service pack is installed<br />
+    - If it is, verify that "c:\windows\System32\instsrv\w3core.dll" is either the<br />
+RTM version or SP1 version.<br />
+    - If it is the RTM version then reapplying the service pack should fix the problem.</p>
+<p>2. Is this IIS server a DC and have you reinstalled IIS on another DC?<br />
+    I have had two cases where there was a permissions failure reading nodes in the<br />
+metabase<br />
+    When installing IIS it creates an IIS_WPG group with a somewhat random SID.<br />
+    Permissions in the metabase are then set using this unique version of<br />
+IIS_WPG.<br />
+    When removing IIS on a DC it will delete the IIS_WPG group, if Win2k3 SP1 is<br />
+not installed, which is used by all the other DC's running IIS<br />
+    When then adding IIS back on to this DC, a new IIS_WPG group is created that<br />
+has a new SID<br />
+    The pre-existing permissions (older SID) in the other metabases will have<br />
+"Unknown User" for the permissions and spawning W3WP.exe under anything other than<br />
+SYSTEM will fail with 0xffffffff<br />
+    - I found this by enabling Tracing then searching through source code.<br />
+    - If you get a Debug Trace using DbgView.exe look for a line that says:<br />
+        w3core!W3_SERVER::Initialize [\w3server.cxx @ 526]:Error reading<br />
+UseDigestSSP property.  hr = 80070005<br />
+    - However It would be easy enough to skip Debug Tracing and just look at the<br />
+following nodes using Metabase Explorer.<br />
+    - IIS_WPG needs permissions to the following nodes:<br />
+      1. MachineName - Read<br />
+      2. w3svc/1/Filters (or any other filters node) - Read/Write<br />
+      3. w3svc/AppPools - Special (Query Unsecure Property)</p>
+<p>3. Has the customer modified default DCOM security?<br />
+    - We have run into an issue where the customer had modified<br />
+the default Launch and Activation Permissions in Component Services.<br />
+    - The customer removed Local Launch and Local Activation for the Everyone<br />
+group.<br />
+    - Here is the section of loader snaps output that is a hint of this scenario:</p>
+<p>LDR: LdrGetProcedureAddress by NAME - CoMarshalInterface<br />
+LDR: LdrGetProcedureAddress by NAME - CoUnmarshalInterface<br />
+LDR: LdrGetProcedureAddress by NAME - CoReleaseMarshalData<br />
+(15c8.914): Unknown exception - code 80070005 (first chance)<br />
+LDR: UNINIT LIST<br />
+          (1) [iisres.dll] c:\windows\system32\inetsrv\iisres.dll (0) deinit 0<br />
+LDR: Unmapping [iisres.dll]<br />
+LDR: Derefcount IISMAP.dll (0)</p>
+<p>----------------------------------------------------------- 
+The process exit code was '0xc0000005'.<br />
+  This is a crash.<br />
+  Troubleshoot using a Debugger. (Debug Diagnostics)<br />
+----------------------------------------------------------- 
+The process exit code was '0xff'.<br />
+  Process shut down "gracefully" for some reason.<br />
+  Troubleshoot as a crash and see who called TerminateProcess or ExitProcess.<br />
+----------------------------------------------------------- 
+The process exit code was '0x0'.<br />
+  This would be typical if you had w3wp.exe configured to launch under a debugger<br />
+and you never did a "Go" in the debugger windows.<br />
+  Launch gflags.exe and clear the debugger setting for w3wp.exe<br />
+----------------------------------------------------------- 
+Loader Snaps Section - These steps are not for getting memory dumps. This explains<br />
+how to easily get the reason that a module (DLL) failed to load which is one reason for a 0xffffffff.</p>
+<p>1. Send customer "gflags.exe" (can be obtained from Debugging Tools for<br />
+Windows)<br />
+  2. Double-click gflags.exe<br />
+  3. Go to the "Image File" tab<br />
+  4. Enter "w3wp.exe" for the image then press "tab"<br />
+  5. Put a check in "Show loader snaps"<br />
+  6. Put a check in "Debugger" and enter<br />
+        "NTSD.exe -logo c:\temp\LDR.log -g -G -r 0" (&lt;-- that is a zero)<br />
+  7. Ensure the folder from the previous step has adequate read/write permissions<br />
+for the Identity that is launching the AppPool.<br />
+  8. Ensure that the AppPool is enabled<br />
+  9. Reproduce the problem. - At this point w3wp.exe should spawn under NTSD.exe,<br />
+write to the log, then shut down.<br />
+  10. Have customer send the LoaderSnaps.log output found in the c:\temp folder.<br />
+  11. Search for the text of "exception" or "failed" (you'll probably find what you<br />
+want near the end of the log)<br />
+  12. Lookup the listed error number using err.exe or hrplus.exe. The DLL that it<br />
+is having trouble on is the line just previous to the "exception/failed" line.<br />
+  13. Take the logical steps to address whatever the error is describing.</p>
+<p>Notes - Don't forget to reverse these settings when done.<br />
+            - If you identify a DLL that is the wrong version usually simply<br />
+reapplying the relevant hotfix or service pack will resolve the issue.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-hp-management-agents-on-esx-servers.html">&larr; Older: HP Management Agents on ESX servers</a><a class="post-nav-link align-right" href="../posts/2011-03-04-how-to-check-for-the-existence-of-a-service-via-batch-file.html">Newer: How to check for the existence of a service via batch file &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

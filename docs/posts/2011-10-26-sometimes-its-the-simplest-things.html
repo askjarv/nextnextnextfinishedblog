@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sometimes it&#x27;s the simplest things...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Sometimes it&#x27;s the simplest things...</h1>
+        <div class="meta">
+          <time datetime="2011-10-26">2011-10-26</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a><a class="tag" href="../tags/dos.html">dos</a><a class="tag" href="../tags/for-loop.html">for-loop</a><a class="tag" href="../tags/script.html">script</a><a class="tag" href="../tags/uptime.html">uptime</a></div>
+        <div class="content">
+          <p>I have been fighting with trying to get a list of my Citrix servers from the command line into a text document for later parsing in a number of other scripts- I quickly found this article - <a href="http://www.brianmadden.com/forums/t/21550.aspx">http://www.brianmadden.com/forums/t/21550.aspx</a> but try as I might I ran around in circles trying to get it to output correctly - that was when I realised I was being silly and need to use:</p>
+<p><a href="http://www.brianmadden.com/forums/t/21550.aspx">for /f "tokens=1 skip=3" %%i in ('qfarm /load') do echo %%i &gt;&gt; C:\servers.txt</a> to pipe EACH LINE when it's ran as a BATCH FILE (not from the command line, which makes it look like it's piping the name AND the name of the output document to the results!).</p>
+<p>Simple things, eh.</p>
+<p>For the nosy amongst you, I've been using this text file, for, amongst other things, to check some general server stuff which I'll be posting over the next few days- let's start with an easy one- a uptime checker using the list from the batch file above:</p>
+<pre><code>function WMIDateStringToDate($Bootup) {  
+
+    [System.Management.ManagementDateTimeconverter]::ToDateTime($Bootup)  
+
+}  
+
+
+
+# Main script  
+
+$Servers = Get-Content &quot;c:\ps\servers.txt&quot; 
+Remove-Item c:\ps\uptime.txt
+
+foreach ($Computer in $Servers)
+
+{
+
+$computers = Get-WMIObject -class Win32_OperatingSystem -computer $computer  
+
+
+
+foreach ($system in $computers) {  
+
+    $Bootup = $system.LastBootUpTime  
+
+    $LastBootUpTime = WMIDateStringToDate($Bootup)  
+
+    $now = Get-Date  
+
+    $Uptime = $now - $lastBootUpTime  
+
+    $d = $Uptime.Days  
+
+    $h = $Uptime.Hours  
+
+    $m = $uptime.Minutes  
+
+    $ms= $uptime.Milliseconds  
+
+
+
+   $uptimes = &quot;$Computer has been up for: {0} days, {1} hours, {2}.{3} minutes&quot; -f $d,$h,$m,$ms  
+#If $d &gt; 7 then
+#write-eventlog -logname Application -eventID 6969 -entrytype Information -message &quot;MyApp added a user-requested feature to the display.&quot; -category 1 -rawdata 10,20
+
+}   
+
+$output = &quot;c:\ps\uptime.txt&quot;
+
+$Uptimes &gt;&gt;$output
+
+}
+
+$message = New-Object System.Net.Mail.MailMessage –ArgumentList CHudson@dartgroup.co.uk, (&quot;dartusers@bluechip.uk.com,jez.eling@bluechip.uk.com,chudson@dartgroup.co.uk&quot;), 'Citrix Uptime', &quot;Please find attached the Citrix uptime results&quot;
+$attachment = New-Object System.Net.Mail.Attachment –ArgumentList c:\ps\uptime.txt, 'text/plain'
+$message.Attachments.Add($attachment)
+$smtp = New-Object System.Net.Mail.SMTPClient –ArgumentList dgexcas01
+$smtp.Send($message)
+
+Remove-Variable  * -Scope Global -ErrorAction SilentlyContinue
+</code></pre>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-07-24-golden-rules-of-good-support-part-3.html">&larr; Older: Golden Rules of Good Support (Part 3)</a><a class="post-nav-link align-right" href="../posts/2012-01-01-the-importance-of-a-communication-plan-when-disaster-strikes.html">Newer: The importance of a communication plan when disaster strikes &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

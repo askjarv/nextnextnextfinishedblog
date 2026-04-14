@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Configuring Outlook Anywhere for Exchange 2007 SP1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Configuring Outlook Anywhere for Exchange 2007 SP1</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/exchange-2007.html">exchange-2007</a><a class="tag" href="../tags/outlook-anywhere.html">outlook-anywhere</a><a class="tag" href="../tags/rpc-https.html">rpc-https</a></div>
+        <div class="content">
+          <p>Exchange 2007 has rebranded rpc/https which is now called Outlook Anywhere and has even made some slight modification from RTM to Exchange 2007 SP1. +<br />
+<a href="http://msexchangeteam.com/archive/2007/11/08/447484.aspx">http://msexchangeteam.com/archive/2007/11/08/447484.aspx</a></p>
+<p>When utlizing Outlook 2007 the autodiscover service is heavily tied into Outlook anywhere functionality, I am going to reference a previous posting that explains those functions in detail.<br />
+<a href="http://exchange-genie.blogspot.com/2007/07/autodiscover-ad-attribute.html">http://exchange-genie.blogspot.com/2007/07/autodiscover-ad-attribute.html</a></p>
+<p>With Exchange 2007 in order to allow clients remote access to the mail system you will need to install an Exchange 2007 CAS server which will allow clients to access thier mail via Imap,Pop,OWA,Active Sync, and Rpc/https (outlook anywhere).</p>
+<p>For this article I am going to skip the installation of each server role and just work with the configuration. The lab consists of 1 DC, 1 CAS/Hub and 1 MBX server running Windows 2003 and Exchange 2007 SP1.</p>
+<p><a href="http://2.bp.blogspot.com/_jG-efUpJ7Oc/R-rtPie74OI/AAAAAAAAAr8/pgCGZ3anNmo/s1600-h/rpc_proxy.jpg"><img alt="" src="images/rpc_proxy.jpg" /></a></p>
+<p>Rpc/http was first introduced with Exchange 2003 and has been renamed with Exchange 2007 to Outlook Anywhere. In order to use this functionality with Exchange we must install the RPC over HTTP Proxy networking component on a server (recommened on your Exchange server).</p>
+<p>What does this network componet do for us?<br />
+RpcProxy.dll is an Internet Server API (ISAPI) that runs in Internet Information Services (IIS). RpcProxy.dll listens for activity on the RPC virtual directory</p>
+<p>The rpcproxy.dll requires authentication and will not pass anonymous request even if IIS is configured for anonymous authentication.</p>
+<p>When an Outlook clients typicaly communicates with an Exchange server the client attempts to connect via Mapi Rpc, with Rpc/http Outlook makes a http connection to the rpc proxy server which strips the http and send the rpc request to tha appropriate Exchange server.</p>
+<p><strong>Installing Rpc/http networking componet:</strong><br />
+1. From the Add/Remove programs select Windows components<br />
+2. Select Networking Services then details<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/i1.jpg"><img alt="" src="images/i1.jpg" /></a><br />
+3. Select Rpc over http proxy -&gt; OK<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/i2.jpg"><img alt="" src="images/i2.jpg" /></a><br />
+4. Click Next to start the installation<br />
+5. Click Finish to complete the installation</p>
+<p>How do we verify the installation?<br />
+1. Validate you have 2 virtual directories installed called RPC and RPC with Cert<br />
+The 2 new virtual directories points to C:\WINDOWS\System32\RpcProxy which is the location of the rpcproxy.dll<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/v1.jpg"><img alt="" src="images/v1.jpg" /></a><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/v2.jpg"><img alt="" src="images/v2.jpg" /></a><br />
+2. Verify the RPC Proxy server extension is allowed in IIS (this will be enabled after you install the component)<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/v3.jpg"><img alt="" src="images/v3.jpg" /></a><br />
+Later we will look at a tool called rpc dump that can be used to troubleshoot connectivity problems.</p>
+<p>After we have installed our CAS server we need to enable Outlook Anywhere which can be done in 1 of two ways, 1. EMS (command line) or 2. EMC (gui)</p>
+<p><strong>1. EMS</strong><br />
+To work with Outlook anywhere via EMS we would use the the following set of commands Get-OutlookAnywhere,Set-OutlookAnywhere,Enable-OutlookAnywhere.</p>
+<p>A. Open EMS<br />
+B. Now we will use the Enable-OutlookAnywhere command to enable this feature<br />
+–The following switches are available for the command<br />
+** Pre SP1<br />
+Enable-OutlookAnywhere -DefaultAuthenticationMethod -ExternalHostname -SSLOffloading &lt;$true $false&gt; [-Confirm []] [-DomainController ] [-Server ] [-TemplateInstance ] [-WhatIf []]<br />
+** Post SP1<br />
+Enable-OutlookAnywhere -ClientAuthenticationMethod -ExternalHostname -SSLOffloading &lt;$true $false&gt; [-Confirm []] [-DomainController ] [-IISAuthenticationMethods ] [-Server ] [-TemplateInstance ][-WhatIf []]</p>
+<p>For this demo I used the following command<br />
+[PS] C:\&gt;Enable-OutlookAnywhere -Server vmcashub -SSLOffloading:$false -ExternalHostname vmcashub.vn.local -ClientAuthenticationMethod basic -IISAuthenticationMethods basic<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/ems-en1.jpg"><img alt="" src="images/ems-en1.jpg" /></a><br />
+*Note if you use the defaultauthenticationmethod is will override the clientauth and IISAuth **<br />
+*Setting the ClientAuthMethod is what autodiscover will user to configure the client*</p>
+<p>Enable-OutlookAnywhere<br />
+<a href="http://technet.microsoft.com/en-us/library/bb124993%28EXCHG.80%29.aspx">http://technet.microsoft.com/en-us/library/bb124993%28EXCHG.80%29.aspx</a></p>
+<p>We can ouse the Get-OutlookAnywhere command to view our configuration<br />
+Get-OutlookAnywhere<br />
+<a href="http://technet.microsoft.com/en-us/library/bb124263%28EXCHG.80%29.aspx">http://technet.microsoft.com/en-us/library/bb124263%28EXCHG.80%29.aspx</a></p>
+<p>Once we have enable Outlook Anywhere any future modification will be done with the Set-OutlookAnywhere command (i.e. changing authentication)<br />
+Set-OutlookAnywhere <a href="http://technet.microsoft.com/en-us/library/bb123545%28EXCHG.80%29.aspx">http://technet.microsoft.com/en-us/library/bb123545%28EXCHG.80%29.aspx</a></p>
+<p><strong>2. EMC<br />
+</strong>a. Open EMC –&gt; Server configuration –&gt; client Access Server<br />
+b. Select the CAS server you want to enable<br />
+c. Click the button to Enable Outlook Anywhere<br />
+<a href="http://4.bp.blogspot.com/_jG-efUpJ7Oc/R89DCpxkTbI/AAAAAAAAArU/HIeUkJzdsNU/s1600-h/emc1.jpg"><img alt="" src="images/emc1.jpg" /></a><br />
+d. Enter the External name that clients will use to connect to your Exchange Server, note this name should match the name on your certificate. Select the authentication method of choice<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/emcbasic.jpg"><img alt="" src="images/emcbasic.jpg" /></a><br />
+e. On the Completion Wizard Click finish<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/emc2.jpg"><img alt="" src="images/emc2.jpg" /></a><br />
+As you saw there is very little configuration when enabling Outlook Anywhere we have 3 options<br />
+1. Url 2. authentication and 3. Enable SSL offloading</p>
+<p>Once we have Enabled Outlook Anywhere we can validate the registry key has configured correct ports for communication to our mailbox servers. Note only the name listed in the key can be used by clients to connect and you will notice there is no IP address listed so testing via IP will fail through the rpc proxy.</p>
+<p>1. Click start Run<br />
+2. Regedit – this will open the registry editor<br />
+3. HKEY_LOCAL_MACHINE\Software\Microsoft\Rpc\RpcProxy<br />
+4. Notice the Dword called Enabled set to 1<br />
+5. There is a String value called “ValidPorts”<br />
+VMMBX1<strong>:6001-6002</strong>;VMMBX1:<strong>6004</strong>;vmmbx1.vm.local:<strong>6001-6002</strong>;vmmbx1.vm.local:</p>
+<p><strong>6004</strong></p>
+<p><strong><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/regedit.jpg"><img alt="" src="images/regedit.jpg" /></a><br />
+**Note if the port are not listed it could take up to 15 minutes to update or you can restart the Microsoft Exchange Service Host **<br />
+we can see that the rpc proxy connects to our mailbox server on the following port 6001-6002 and 6004. Each port is defined below</strong></p>
+<p>Microsoft Exchange Information Store service: <strong>6001<br />
+</strong>referral service of DSProxy: <strong>6002<br />
+</strong>proxy service of DSProxy: <strong>6004</strong><br />
+Active Directory (if the global catalog server and Exchange Server are on the same server): <strong>6004</strong></p>
+<p>In our client testing we can validate the proxy making connections to our mailbox server with these ports.</p>
+<p><strong>Configure a client:</strong><br />
+Manually<br />
+1. Create a New profile<br />
+2. check the manually configure box at the bottom<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/11.jpg"><img alt="" src="images/11.jpg" /></a></p>
+<p>3. Select Microsoft Exchange</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/21.jpg"><img alt="" src="images/21.jpg" /></a></p>
+<p>4. Input your mailbox server name (this could be FQDN or Netbios Name)</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/31.jpg"><img alt="" src="images/31.jpg" /></a></p>
+<p>5. Click the “More settings” button</p>
+<p>6. Select the connections tab</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/4.jpg"><img alt="" src="images/4.jpg" /></a></p>
+<p>7. Check the box “Connect to Microsoft Exchange using HTTP” -&gt; Exchange Proxy Settings</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/5.jpg"><img alt="" src="images/5.jpg" /></a></p>
+<p>8. Input the url of your Outlook Anywhere server, check the appropriate authentication</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/6.jpg"><img alt="" src="images/6.jpg" /></a></p>
+<p>9. Click OK and finish the profile<br />
+2. Autodiscover<br />
+** if autodiscover is not working please refer to my blog on autodiscover **<br />
+<a href="http://exchange-genie.blogspot.com/2007/07/autodiscover-ad-attribute.html">http://exchange-genie.blogspot.com/2007/07/autodiscover-ad-attribute.html</a></p>
+<p>1. Click Add<br />
+<a href="http://4.bp.blogspot.com/_jG-efUpJ7Oc/R_jQ9ie74hI/AAAAAAAAAuU/Mi1yoHsV5zg/s1600-h/1.jpg"><img alt="" src="images/1.jpg" /></a></p>
+<p>2. Give a name for the profile<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/22.jpg"><img alt="" src="images/22.jpg" /></a></p>
+<p>3. Input the display name and users email address and password<br />
+**Note a domain logged on user will auto populate the information**<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/32.jpg"><img alt="" src="images/32.jpg" /></a></p>
+<p>5. Logon to your mailbox<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/41.jpg"><img alt="" src="images/41.jpg" /></a></p>
+<p>6. Click Finish<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/51.jpg"><img alt="" src="images/51.jpg" /></a><br />
+<strong>Validation:<br />
+</strong>That we have installed all the components we need to do some testing to validate we have access to our mail.</p>
+<p><strong>Check Outlook connection status:</strong><br />
+1. Log onto Outlook<br />
+2. in the System tray hold the CTRL key and right click the Outlook icon<br />
+3. select connection status<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/stat1.jpg"><img alt="" src="images/stat1.jpg" /></a></p>
+<p>You can see our connection shows https, which validates we are going through the CAS server and proxying our connection.</p>
+<p><strong>Netstat:<br />
+</strong>We can use netstat to show our connection for each hop Client-&gt; CAS -&gt; Mbx -&gt; DC</p>
+<p>Open a command windows on the CAS server and type netstat -na<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/stat2.jpg"><img alt="" src="images/stat2.jpg" /></a></p>
+<p>You can see from the screen shot above that our client 192.168.1.5 is making connections are port 443 to our CAS server 192.168.1.101</p>
+<p>As noted in the connections window from Outlook you can see that the Outlook client makes multiple connections to the CAS server on port 443 and this is validated in the netstat</p>
+<p>CAS -&gt; MBX<br />
+On the mailbox server open a command window and type Netstat -na</p>
+<p>The first item to note is our mailbox server listening on ports 6001,6002, and 6004 which is the ports used by rpc/http to make connections<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/mbxlisten.jpg"><img alt="" src="images/mbxlisten.jpg" /></a></p>
+<p>Below you can see our mbx server 192.168.1.102 receiving connections on port 6001 and 6004 from our CAS server 192.168.1.101<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/cas2mbx600x.jpg"><img alt="" src="images/cas2mbx600x.jpg" /></a></p>
+<p>MBX -&gt; DC<br />
+On our domain controller we can see Ldap 389 and GC 3268 ports with connections from both our CAS server and MBX server.<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/dc2casandmbx.jpg"><img alt="" src="images/dc2casandmbx.jpg" /></a></p>
+<p><strong>Packet Captures:<br />
+</strong>We can use a tool like NetMon or WireShark to perform network captures on each hop as well to validate our traffic between each node. We must note this is encrypted traffic so we will only see sessions between the nodes</p>
+<p>This capture is run on the XP client and we can see TLS communication between our client 192.168.1.5 and our CAS 192.168.1.101<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/client-cas.jpg"><img alt="" src="images/client-cas.jpg" /></a></p>
+<p>This capture show communication from the CAS 192.168.101 to the mailbox server on port 6001/6004</p>
+<p>See the highlighted section showing a destination port 6001 from the CAS to the MBX server<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/cas-mbx1.jpg"><img alt="" src="images/cas-mbx1.jpg" /></a></p>
+<p>See the highlighted section showing a destination port 6004 from the CAS to the MBX server<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/6004.jpg"><img alt="" src="images/6004.jpg" /></a></p>
+<p>Mailbox Server -&gt; DC/GC<br />
+Below we can see our mailbox server making connections to the DC Ldap port 389<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/ldap.jpg"><img alt="" src="images/ldap.jpg" /></a></p>
+<p><strong>RPCPing:</strong></p>
+<p>RpcPing is a utility that we can use to troubleshoot or validate that our rpc proxy is working properly.<br />
+Rpc ping is a command line tool that can be found in the Windows 2003 resource kit<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;DisplayLang=en">http://www.microsoft.com/downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;DisplayLang=en</a> We can use this tool to test rpc connectivity through an rpc proxy server which is used for Outlook Anywhere.</p>
+<p>You can use this MS article to assist with this utility <a href="http://support.microsoft.com/kb/831051">http://support.microsoft.com/kb/831051</a></p>
+<p>1. Open a command line to the resource kit directory</p>
+<p><a href="http://3.bp.blogspot.com/_jG-efUpJ7Oc/SA6HxRc9fdI/AAAAAAAAAvM/Yv-7YXmEZXU/s1600-h/1.jpg"><img alt="" src="images/1.jpg" /></a></p>
+<p>2. Lets connect to port 6001 =store</p>
+<p>rpcping -t ncacn_http -s vmmbx1.vm.local -o RpcProxy=mail.vm.local -P “brian.tirch,vm.local,*” -I “brian.tirch,vm.local,*” -H 1 -F 3 -v 3 -B msstd:mail.vm.local -e 6001 -u 10 -a connect</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/23.jpg"><img alt="" src="images/23.jpg" /></a></p>
+<p>You can see we make a successful connection<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/33.jpg"><img alt="" src="images/33.jpg" /></a></p>
+<p>3. Lets connect to port 6004 =DsProxy</p>
+<p>rpcping -t ncacn_http -s vmmbx1.vm.local -o RpcProxy=mail.vm.local -P “brian.tirch,vm.local,*” -I “brian.tirch,vm.local,*” -H 1 -F 3 -v 3 -B msstd:mail.vm.local -e 6004 -u 10 -a connect</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/42.jpg"><img alt="" src="images/42.jpg" /></a></p>
+<p>You can see we make a successful connection<br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/52.jpg"><img alt="" src="images/52.jpg" /></a></p>
+<p>These tests show us that we are properly connecting through the rpc proxy server to the correct ports associated with Outlook Anywhere.</p>
+<p>reference the above MS article for a break down of the switches.</p>
+<p><strong>PerfMon:<br />
+</strong>Windows 2008 has added some additional perf counters that we can use with Rpc/Proxy that can assist in identifying connectivity and user load.</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/perf.jpg"><img alt="" src="images/perf.jpg" /></a></p>
+<p><strong>common issues:</strong><br />
+1. Certificates – If the client machine does not trust the certificate that is being presented it will fail to connect. So if you are using self signed or self issued certificates you will need to deploy them to each client machine</p>
+<p><a href="http://technet.microsoft.com/en-us/library/bb124149%28EXCHG.80%29.aspx">http://technet.microsoft.com/en-us/library/bb124149%28EXCHG.80%29.aspx</a></p>
+<p><a href="http://www.exchange-genie.com/2008/02/configuring-outlook-anywhere-for-exchange-2007-sp1/">http://www.exchange-genie.com/2008/02/configuring-outlook-anywhere-for-exchange-2007-sp1/</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-determine-memory-dimm-usage-on-esx-host-without-agents.html">&larr; Older: Determine Memory DIMM usage on ESX host without agents</a><a class="post-nav-link align-right" href="../posts/2011-03-04-bt-ptr-records.html">Newer: BT PTR REcords &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Office Home and Business 2010 install on Windows 2008 R2 RDS server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Office Home and Business 2010 install on Windows 2008 R2 RDS server</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a><a class="tag" href="../tags/license.html">license</a><a class="tag" href="../tags/office.html">office</a></div>
+        <div class="content">
+          <p>Whilst it might install, Office Home edition will give you problems on 2008 - a retail licence only allows you to use a single copy, so why would you want to put it in a ts environment, even if it did work you would only have the licence for one dedicated client to access it.</p>
+<p>Take a look at</p>
+<p><a href="http://download.microsoft.com/download/1/7/7/17745e4a-5d31-4de4-a416-07c646336d94/desktop_application_with_windows_server_terminal_services.docx">http://download.microsoft.com/download/1/7/7/17745e4a-5d31-4de4-a416-07c646336d94/desktop_application_with_windows_server_terminal_services.docx</a></p>
+<p>In brief the version installed on the server must be the same as the version licences on the desktop.</p>
+<p>For what it’s worth, if you do install Office 2003 on Windows Server 2008 R2, the only issue I came across recently was DEP kicking in on Outlook.</p>
+<p>I added an exception for Outlook, and scripted it like this in a .cmd file</p>
+<p>@echo off</p>
+<p>SET Outlook_Location="C:\Program Files (x86)\Microsoft Office\OFFICE11\OUTLOOK.EXE"</p>
+<p>REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" /v %Outlook_Location% /t REG_SZ /d DisableNXShowUI /f</p>
+<p>If you want to script the automatic Outlook 2003 configuration via PRF file on first logon, then I used this script</p>
+<p>@echo off</p>
+<p>SET PRF_Location=\\company.local\NETLOGON\company.prf</p>
+<p>reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList" /v Default &gt; %temp%\DefaultProfileList.txt</p>
+<p>for /f "skip=2 tokens=3*" %%P in (%temp%\DefaultProfileList.txt) do set DefaultProfilePath=%%P\NTUSER.DAT</p>
+<p>call set ExpandedDefaultProfilePath=%DefaultProfilePath%</p>
+<p>REG LOAD HKU\TempDefaultUser %ExpandedDefaultProfilePath%</p>
+<p>REG ADD HKU\TempDefaultUser\Software\Microsoft\Office\11.0\Outlook\Setup /v ImportPRF /t REG_SZ /d %PRF_Location% /f</p>
+<p>REG UNLOAD HKU\TempDefaultUser</p>
+<p>del /q %temp%\DefaultProfileList.txt</p>
+<p>The other thing I came across at the same time was 123mrp.Net (if they use it) required running in 32bit mode with .Net Framework, which you can do with the corflags utility</p>
+<p>@echo off</p>
+<p>"%~dp0CorFlags.exe" "%ProgramFiles(x86)%\123mrp.NET\123mrp.NET Client\6.04.01.03\123mrp.NET.exe" /32BIT+</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-outlook-deployment-on-citrix-via-transofmraiton-files.html">&larr; Older: Outlook Deployment on Citrix via Transofmraiton Files</a><a class="post-nav-link align-right" href="../posts/2011-03-03-ocs-to-cucm-integration.html">Newer: OCS to CUCM integration &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

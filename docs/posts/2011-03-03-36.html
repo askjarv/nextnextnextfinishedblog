@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>2011-03-03-36</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>2011-03-03-36</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/alerts.html">alerts</a><a class="tag" href="../tags/snmp.html">snmp</a><a class="tag" href="../tags/vmware.html">vmware</a></div>
+        <div class="content">
+          <p>I’ve seen this a few times now, where SNMP traps are being sent from vCenter even though there is no matching alarm on the management console. I haven’t managed to identify the main cause but find restarting the “VMware ESX Management services” on the relevant ESX host and the “VMware VirtualCenter Server” service appear to resolve the problem.</p>
+<p><img alt="" src="images/2.jpg" title="Services" /></p>
+<p>[root@esx01 init.d]# <strong>service mgmt-vmware restart</strong></p>
+<p>Stopping VMware ESX Management services:</p>
+<p>VMware ESX Host Agent Watchdog [ OK ]</p>
+<p>VMware ESX Host Agent [ OK ]</p>
+<p>Starting VMware ESX Management services:</p>
+<p>VMware ESX Host Agent (background) [ OK ]</p>
+<p>Availability report startup (background) [ OK ]</p>
+<p>[root@esx01 init.d]# <strong>service vmware-vpxa restart</strong></p>
+<p>Stopping vmware-vpxa: [ OK ]</p>
+<p>Starting vmware-vpxa: [ OK ]</p>
+<p>[root@esx01 init.d]#</p>
+<p><img alt="" src="images/3.jpg" title="VMware SNMP" /></p>
+<p>Additionally, if you acknowledge any alarms in vCenter it will stop sending the SNMP traps until a new condition is met. Therefore, be sure that you want to do this!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-allow-citrix-client-to-see-local-drives.html">&larr; Older: Allow Citrix client to see local drives</a><a class="post-nav-link align-right" href="../posts/2011-03-03-22.html">Newer: Missing folder in Outlook &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

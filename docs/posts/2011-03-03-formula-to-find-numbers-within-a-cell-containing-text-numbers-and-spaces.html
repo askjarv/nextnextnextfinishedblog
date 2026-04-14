@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Formula to find numbers within a cell containing text, numbers and spaces.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Formula to find numbers within a cell containing text, numbers and spaces.</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/excel.html">excel</a><a class="tag" href="../tags/formula.html">formula</a></div>
+        <div class="content">
+          <p>I need a formula that will locate only numbers within a text/number cell (i.e. HSS 3x2 11GA) and then use those numbers to calculate certain values.</p>
+<p>For example: One cell, A1, has HSS 4x2 11GA, in cell C1 I would like a formula to calculate ((4*2^3)/32)*(11/0.5), having found the 4,2 and 11 values from A1. I would also like to click and drag this formula down the C column.</p>
+<p><strong>Answer</strong> You need a VBA User-defined Function. Press Alt/F11, use Insert/Module, copy/paste this in: Function Getno(rg As Range, no As Integer) As Integer temp = rg.Value For i = 1 To Len(temp) ch = Mid(temp, i, 1) Select Case ch Case "0" To "9" Case Else If i = 1 Then temp = " " &amp; Mid(temp, 2) ElseIf i = Len(temp) Then temp = Left(temp, i - 1) &amp; " " Else temp = Left(temp, i - 1) &amp; " " &amp; Mid(temp, i + 1) End If End Select Next Getno = Split(Application.Trim(temp), " ")(no - 1) End Function</p>
+<p>Not, go back to the worksheet, and, assuming the text is in A1, enter this in B1: =Getno(A1,1) to get the 1st #, =Getno(A1,2) for the 2nd, etc. So you can use =((getno(A1,1)*getno(A2,2)^3)/32)*(getno(A1,3)/0.5)</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-fortigate-flash-memory-errors.html">&larr; Older: Fortigate Flash Memory Errors</a><a class="post-nav-link align-right" href="../posts/2011-03-03-finding-physical-nic-port-using-ms-iscsi-initiators.html">Newer: Finding Physical NIC Port using MS iSCSI Initiators &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

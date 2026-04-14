@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>How to add sites to trusted/intranet zone via GPO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>How to add sites to trusted/intranet zone via GPO</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/group-policy.html">group-policy</a></div>
+        <div class="content">
+          <p>To create a policy to add a site to the <strong>Trusted Sites</strong> <a href="http://www.windowsitpro.com/article/tips/jsi-tip-6644-how-can-i-use-group-policy-to-add-a-site-to-the-trusted-sites-zone-.aspx">security</a> zone:</p>
+<p>01. Log on as a member of the <strong>Domain Admins</strong> group.</p>
+<p>02. Open the <strong>Active Directory Users and <a href="http://www.windowsitpro.com/article/tips/jsi-tip-6644-how-can-i-use-group-policy-to-add-a-site-to-the-trusted-sites-zone-.aspx">Computers</a></strong> <strong>MMC</strong> snap-in.</p>
+<p>03. Right-click the domain or Organizational Unit where you want to create the <strong>GPO</strong> and press <strong>Properties</strong>.</p>
+<p>04. Select the <strong>Group Policy</strong> tab.</p>
+<p>05. Press <strong>New</strong>.</p>
+<p>06. Type a name for the new <strong>GPO</strong> and press <strong>Enter</strong>.</p>
+<p>07. To prevent the policy from being applied to some users or groups, press <strong>Properties</strong>. Select the <strong>Security</strong> tab. Add the user or group that you want to prevent from having this policy and clear the <strong>Read</strong> and the <strong>Apply Group Policy</strong> boxes in the <strong>Allow</strong> column. Press <strong>OK</strong>.</p>
+<p>08. Press the <strong>Edit</strong> button.</p>
+<p>09. Navigate through <strong>User Configuration / Windows Settings / <a href="http://www.windowsitpro.com/article/tips/jsi-tip-6644-how-can-i-use-group-policy-to-add-a-site-to-the-trusted-sites-zone-.aspx">InternetExplorer</a> Maintenance / Security</strong>.</p>
+<p>10. Right-click <strong>Security Zones and Content Ratings</strong> in the right-hand pane and press <strong>Properties</strong>.</p>
+<p>11. Select <strong>Import the current security zones and privacy settings</strong>. If prompted, press <strong>Continue</strong>.</p>
+<p>12. Press <strong>Modify Settings</strong>.</p>
+<p>13. Select <strong>Trusted Sites</strong> and press the <strong>Sites</strong> button.</p>
+<p>14. Type the full URL of the site you wish to add and press <strong>Add</strong>.</p>
+<p>15. Press <strong>Close</strong> (or <strong>OK</strong>) and <strong>OK</strong>.</p>
+<p>16. Press <strong>Close</strong> (or <strong>OK</strong>) until all dialog boxes are closed, and close any snap-in windows.</p>
+<p>17. Allow sufficient time for the policy to propagate throughout the domain.</p>
+<p><strong>NOTE:</strong> See <a href="http://www.windowsitpro.com/article/jsifaq/jsi-tip-6643-how-can-i-manually-add-a-site-to-the-trusted-sites-zone-.aspx">How can I manually add a site to the <strong>Trusted Sites</strong> zone?</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-how-to-determine-the-ou-a-user-is-located-in.html">&larr; Older: How to determine the ou a user is located in</a><a class="post-nav-link align-right" href="../posts/2011-03-03-how-to-add-pictures-to-active-directory-and-contacts-to-lync-using-utils.html">Newer: How to add pictures to active directory and contacts to Lync using utils &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

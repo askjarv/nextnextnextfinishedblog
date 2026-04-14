@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Rebuilding logical disk performance counters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Rebuilding logical disk performance counters</h1>
+        <div class="meta">
+          <time datetime="2011-03-30">2011-03-30</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/monitoring.html">monitoring</a><a class="tag" href="../tags/performance-counters.html">performance-counters</a><a class="tag" href="../tags/windows.html">windows</a></div>
+        <div class="content">
+          <p>Guys,</p>
+<p>If you ever need to monitor logical disk performance counters (for free space as a percentage, in Megabytes and so on) and find that those counters and those counters alone either aren’t working or simply aren’t present, then you might want to bear in mind the following possible fixes:</p>
+<ul>
+<li>At a command prompt, typing <strong>diskperf –yv</strong> will activate logical disk monitoring if it isn’t already enabled – this is turned on by default under Windows 2003 and 2008 Server, but is <em>disabled</em> by default in Windows 2000. Running this command will also confirm the current state of logical counter activation anyway, but if you are enabling counters with this command then you’ll need a reboot afterwards for the change to take place.</li>
+<li>If logical disk counters still don’t appear in PerfMon, then check the following Registry location: <strong>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PerfDisk\Performance</strong> – if there is a key within this folder named <strong>DisablePerformanceCounters</strong>, ensure that it is set to <strong>0</strong> to enable logical disk counters.</li>
+<li>If logical disk counters appear in PerfMon but not via WMI (you can see what performance counters are available over WMI by using the <strong>perfmon /wmi</strong> switch), then you can reinstate these counters with the following simple command: <strong>wmiadap /f</strong> – this parses and refreshes all WMI performance counter classes on the system.</li>
+</ul>
+<p>One or a combination of these commands should fix your problem – if not, you’re probably looking at a complete rebuild of WMI most likely. Happy monitoring!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-30-script-to-set-your-most-recently-added-printer-as-your-default-printer.html">&larr; Older: Script to set your most recently added printer as your default printer</a><a class="post-nav-link align-right" href="../posts/2011-03-30-fortigate-dual-ping-peer-gateways.html">Newer: Fortigate Dual Ping Peer gateways &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SSL VPN Auth by Security Group using LDAP on FortiGate OS 4.0MR2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>SSL VPN Auth by Security Group using LDAP on FortiGate OS 4.0MR2</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/authentication.html">authentication</a><a class="tag" href="../tags/vpn.html">vpn</a></div>
+        <div class="content">
+          <p><strong>1) Create a standard active directory user object to allow the FortiGate to run LDAP queries</strong></p>
+<p>In this example we are using the following:</p>
+<p>User Name: Fortinet LDAP<br />
+Username: fortinet<br />
+Password: (something verify complex)<br />
+Password never expires: Enabled<br />
+User cannot change password: Enabled</p>
+<p><strong>2) Create an Active Directory security group</strong></p>
+<p>Users who are members of this group will be allowed to authenticate to the SSL VPN.<br />
+For this example we are using: <strong>SSL VPN Users</strong></p>
+<p><strong>3) Add the LDAP server to the Fortigate appliance</strong></p>
+<p>To speed things up we are using the CLI. You will require the following information to complete this step:</p>
+<p>Pick an LDAP ID Name: <strong>serverLDAP<br />
+</strong>LDAP Server (domain controller): <strong>10.200.1.10<br />
+</strong>CNID</p>
+<p>Allows you to choose what values are to be referenced when authenticating. In this example, we are using staff usernames (ie. jsmith):CNID = <strong>sAMAccountName</strong></p>
+<p>Distinguished Name</p>
+<p>A distinguished name is path the OU or domain you wish to filter. In most cases using the entire domain is sufficient and will not affect performance (less than 1000 users). For this case we will be using a default instance, please replace domain.com with your own details.</p>
+<p>DN: <strong>DC=domain,DC=com</strong></p>
+<p>LDAP Auth Type (basic, regular, anonymous)</p>
+<p><strong>Use regular</strong>, it requires a valid user ID to make LDAP queries.</p>
+<p>AD Username</p>
+<p>You will need the LDAP path to the "Fortinet LDAP" user object created in section 1. Load the command prompt on your domain controller:<br />
+dsquery user -name "Fortinet LDAP"</p>
+<p>which will return the value you need:</p>
+<p>"CN=Fortinet LDAP,OU=Users,DC=domain,DC=com"</p>
+<p>Now that you've acquired all the information, you can generate the required entry into the Fortinet CLI:</p>
+<p>config user ldap</p>
+<p>edit "serverLDAP"</p>
+<p>set server "10.200.1.10"</p>
+<p>set cnid "sAMAccountName"</p>
+<p>set dn "dc=domain,dc=com"</p>
+<p>set type regular</p>
+<p>set username "CN=Fortinet LDAP,OU=Users,DC=domain,DC=com"</p>
+<p>set password</p>
+<p>next</p>
+<p>end</p>
+<p><strong>4) Create a firewall user group</strong></p>
+<p>This group is used when creating your SSL VPN firewall policies.</p>
+<p>You will require the following information to complete this task:</p>
+<p>Group Name: <strong>LDAP VPN Users</strong>Pick a name to reference in future tasks. Tunnel Type: <strong>Tunnel-Access</strong>You can create unique tunneling policies by visiting (VPN-&gt;SSL-&gt;Portal). We will use the default tunnel-access for this task. If you would like to setup split tunneling, you will need to visit the "tunnel access" profile and enable it. LDAP Server Profile Name (created in section 3)<strong>serverLDAP</strong> Security Group LDAP pathThis is the important part! You need to acquire the exact LDAP path to the security group you are using to allow access to the SSL VPN. In this example, we created this security group in section 2.</p>
+<p>To find it, use dsquery. Load the command prompt on your domain controller:<br />
+dsquery group -name "SSL VPN Users"</p>
+<p>which will return the value you need:</p>
+<p>"CN=SSL VPN Users,OU=Builtin,DC=domain,DC=com"</p>
+<p>Now that you've acquired all the information, you can enter the details into the Fortigate CLI: :</p>
+<p>config user group</p>
+<p>edit "SSL VPN Users"</p>
+<p>set sslvpn-portal "tunnel-access"</p>
+<p>set member "serverLDAP"</p>
+<p>config match</p>
+<p>edit 1</p>
+<p>set server-name "serverLDAP"</p>
+<p>set group-name "CN=SSL VPN Users,OU=Builtin,DC=domain,DC=com"</p>
+<p>next</p>
+<p>end</p>
+<p>next</p>
+<p>end</p>
+<p><strong>5) Create an incoming firewall policy to open the SSL VPN Auth mechanism</strong></p>
+<p>Generally most situations call for WAN1 to Internal1. Depending on your network, you may need to setup several incoming rules if you would like to allow authenticated users to access internal WLAN or other internal interfaces. For this example, we will just create the standard.</p>
+<p>Using the Web-Gui:</p>
+<p>- Firewall -&gt; Policy -&gt; Policy -&gt; Create New</p>
+<p>Source Interface: WAN1<br />
+Source Address: All<br />
+Destination Interface: Internal1<br />
+Destination Address: ALL or Internal LAN<br />
+Action: SSL-VPN</p>
+<p>At this point you will notice the form change.</p>
+<p>- Click for the "Add" button located directly below "Configure SSL-VPN Users".</p>
+<p>- Move "LDAP VPN Users" to the available user groups</p>
+<p>- Move "Any" to the selected services.</p>
+<p>- Save.</p>
+<p>- Save the new firewall policy.</p>
+<p>- Move it to the top of the "Wan -&gt; Internal" list so that this new policy is the first.</p>
+<p><strong>6) Create a firewall policy to allow the authenticated users to access your internal network.</strong></p>
+<p>Once users are authenticated, they need access to the internal lan. Create another policy as follows:</p>
+<p>Source Interface: SSL Tunnel Interface<br />
+Source Address: All<br />
+Destination Interface: Internal1<br />
+Destination Address: ALL or Internal LAN<br />
+Action: Accept</p>
+<p>This allows all SSL traffic to pass to all internal LAN IPs</p>
+<p><strong>7) Add users to the security group and test</strong></p>
+<p>Remember that each user with access to the VPN needs to be a member of the security group in section 2. Once added, you can load the SSL VPN client from an external location and attempt a connection.</p>
+<p>Server: (your external ip or hostname)<br />
+Username: (active directory username)<br />
+Password: (active directory password)</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-tapi-call-contact-in-outlook-on-windows-7-with-lync-installed.html">&larr; Older: TAPI &amp;ldquo;Call Contact&amp;rdquo; in Outlook on Windows 7 with Lync Installed</a><a class="post-nav-link align-right" href="../posts/2011-03-03-sbs-remote-portal-error-50331688.html">Newer: SBS remote portal error (50331688) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

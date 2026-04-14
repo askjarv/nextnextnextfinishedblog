@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ page_title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ stylesheet_path }}">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="{{ header_link }}">{{ site_title }}</a></h1>
+      <p class="site-subtitle">{{ site_description }}</p>
+      <p class="site-rss"><a href="rss.xml">RSS feed</a></p>
+    </header>
+
+    <main>
+      {{ post_list }}
+      {{ pagination }}
+    </main>
+  </div>
+</body>
+</html>

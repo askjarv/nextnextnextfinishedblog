@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VBS Script to detect OS version</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>VBS Script to detect OS version</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/os.html">os</a><a class="tag" href="../tags/vbs.html">vbs</a><a class="tag" href="../tags/x64.html">x64</a><a class="tag" href="../tags/x86.html">x86</a></div>
+        <div class="content">
+          <p>Here is a nice little script that may help you out in the future for any reason, mine was Trend.</p>
+<p>I have recently installed Trend and have created a Remote Deployment package that comes in either x64 or x86 variety. In order to save time for anyone deploying the software I have created a script to go with it that detects what version of OS you are running and then runs the correct installer.</p>
+<p>Copy the below to a new notepad file and save as .vbs in the same folder as the x64 and x86 installation packages. Change the filenames to whatever you like between the “” after objShell.Run.</p>
+<p>Set objShell = CreateObject("WScript.Shell")</p>
+<p>osType = objShell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%")</p>
+<p>If osType = "x86" Then</p>
+<p>objShell.Run "deployclientx86.msi"</p>
+<p>ElseIf osType = "AMD64" Then</p>
+<p>objShell.Run "deployclientx64.msi"</p>
+<p>Else</p>
+<p>'*shrug*</p>
+<p>End If</p>
+<p>Simple but effective… Hope this helps.</p>
+<p>Wes</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-veeam-fast-scp.html">&larr; Older: Veeam FAST-SCP</a><a class="post-nav-link align-right" href="../posts/2011-03-04-trend-worry-free-business-disk-space-issues.html">Newer: Trend worry free business disk space issues &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

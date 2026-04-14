@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Exchange 2010 DAG FAILOVER breaks backup exec access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Exchange 2010 DAG FAILOVER breaks backup exec access</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/backup.html">backup</a><a class="tag" href="../tags/dag.html">dag</a><a class="tag" href="../tags/exchange-2010.html">exchange-2010</a></div>
+        <div class="content">
+          <p>Just had the issue below , Exchange failover not as seamless as suggested (pre SP1) . This does not effect end users as mail is still online</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0011.jpg"><img alt="clip_image001" src="images/clip_image001_thumb1.jpg" title="clip_image001" /></a></p>
+<p>This is however nothing to do with the Remote agent and is actually a bug in Exchange 2010 pre SP1.   You need to Check Cluster manager and then under Cluster Resources you will notice the Cluster is offline. It will not allow you to bring online Although you should never touch the failover clustering for Exchange DAG setup . You have to make an exception for the workaround on the link below . There is the usual padding and 3 options that achieve the same result.</p>
+<p><a href="http://blogs.technet.com/b/timmcmic/archive/2010/05/12/cluster-core-resources-fail-to-come-online-on-some-exchange-2010-database-availability-group-dag-nodes.aspx">http://blogs.technet.com/b/timmcmic/archive/2010/05/12/cluster-core-resources-fail-to-come-online-on-some-exchange-2010-database-availability-group-dag-nodes.aspx</a></p>
+<p>I did as follows and all was good.</p>
+<p><strong><em>Windows 2008 / Windows 2008 R2 – Using Failover Cluster Management Tool</em></strong></p>
+<p>The network state can be reset using Failover Cluster Manager</p>
+<ul>
+<li>Launch Failover Cluster Management</li>
+<li>Expand the cluster \ networks.</li>
+</ul>
+<p><a href="http://blogs.technet.com/blogfiles/timmcmic/WindowsLiveWriter/ClusterCoreResourcesfailtocomeonlineons_83A6/image_14.png"><img alt="clip_image003" src="images/clip_image0031.gif" title="clip_image003" /></a></p>
+<ul>
+<li>Get the properties of the cluster network in question.</li>
+<li>Uncheck the box to “Allow clients to connect through this network”.</li>
+</ul>
+<p><a href="http://blogs.technet.com/blogfiles/timmcmic/WindowsLiveWriter/ClusterCoreResourcesfailtocomeonlineons_83A6/image_16.png"><img alt="clip_image005" src="images/clip_image005.gif" title="clip_image005" /></a></p>
+<ul>
+<li>Press <apply> - you will be prompted with the following – select OK.</li>
+</ul>
+<p><a href="http://blogs.technet.com/blogfiles/timmcmic/WindowsLiveWriter/ClusterCoreResourcesfailtocomeonlineons_83A6/image_18.png"><img alt="clip_image007" src="images/clip_image007.gif" title="clip_image007" /></a></p>
+<ul>
+<li>Press <OK> to exist the properties pane.</li>
+<li>The network is disabled for “Allow clients to connect through this network”. </li>
+</ul>
+<p>Next we need to enable the network for “Allow clients to connect through this network”.</p>
+<ul>
+<li>Get the properties of the cluster network.</li>
+<li>Check the box to “Allow clients to connect through this network”.</li>
+</ul>
+<p><a href="http://blogs.technet.com/blogfiles/timmcmic/WindowsLiveWriter/ClusterCoreResourcesfailtocomeonlineons_83A6/image_20.png"><img alt="clip_image009" src="images/clip_image009.gif" title="clip_image009" /></a></p>
+<ul>
+<li>Press <apply> – you will be prompted with the following – select OK.</li>
+</ul>
+<p><a href="http://blogs.technet.com/blogfiles/timmcmic/WindowsLiveWriter/ClusterCoreResourcesfailtocomeonlineons_83A6/image_22.png"><img alt="clip_image011" src="images/clip_image011.gif" title="clip_image011" /></a></p>
+<ul>
+<li>Press <OK> to exist the properties pane.</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-exchange-grt-restore-fails-backup-exec.html">&larr; Older: Exchange GRT restore Fails (Backup Exec)</a><a class="post-nav-link align-right" href="../posts/2011-03-03-exchange-2003-spam-confidence-levels.html">Newer: Exchange 2003 Spam-Confidence-Levels &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IIS with multiple versions of asp.net</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>IIS with multiple versions of asp.net</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/asp-net.html">asp-net</a></div>
+        <div class="content">
+          <p>It is not possible to run two different versions of ASP.NET in the same IIS process. Please use the IIS Administration Tool to reconfigure your server to run the application in a separate process.</p>
+<p>Is as below:</p>
+<p>Log into IIS,</p>
+<p>Create a new Application pool - (i.e. Remote Workplace)</p>
+<p>Browse to the remote site under websites,</p>
+<p>Right click, properties, and browse to virtual directory,</p>
+<p>Move the application pool to our newly created pool,</p>
+<p>Click ok.</p>
+<p>Test remote connectivity to remote workplace.</p>
+<p>In this specific case, this did not require an issreset to work.</p>
+<p>Just in case you come across this again.</p>
+<p>Further details as to the cause are found at:</p>
+<p><a href="http://weblogs.asp.net/owscott/archive/2006/01/26/Running-multiple-versions-of-the-Framework-in-ASP.NET.aspx">http://weblogs.asp.net/owscott/archive/2006/01/26/Running-multiple-versions-of-the-Framework-in-ASP.NET.aspx</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-isdn-cards-for-isrs.html">&larr; Older: ISDN CARDS FOR ISR&#x27;s</a><a class="post-nav-link align-right" href="../posts/2011-03-03-how-to-use-bemig-to-manually-upgrade-the-backup-exec-database-from-a-previous-version.html">Newer: How to use BEMIG to manually upgrade the Backup Exec database from a previous version &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

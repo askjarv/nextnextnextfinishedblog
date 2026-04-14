@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Architecture Anti-Patterns</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Architecture Anti-Patterns</h1>
+        <div class="meta">
+          <time datetime="2026-02-17">2026-02-17</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/architecture.html">architecture</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>File Integrity Monitoring (FIM) and Security Configuration Management (SCM) platforms like the ones I currently work with at Fortra are deceptively simple on the surface: deploy/configure endpoints, define rules/assessments, schedule tasks, evaluate results, report.</p>
+<p>In practice, however, architectural missteps turn what should be a high-signal assurance capability into an expensive noise generator for far too many - and it's probably the biggest challenge I still see in projects today (and, to be honest, I've seen plenty of non-FIM and SCM security projects that suffer similarly, but for today I'll focus on FIM/SCM though I may revisit for a VM/EDR post at somepoint!)</p>
+<p>Below, then, are some of the more common architectural anti-patterns I've observed in enterprise FIM/SCM implementations - along with why they fail and what the alternatives look like.</p>
+<h2 id="too-many-policies">Too Many Policies</h2>
+<h3 id="the-anti-pattern">The Anti-Pattern</h3>
+<p>Hundreds (sometimes thousands) of overlapping policies are deployed because:</p>
+<ul>
+<li>
+<p>Every benchmark is imported (CIS, NIST, ISO, internal standards)</p>
+</li>
+<li>
+<p>Each team wants its own view</p>
+</li>
+<li>
+<p>No rationalisation or deduplication occurs</p>
+</li>
+<li>
+<p>No policy lifecycle governance exists</p>
+</li>
+</ul>
+<h3 id="why-it-fails">Why It Fails</h3>
+<p>Architecturally, this creates:</p>
+<ul>
+<li>
+<p><strong>Policy sprawl</strong></p>
+</li>
+<li>
+<p>Redundant checks across nodes</p>
+</li>
+<li>
+<p>Duplicate rule execution</p>
+</li>
+<li>
+<p>Increased scan duration</p>
+</li>
+<li>
+<p>Conflicting evaluation logic</p>
+</li>
+<li>
+<p>Unmaintainable exception management</p>
+</li>
+</ul>
+<p>More importantly, <strong>signal dilution</strong> occurs. When everything is “critical,” nothing is.</p>
+<h3 id="better-architecture">Better Architecture</h3>
+<ul>
+<li>
+<p>Abstract reusable rule libraries - Tripwire fortunately provides lots of these - but consider too how you approach application monitoring rules such that they are easily transferable between apps so you've got a consistent approach across your organisation!</p>
+</li>
+<li>
+<p>Create baseline policies aligned to node class (e.g., Windows Server, RHEL MySQL, Kubernetes Worker, etc). That makes things a lot easier to spot gaps and ensures you're thinking about "device types" and "applications" consistently.</p>
+</li>
+<li>
+<p>Consider separating:</p>
+<ul>
+<li>
+<p>Operational policies</p>
+</li>
+<li>
+<p>Security hardening</p>
+</li>
+<li>
+<p>Compliance mapping overlays<br />
+    ... and if you're only doing one of these, consider if the others are necessary/beneficial</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Implement a policy review board and lifecycle process -work out in advance how you plan to evaluate and off/onboard policies ove time.</p>
+</li>
+</ul>
+<p>I encourage you to think in terms of <em>control objectives</em>, not just benchmark imports to tick a box...</p>
+<h2 id="compliance-only-thinking">Compliance-Only Thinking</h2>
+<h3 id="the-anti-pattern_1">The Anti-Pattern</h3>
+<p>FIM/SCM is deployed only to “pass audit.”</p>
+<p>Common patterns:</p>
+<ul>
+<li>
+<p>Policies enabled only during audit windows</p>
+</li>
+<li>
+<p>Checks mapped exclusively to external standards</p>
+</li>
+<li>
+<p>No integration into SOC or incident response</p>
+</li>
+<li>
+<p>No threat-informed tuning</p>
+</li>
+</ul>
+<h3 id="why-it-fails_1">Why It Fails</h3>
+<p>Compliance validation ≠ security assurance.</p>
+<p>FIM and SCM provide:</p>
+<ul>
+<li>
+<p>Change detection</p>
+</li>
+<li>
+<p>Privilege misuse detection</p>
+</li>
+<li>
+<p>Drift detection</p>
+</li>
+<li>
+<p>Baseline deviation analysis</p>
+</li>
+</ul>
+<p>When scoped only for compliance:</p>
+<ul>
+<li>
+<p>High-risk operational drift goes unnoticed.</p>
+</li>
+<li>
+<p>Threat actors modifying configurations are missed.</p>
+</li>
+<li>
+<p>Controls are reactive instead of preventative.</p>
+</li>
+</ul>
+<p>This creates an illusion of security maturity without operational security impact. Sure, on day one, SCM is great, giving binary feedback on state - but <em>actual</em> maturity takes work (but delivers <em>actual</em> gains in turn).</p>
+<h3 id="better-architecture_1">Better Architecture</h3>
+<ul>
+<li>
+<p>Map FIM alerts into (SIEM) workflows so that your teams actually act on alerts.</p>
+</li>
+<li>
+<p>Prioritise high-risk paths (e.g., authentication configs, sudoers, domain policies, etc.). If you don't know what your "crown jewels" are, starting working that out now!</p>
+</li>
+<li>
+<p>Align with threat models (e.g., ransomware TTPs targeting backups or logging configs) - MITRE ATT&amp;CK does a great job (and Fortra's Tripwire tools fortunately have good overlap here with MITRE ATT&amp;CK forensic audit and compliance rules to help you get going!).</p>
+</li>
+<li>
+<p>Use compliance as a <em>additional reporting layer</em>, not the primary design driver.</p>
+</li>
+</ul>
+<p>Design for resilience and detection first and then you audit reporting can become a by-product or "additional benefit" on top.</p>
+<h2 id="alert-fatigue">Alert Fatigue</h2>
+<h3 id="the-anti-pattern_2">The Anti-Pattern</h3>
+<p>Default rule sets are enabled with minimal tuning or thought.</p>
+<p>The result:</p>
+<ul>
+<li>
+<p>Thousands of file change alerts per day</p>
+</li>
+<li>
+<p>Recurring patch-cycle noise</p>
+</li>
+<li>
+<p>Log rotation alerts</p>
+</li>
+<li>
+<p>Temporary file churn</p>
+</li>
+<li>
+<p>No prioritisation</p>
+</li>
+</ul>
+<p>Eventually:</p>
+<ul>
+<li>
+<p>Alerts are ignored</p>
+</li>
+<li>
+<p>Email notifications are disabled</p>
+</li>
+<li>
+<p>SOC disengages</p>
+</li>
+<li>
+<p>Executive confidence declines</p>
+</li>
+</ul>
+<h3 id="why-it-fails_2">Why It Fails</h3>
+<p>From a systems engineering perspective:</p>
+<ul>
+<li>
+<p>High false-positive rates degrade trust.</p>
+</li>
+<li>
+<p>Cognitive overload reduces detection probability.</p>
+</li>
+<li>
+<p>Mean time to acknowledge increases.</p>
+</li>
+<li>
+<p>True positives are buried in noise.</p>
+</li>
+</ul>
+<p>The monitoring system becomes entropy.</p>
+<h3 id="better-architecture_2">Better Architecture</h3>
+<ul>
+<li>
+<p>Implement baselining and drift tolerance.</p>
+</li>
+<li>
+<p>Separate:</p>
+<ul>
+<li>
+<p>Informational telemetry</p>
+</li>
+<li>
+<p>Policy violations</p>
+</li>
+<li>
+<p>High-risk change alerts</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Use suppression rules for known maintenance windows.</p>
+</li>
+<li>
+<p>Apply risk scoring.</p>
+</li>
+<li>
+<p>Route alerts via tiered triage (not raw email).</p>
+</li>
+</ul>
+<p>Architecturally, alerts should be rare, actionable, and prioritised. Programs for continuous improvement, however, should be in place to make sure those alerts are tuned frequently and your posture is actually improve based on insights gathered from the toolset.</p>
+<h1 id="my-final-opinionated-thought">My Final (Opinionated!) Thought</h1>
+<p>Security does not have “tools you install”. Security is about building <strong>control ecosystems</strong> embedded into operational, security, and governance workflows. As a result, you should be architecting them like critical infrastructure:</p>
+<ul>
+<li>
+<p>With clear ownership.</p>
+</li>
+<li>
+<p>With defined fault domains.</p>
+</li>
+<li>
+<p>With lifecycle governance.</p>
+</li>
+<li>
+<p>With detection intent.</p>
+</li>
+</ul>
+<p>When designed correctly, they become high-fidelity sensors of configuration risk and operational drift. When designed poorly, they become background noise - and eventually, shelfware. The difference is architectural discipline - so don't forget to speak to your consultancy team about how to make sure you're being effective with your deployments (there's a reason why our teams consultancy often makes the difference between achieving ROI and just ticking the audit compliance box).</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-11-14-te-external-rule-elements-example.html">&larr; Older: TE External Rule Elements Example</a><a class="post-nav-link align-right" href="../posts/2026-03-10-monitoring-containers-a-fim-perspective.html">Newer: Monitoring Containers - A FIM perspective &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

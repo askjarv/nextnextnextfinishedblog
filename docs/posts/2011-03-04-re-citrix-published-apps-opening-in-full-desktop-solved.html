@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RE: Citrix Published apps opening in full desktop - Solved</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>RE: Citrix Published apps opening in full desktop - Solved</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a></div>
+        <div class="content">
+          <p>Updated:</p>
+<p>A hotfix for the problem that described is available as described on <a href="http://support.microsoft.com/kb/969851">http://support.microsoft.com/kb/969851</a></p>
+<p>Citrix Published apps opening in full desktop - Solved</p>
+<p>This issue has been affecting a number of users in for a while- when opening a Citrix published application will open a full Citrix desktop instead. This is due to a check box within the ad profile set to start program at logon.</p>
+<p>It is due to a bug within AD and when amended from a 2003 AD it can corrupt the object and this option will display differently from a 2008 AD.</p>
+<p>To resolve this, ensure the option shown in the attachment “Start the following program at logon” is <strong>UNCHECKED.</strong> Because of the corruption to the object this can only be shown from a 2003 AD as the 2008 AD will show this option as unchecked.</p>
+<p>This option to load a program at startup will override any other request (including the published application) and because there is no program specified it will open the explorer shell instead.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-resolving-common-windows-time-errors.html">&larr; Older: Resolving common windows time errors</a><a class="post-nav-link align-right" href="../posts/2011-03-04-net-uninstall-clean-up-tool.html">Newer: .Net uninstall clean up tool &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

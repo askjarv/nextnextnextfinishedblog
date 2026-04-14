@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Large WinSXS folder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Large WinSXS folder</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/disk.html">disk</a><a class="tag" href="../tags/tool.html">tool</a><a class="tag" href="../tags/utility.html">utility</a><a class="tag" href="../tags/windows.html">windows</a></div>
+        <div class="content">
+          <p>Cleaning up disks is a pain- and often you find your server has a large %systemroot%\WinSxS folder (we’ve seen over 11.3GB!)</p>
+<p>In a nutshell, the Windows SxS directory represents the “installation and servicing state” of all system components and solves a number of issues in legacy Windows related to installation, servicing and reliability.  It is not possible to delete or remove files from this folder other than what the ‘COMCLN.exe’ program can safety remove, as  removing files effects the reliably of windows and the services it provides and it would affect all operating system components and the ability to update or configure optional components on the system and helps avoid uninstall issues with other programs</p>
+<p>The following two links explain the engineering behind the WinSxS folder…</p>
+<p>· <a href="http://blogs.technet.com/b/askcore/archive/2008/09/17/what-is-the-winsxs-directory-in-windows-2008-and-windows-vista-and-why-is-it-so-large.aspx">http://blogs.technet.com/b/askcore/archive/2008/09/17/what-is-the-winsxs-directory-in-windows-2008-and-windows-vista-and-why-is-it-so-large.aspx</a></p>
+<p>· <a href="http://blogs.msdn.com/b/e7/archive/2008/11/19/disk-space.aspx">http://blogs.msdn.com/b/e7/archive/2008/11/19/disk-space.aspx</a></p>
+<p>and there is a command-line program called COMPCLN.exe which  removes old service pack files.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-little-known-clariion-facts-and-trivia.html">&larr; Older: little known Clariion facts and trivia :-)</a><a class="post-nav-link align-right" href="../posts/2011-03-03-isdn-cards-for-isrs.html">Newer: ISDN CARDS FOR ISR&#x27;s &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

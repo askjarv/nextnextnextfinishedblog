@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>OCS to CUCM integration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>OCS to CUCM integration</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/cisco-call-manager.html">cisco-call-manager</a><a class="tag" href="../tags/cucm.html">cucm</a><a class="tag" href="../tags/lync.html">lync</a><a class="tag" href="../tags/voip.html">voip</a></div>
+        <div class="content">
+          <h5 id="direct-sip-cisco-unified-communications-manager-71">Direct SIP: Cisco Unified Communications Manager 7.1</h5>
+<p><a href="http://blogs.technet.com/members/JBRD/"><img alt="clip_image001" src="images/clip_image001.gif" title="clip_image001" /></a><a href="http://blogs.technet.com/members/JBRD/">DrRez</a></p>
+<p>12 Oct 2010 7:26 AM</p>
+<p>· Comments <a href="http://blogs.technet.com/b/drrez/archive/2010/10/12/direct-sip-cisco-unified-communications-manager-7-1.aspx#comments">0</a></p>
+<p><em>If you’re looking for an introduction about how to configure Cisco Unified Communications Manager (CUCM) version 7.1.3 with Office Communications Server 2007 R2, this article will help you. The proper way to connect and interoperate the two products is to set up a Direct SIP connection in Office Communications Server. On the Cisco side, this is referred to as a SIP trunk. This article covers how to configure a SIP trunk in CUCM 7.1.</em></p>
+<p><strong>Author:</strong> <a href="http://blogs.technet.com/b/nexthop/p/contributors.aspx">Curtis Johnstone</a>, <a href="http://blogs.technet.com/b/nexthop/p/contributors.aspx">John Johnson</a>, <a href="http://blogs.technet.com/b/nexthop/p/contributors.aspx">Rui Maximo</a></p>
+<p><strong>Publication date:</strong> August 2010</p>
+<p><strong>Product version:</strong> Office Communications Server 2007 R2</p>
+<p>If you’re looking for an introduction about how to configure Cisco Unified Communications Manager (CUCM) version 7.1.3 with Office Communications Server 2007 R2, this article will help you. The proper way to connect and interoperate the two products is to set up a Direct SIP connection in Office Communications Server’s parlance. In Cisco’s parlance, this is referred to as a <em>SIP trunk</em>. So, when discussing the configuration of CUCM, we’ll refer to this connection as a SIP trunk. When explaining the configuration of the Office Communications Server, we’ll refer to this connection as a <em>Direct SIP</em>.</p>
+<p>If you’re trying to connect CUCM with Office Communications Server 2007 R2, you probably already have CUCM deployed in your environment for all your IP phones and CUCM configured to route all external calls to the PSTN through a PSTN trunk. In this case, you’ll want to configure Office Communications Server 2007 R2 Enterprise Voice to route external calls to the PSTN through the CUCM PSTN trunk. Calls between Communicator users and Cisco IP phone users should be possible by using each user’s unique extension number, and users are accessible via externally routable direct inward dialing (DID). This is illustrated in Figure 1.</p>
+<p><strong>Figure 1. Routing of calls between Communicator users and Cisco IP phone users</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image002.jpg"><img alt="clip_image002" src="images/clip_image002_thumb.jpg" title="clip_image002" /></a></p>
+<p>It is worth clarifying that a new range of phone numbers assigned to Communicator endpoints must be defined in CUCM. This new range needs to be separate from any existing number range used for Cisco desk phone endpoints. For end users who have both a Cisco desk phone and a Communicator client, the same number cannot be used for inbound and outbound dialing. This restriction exists because call routing for Communicator clients in CUCM is achieved by creating a new SIP trunk that is used only for Communicator endpoints. Multiple device endpoints cannot share the same number when the call routing is defined on different SIP trunks.</p>
+<p>For details about Office Communications Server telephony integration, including options for the coexistence of specific features, see "<a href="http://go.microsoft.com/fwlink/?LinkId=133655">Integrating Telephony with Office Communications Server 2007 and 2007 R2</a>".</p>
+<p>There are two parts to interoperating the two products: configuring CUCM and configuring Office Communications Server. The high level steps for configuring CUCM are as follows:</p>
+<p>1. Create a partition.</p>
+<p>2. Create a calling search space.</p>
+<p>3. Define translation patterns.</p>
+<p>4. Provision a SIP trunk.</p>
+<p>5. Set up route pattern.</p>
+<p>The following sections describe the CUCM configuration steps in more detail. For details about how to configure Direct SIP on Office Communications Server 2007 R2 Mediation Server, see <a href="http://technet.microsoft.com/en-us/library/ee862410.aspx">Direct SIP: Configuring Mediation Server</a>.</p>
+<h6 id="configuring-cisco-unified-communications-manager-713">Configuring Cisco Unified Communications Manager 7.1.3</h6>
+<p>Let’s dive into the configuration steps for CUCM. The connectivity between CUCM and the Mediation Server is referred to as SIP trunk to conform to Cisco’s terminology.</p>
+<h6 id="create-a-partition">Create a Partition</h6>
+<p>A CUCM partition contains a list of route patterns. Partitions facilitate call routing by dividing the route plan into logical subsets that are based on organization, location, and call type. For details about partitions, see "Partitions and Calling Search Spaces" in the CUCM System Guide.</p>
+<p>This partition is specific to the SIP trunk that connects Office Communications Server to CUCM. It will store route pattern and translation pattern rules that are specific to handling incoming traffic to CUCM from the Mediation Server. For our example, this partition is named "OCSIncoming".</p>
+<p>To create a CUCM partition</p>
+<p>1. From your CUCM Administration console, click <strong>Call Routing</strong>, click <strong>Class of Control</strong>, and then click <strong>Partition</strong> (Figure 2).</p>
+<p><strong>Figure 2. Opening the partitions screen</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image003.jpg"><img alt="clip_image003" src="images/clip_image003_thumb.jpg" title="clip_image003" /></a></p>
+<p>2. Click <strong>Add New</strong> to create a new partition as showing in Figure 3.</p>
+<p><strong>Figure 3. Adding a new partition</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image004.jpg"><img alt="clip_image004" src="images/clip_image004_thumb.jpg" title="clip_image004" /></a></p>
+<p>3. In the <strong>Name</strong> field, specify the name of the partition and a description as shown in Figure 4. We’ve specified "OCSIncoming, OCSIncoming".</p>
+<p><strong>Figure 4. Name and description of the partition</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image005.jpg"><img alt="clip_image005" src="images/clip_image005_thumb.jpg" title="clip_image005" /></a></p>
+<p>4. Click <strong>Save</strong>, and then click <strong>Find</strong> to verify that the partition was created. The new partition should appear in the result set as shown in Figure 5.</p>
+<p><strong>Figure 5. New partition successfully created</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image006.jpg"><img alt="clip_image006" src="images/clip_image006_thumb.jpg" title="clip_image006" /></a></p>
+<p>5. To view the configuration, click the new partition name (Figure 6).</p>
+<p><strong>Figure 6. Partition information</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image007.jpg"><img alt="clip_image007" src="images/clip_image007_thumb.jpg" title="clip_image007" /></a></p>
+<table>
+<thead>
+<tr>
+<th><strong><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image008.gif"><img alt="clip_image008" src="images/clip_image008_thumb.gif" title="clip_image008" /></a></strong><strong>Note:</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Whether a partition is required in a particular environment may depend on the rules required. Verify this with your CUCM administrator.</td>
+</tr>
+</tbody>
+</table>
+<h6 id="create-a-calling-search-space">Create a Calling Search Space</h6>
+<p>A CUCM calling search space is an ordered list of route partitions. Calling search spaces determine which partitions and the order in which they are searched when CUCM routes a call. In our example, this calling search space is named "OCSIncoming" and is assigned to the OCSIncoming partition created earlier.</p>
+<p><strong>To create a calling search space</strong></p>
+<p>1. From the CUCM Administration console, click <strong>Call Routing</strong>, click <strong>Class of Control</strong>, and then click <strong>Calling Search Space</strong> (Figure 7).</p>
+<p><strong>Figure 7. Opening the Calling Search Space Configuration screen</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image009.jpg"><img alt="clip_image009" src="images/clip_image009_thumb.jpg" title="clip_image009" /></a></p>
+<p>2. Click <strong>Add New</strong> to create a new calling search space. Specify a name for the calling search space. In our example, the new calling search space is "OCSIncoming".</p>
+<p>3. Select the OCSIncoming partition, and then click the down arrow to move it to the <strong>Selected Partitions</strong> area to assign this calling search space to the OCSIncoming partition (Figure 8).</p>
+<p><strong>Figure 8. Assigning the OCSIncoming calling search space to the OCSIncoming partition</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image010.jpg"><img alt="clip_image010" src="images/clip_image010_thumb.jpg" title="clip_image010" /></a></p>
+<p>4. Click <strong>Save</strong> to insert this calling search space into the CUCM configuration.</p>
+<h6 id="define-translation-patterns">Define Translation Patterns</h6>
+<p>Next, translation patterns must be defined and assigned to the newly created partition. Translation patterns manipulate dial strings before a call is routed.</p>
+<p>The translation patterns we’ll define are specific for handling inbound calls to the CUCM that come from Office Communications Server. A translation pattern converts dial strings for calls sent by the Mediation Server where the TO field matches the pattern. CUCM then uses the translated dial string to determine how to route the call.</p>
+<p>One or more translation patterns must be defined depending on your needs. At a minimum, you need to define at least two translation patterns:</p>
+<ul>
+<li>A translation pattern for incoming calls from Office Communications Server that are destined for the PSTN. This allows Office Communicator users who are enabled for Enterprise Voice to dial out externally.</li>
+<li>A translation pattern for incoming calls from Office Communications Server that are destined for CUCM-assigned phone numbers. This allows Office Communicator users to dial Cisco phones within the organization.</li>
+</ul>
+<p>If users are allowed to dial international numbers, you have to define a third translation pattern. Consider creating translation patterns for emergency numbers (for example, 911).</p>
+<p><strong>Office Communications Server to PSTN Translation Pattern</strong></p>
+<p>The first translation pattern (called 33.xxxxxxxxx, which means the TO string starting with 33 followed by 9 digits as shown in Figure 9) transforms all calls from Office Communications Server that are destined to a domestic PSTN number.</p>
+<p>On your CUCM Administration console, click <strong>Call Routing</strong>, click <strong>Translation Pattern</strong> (Figure 9), and then click <strong>Add New</strong> to create a new translation pattern configuration.</p>
+<p><strong>Figure 9. Opening the Translation Pattern Configuration screen</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image011.jpg"><img alt="clip_image011" src="images/clip_image011_thumb.jpg" title="clip_image011" /></a></p>
+<p>The translation pattern is assigned to the OCSIncoming partition that you previously created.</p>
+<p>The period (.) is a separator that indicates that all digits before the period are to be discarded. This separator is used in the <strong>Called Party Transformations</strong> section (see Figure 10) when the <strong>Discard Digits</strong> setting is set to <strong>PreDot</strong>. In our example, 33 will be removed from the dial string. For North America and the Caribbean, the <strong>Numbering Plan</strong> should be set to <strong>NANP</strong> as shown in Figure 10. NANP is the standard PSTN numbering plan for North America and the Caribbean. Configuring incoming call routing for other geographic regions requires a <strong>Numbering Plan</strong> setting that is standard for that region.</p>
+<p>For the FROM field, the last 9 digits are retained. The country prefix (which is 33 for France) is stripped from the E.164 calling party dial string and is presented to the PSTN in the required format, 16986xxxx. In this case, the translation pattern transforms the dial string from 3316986xxxx to 16986xxxx.</p>
+<p>For the TO field, the pattern strips the leading 33 and adds 00 as a prefix to the remaining string. The translation pattern transforms the dial string from 33xxxxxxxxx to 00xxxxxxxxx, where the first 0 is the outside line prefix that is required to obtain an outside line on CUCM.</p>
+<p><strong>Figure 10. Configuring a new translation pattern</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image012.jpg"><img alt="clip_image012" src="images/clip_image012_thumb.jpg" title="clip_image012" /></a></p>
+<p><strong>Office Communications Server to CUCM Translation Pattern</strong></p>
+<p>The second translation pattern (in this example, 3316986xxxx) transforms all calls from Office Communications Server that are destined for a CUCM assigned number. The translation pattern is assigned to the OCSIncoming partition that you created earlier. Because all calls from Office Communications Server will likely be in RFC 3966 format, calls in this example are prefixed by the country code, 33 for France, and then followed by the prefix for all numbers that are assigned to Cisco IP phones, 16986, in the enterprise. This pattern is applied to calls where the TO field matches the pattern, 3316986xxxx. Because CUCM selects translation patterns on the basis of the best match, this translation pattern will be selected instead of the first translation pattern.</p>
+<p>In our example, this translation pattern translates dial strings for calls sent by the Mediation Server where the TO field matches the pattern, 3316986xxxx. It strips all leading digits from TO and FROM fields and retains only the last 4 digits, xxxx. Dial strings with the pattern 3316986xxxx are translated to dial strings of the form xxxx. As shown in Figure 11, this translation is performed on the number of the user being called (TO field) and on the caller’s number (FROM field). The caller-id information originates from the line URI attribute of the Communicator caller, which is defined as a user property in Active Directory. This caller-id is formatted by any matching Office Communications Server normalization rules before being matched against the CUCM translation patterns.</p>
+<table>
+<thead>
+<tr>
+<th><strong><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image0081.gif"><img alt="clip_image008[1]" src="images/clip_image0081_thumb.gif" title="clip_image008[1]" /></a></strong><strong>Note:</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>If the CUCM Simultaneous Ring feature is used, and the caller has a Cisco Remote Destination Profile set up with their Office Communications Server line URI attribute in the “Destination Number” field, the caller’s number will be mapped to their corresponding Cisco line number.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Figure 11. Office Communications Server to CUCM translation pattern</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image013.jpg"><img alt="clip_image013" src="images/clip_image013_thumb.jpg" title="clip_image013" /></a></p>
+<h6 id="provision-a-sip-trunk">Provision a SIP Trunk</h6>
+<p>A SIP trunk to the Mediation Server is created on the CUCM and is assigned the OCSIncoming calling search space that was created earlier. The SIP trunk uses SIP over TCP, which requires port 5060.</p>
+<p>The CUCM SIP trunk is established to the IP address of the Mediation Server that represents the gateway listening IP address. The Mediation Server must be configured with two IP addresses. One IP address connects to the Office Communications Server infrastructure; the other IP address connects to the CUCM, which represents the gateway.</p>
+<p>If you’re not sure which IP address is the gateway listening IP address for your Mediation Server, see Figure 4 in the article <a href="http://technet.microsoft.com/en-us/library/ee862410.aspx">Direct SIP: Configuring Mediation Server</a>.</p>
+<p>In our example, the trunk name is Trunk_to_OCS, and the Mediation Server’s gateway listening IP address is 192.168.0.105.</p>
+<p><strong>To create a new SIP trunk</strong></p>
+<p>1. On the CUCM Administration console, click <strong>Device</strong>, and then click <strong>Trunk</strong> (Figure 12).</p>
+<p><strong>Figure 12. Adding a new trunk</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image014.jpg"><img alt="clip_image014" src="images/clip_image014_thumb.jpg" title="clip_image014" /></a></p>
+<p>2. Click <strong>Add New</strong>, and then on the <strong>Trunk Type</strong> list, select <strong>SIP Trunk</strong>. Select <strong>SIP</strong> as the <strong>Device Protocol</strong>, and then click <strong>Next</strong> (Figure 13).</p>
+<p><strong>Figure 13. Configuring the SIP trunk</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image015.jpg"><img alt="clip_image015" src="images/clip_image015_thumb.jpg" title="clip_image015" /></a></p>
+<p>3. Specify the <strong>Device Name</strong> (in our example, Trunk_to_OCS), the <strong>Calling Search Space</strong> (in our example, OCSIncoming), the <strong>Rerouting Calling Search Space</strong> (in our example, OCSIncoming), the <strong>Destination Address</strong> to match the Mediation Server gateway listening IP address (in our example, 192.168.0.105), and <strong>Destination Port</strong> (in our example, 5060).<br />
+Table 1 lists the required Trunk Configuration settings and their values (Figure 14).</p>
+<p><strong>Table 1. Required Trunk Configuration settings</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image016.jpg"><img alt="clip_image016" src="images/clip_image016_thumb.jpg" title="clip_image016" /></a></p>
+<p>To successfully communicate with the Mediation Server, CUCM must use the codec, G.711. The device pool default setting in CUCM 7.1 is configured to use the G.711 codec. The Device Pool setting shown in Table 1 and Figure 14 should be set to "Default". If your CUCM default device pool does not use G.711 as the codec, you will need to use a device pool that uses G.711.</p>
+<p><strong>Figure 14. Trunk Configuration settings</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image017.jpg"><img alt="clip_image017" src="images/clip_image017_thumb.jpg" title="clip_image017" /></a></p>
+<p>4. Click <strong>Save</strong>, and then reset the trunk by clicking the <strong>Reset</strong> icon at the top of the <strong>Trunk Configuration</strong> page to activate the SIP trunk changes.</p>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image018.gif"><img alt="clip_image018" src="images/clip_image018_thumb.gif" title="clip_image018" /></a> Set Up Route Pattern: CUCM to Office Communications Server</p>
+<p>Route patterns are designed for routing calls from CUCM to the Mediation Server over the SIP trunk so that users who are using a Cisco IP phone can call Office Communicator users. The route patterns determine which calls are sent to the SIP trunk based on a pattern match of the phone number in the TO field. Route patterns can also perform transformations of the dial strings for the TO and the FROM fields.</p>
+<p><strong>To set up the route pattern</strong></p>
+<p>1. From the CUCM Administration console, click <strong>Call Routing</strong>, click <strong>Route/Hunt</strong>, and then click <strong>Route Pattern</strong> (Figure 15).</p>
+<p>2. Click Add New, and then configure the route pattern.</p>
+<p><strong>Figure 15. Opening the Route Pattern screen</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image019.jpg"><img alt="clip_image019" src="images/clip_image019_thumb.jpg" title="clip_image019" /></a></p>
+<p>For example, if you want users who are using a Cisco IP phone to be able to dial an Office Communicator user using a 4-digit extension, create a route pattern that is associated to the Trunk_to_OCS SIP trunk that you created earlier that instructs CUCM to route to the Mediation Server all calls that match the TO dial string with the pattern xxxx. In this case, no transformation of the dial strings in the TO and the FROM fields is necessary. This route pattern configuration is illustrated in Figure 16.</p>
+<p><strong>Figure 16. Route pattern</strong><br />
+<a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2011/03/clip_image020.jpg"><img alt="clip_image020" src="images/clip_image020_thumb.jpg" title="clip_image020" /></a></p>
+<p>You will need to define multiple CUCM routing patterns if you have different Office Communications Server numbering formats for specific offices or geographic locations.</p>
+<p>That completes your introduction to configuring a SIP trunk on Cisco’s Unified Communications Manager (also known as CallManager).</p>
+<h6 id="additional-resources">Additional Resources</h6>
+<p>To learn more, check out the following articles:</p>
+<ul>
+<li><a href="http://technet.microsoft.com/en-us/library/ee862409.aspx">Direct SIP: Cisco Unified Communications Manager 6.1</a></li>
+<li><a href="http://go.microsoft.com/fwlink/?LinkId=178442">Setting up the Cisco Call Manager 4.2.1 for "Direct SIP with IP-PBX"</a></li>
+<li><a href="http://go.microsoft.com/fwlink/?LinkId=178443">Direct SIP with IP-PBX in Office Communications Server 2007</a></li>
+<li><a href="http://go.microsoft.com/fwlink/?LinkId=178900">Microsoft and Cisco: Joint Interoperability Support Statement</a></li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-office-home-and-business-2010-install-on-windows-2008-r2-rds-server.html">&larr; Older: Office Home and Business 2010 install on Windows 2008 R2 RDS server</a><a class="post-nav-link align-right" href="../posts/2011-03-03-missing-ica-session-performance-counters-on-xenapp-6-high-cpu-usage-from-vmware-tools-service.html">Newer: Missing ICA Session Performance Counters on XenApp 6 / High CPU usage from VMware Tools Service &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

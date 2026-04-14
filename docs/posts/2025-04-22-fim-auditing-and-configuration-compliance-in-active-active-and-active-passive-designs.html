@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FIM, Auditing, and Configuration Compliance in Active-Active and Active-Passive Designs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>FIM, Auditing, and Configuration Compliance in Active-Active and Active-Passive Designs</h1>
+        <div class="meta">
+          <time datetime="2025-04-22">2025-04-22</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>In a lot of environments I walk into, clustering is treated as a resilience problem - but not always as a security one. We're busy designing for uptime, failover, scale, etc... but we don’t always design for <em>consistency of trust</em> across the cluster (especially for on premise deployments where there's a lot more variables at play in my experience). In doing so we, we expose ourselves to risk</p>
+<hr />
+<h2 id="the-misconception">The Misconception</h2>
+<p>There’s a common assumption:</p>
+<ul>
+<li>
+<p><strong>Active-active clusters</strong>: “everything is live, so everything must be secured”</p>
+</li>
+<li>
+<p><strong>Active-passive clusters</strong>: “only the active node matters right now”</p>
+</li>
+</ul>
+<p>That second assumption is where risk creeps in because, from a security standpoint, a passive node is not inactive - it’s just "waiting". Waiting to take over your production traffic, to execute the same critical workloads you were running before seamlessly, to become the new “trusted” state (a term we use a lot with Tripwire Enterprise and change monitoring.</p>
+<p>That why if your passive infrastructure is not continuously monitored and validated (consistently and alongside your active nodes), you’ve effectively built a pre-positioned attack vector into your architecture (and one that will often expose you to the most risk when you're already potentially fighting another fire that started a failover too).</p>
+<hr />
+<h2 id="the-real-risk-drift-failover-exposure">The Real Risk: Drift + Failover = Exposure</h2>
+<p>In real terms, you want to consider what happens during a failover to justify your monitoring stance:</p>
+<h3 id="the-scenario-active-passive-cluster-failover">The Scenario: Active-Passive Cluster Failover</h3>
+<ul>
+<li>
+<p>Node A (active) is hardened, monitored, compliant</p>
+</li>
+<li>
+<p>Node B (passive) is:</p>
+<ul>
+<li>
+<p>Missing patches</p>
+</li>
+<li>
+<p>Has config drift</p>
+</li>
+<li>
+<p>Has unauthorised changes (or worse, persistence mechanisms)</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Everything looks fine… until failover.</p>
+<p>Now Node B becomes active.</p>
+<p>And suddenly:</p>
+<ul>
+<li>
+<p>Your compliance posture changes instantly</p>
+</li>
+<li>
+<p>Your monitoring baselines are invalid</p>
+</li>
+<li>
+<p>Potentially compromised state becomes production reality</p>
+</li>
+</ul>
+<p>This is not theoretical - this is a common failure mode I see a lot of the time in the real world.</p>
+<hr />
+<h2 id="why-fim-and-auditing-must-be-cluster-wide">Why FIM and Auditing Must Be Cluster-Wide</h2>
+<h3 id="1-trust-must-be-symmetrical">1. Trust Must Be Symmetrical</h3>
+<p>Clusters are built on the assumption of <strong>equivalence between nodes</strong>.</p>
+<p>If Node B cannot be trusted to behave identically to Node A:</p>
+<ul>
+<li>
+<p>Your failover is not safe</p>
+</li>
+<li>
+<p>Your resilience is compromised</p>
+</li>
+<li>
+<p>Your security model is inconsistent</p>
+</li>
+</ul>
+<p><strong>FIM (File Integrity Monitoring)</strong> ensures:</p>
+<ul>
+<li>
+<p>Critical binaries, configs, and system files remain consistent</p>
+</li>
+<li>
+<p>Drift is detected <em>before</em> failover happens</p>
+</li>
+</ul>
+<hr />
+<h3 id="2-drift-doesnt-care-about-node-state">2. Drift Doesn’t Care About Node State</h3>
+<p>Configuration drift occurs regardless of:</p>
+<ul>
+<li>
+<p>Node role (active/passive)</p>
+</li>
+<li>
+<p>Workload assignment</p>
+</li>
+<li>
+<p>Traffic patterns</p>
+</li>
+</ul>
+<p>Common causes:</p>
+<ul>
+<li>
+<p>Manual changes during maintenance</p>
+</li>
+<li>
+<p>Automation gaps</p>
+</li>
+<li>
+<p>Patch inconsistencies</p>
+</li>
+<li>
+<p>“temporary” fixes that become permanent</p>
+</li>
+</ul>
+<p>Without continuous monitoring:</p>
+<ul>
+<li>
+<p>Passive nodes silently diverge</p>
+</li>
+<li>
+<p>Baselines become meaningless</p>
+</li>
+</ul>
+<hr />
+<h3 id="3-attackers-target-the-quiet-parts-of-your-estate">3. Attackers Target the Quiet Parts of Your Estate</h3>
+<p>If I were attacking your environment, I wouldn’t go for the most monitored system.</p>
+<p>I’d go for:</p>
+<ul>
+<li>
+<p>The standby node</p>
+</li>
+<li>
+<p>The DR environment</p>
+</li>
+<li>
+<p>The “not currently in use” infrastructure</p>
+</li>
+</ul>
+<p>Why?</p>
+<p>Because:</p>
+<ul>
+<li>
+<p>It’s often less monitored</p>
+</li>
+<li>
+<p>Changes go unnoticed</p>
+</li>
+<li>
+<p>It provides a clean pivot point into production</p>
+</li>
+</ul>
+<p>A compromised passive node is effectively a time-delayed breach. And it's not just me - compromised backup infrastructure has become an increasingly common attack vector and we need to remember that the backup of your crown jewels is, in effect, just a set of crown jewels.</p>
+<hr />
+<h3 id="4-compliance-doesnt-pause-for-failover">4. Compliance Doesn’t Pause for Failover</h3>
+<p>From an audit and regulatory standpoint:</p>
+<p>There is no distinction between:</p>
+<ul>
+<li>
+<p>“active system”</p>
+</li>
+<li>
+<p>“standby system”</p>
+</li>
+</ul>
+<p>If it can process production workloads, it must:</p>
+<ul>
+<li>
+<p>Meet configuration standards</p>
+</li>
+<li>
+<p>Be continuously audited</p>
+</li>
+<li>
+<p>Provide evidential integrity</p>
+</li>
+</ul>
+<p>Otherwise, you end up in a position where:</p>
+<ul>
+<li>
+<p>You pass audits during normal operation</p>
+</li>
+<li>
+<p>You fail them the moment failover occurs</p>
+</li>
+</ul>
+<hr />
+<h2 id="active-active-isnt-immune-either">Active-Active Isn’t Immune Either</h2>
+<p>It’s tempting to assume active-active setups are safer because everything is “live”.</p>
+<p>But the same issues apply:</p>
+<ul>
+<li>
+<p>Nodes can still drift independently</p>
+</li>
+<li>
+<p>Load distribution can mask inconsistent states</p>
+</li>
+<li>
+<p>Partial compromise can spread laterally</p>
+</li>
+</ul>
+<p>Without FIM and configuration compliance:</p>
+<ul>
+<li>
+<p>You lose the guarantee that nodes are equivalent</p>
+</li>
+<li>
+<p>You risk inconsistent behaviour under load</p>
+</li>
+<li>
+<p>You introduce non-deterministic failure modes</p>
+</li>
+</ul>
+<hr />
+<h2 id="what-good-looks-like">What “Good” Looks Like</h2>
+<p>A properly secured cluster treats <strong>every node as production-ready at all times</strong>.</p>
+<h3 id="minimum-baseline">Minimum baseline:</h3>
+<ul>
+<li>
+<p><strong>FIM applied to all nodes</strong></p>
+<ul>
+<li>
+<p>Critical OS paths</p>
+</li>
+<li>
+<p>Application configs</p>
+</li>
+<li>
+<p>Cluster configuration files</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Continuous auditing</strong></p>
+<ul>
+<li>
+<p>Not scheduled “once a day” checks</p>
+</li>
+<li>
+<p>Near real-time or frequent validation</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Configuration compliance enforcement</strong></p>
+<ul>
+<li>
+<p>CIS / internal hardening baselines</p>
+</li>
+<li>
+<p>Drift detection + remediation workflows</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Consistent policy application</strong></p>
+<ul>
+<li>
+<p>No “reduced monitoring” for passive nodes</p>
+</li>
+<li>
+<p>No exceptions for DR environments</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="the-design-principle-to-take-away">The Design Principle to Take Away</h2>
+<p>If a node can <em>ever</em> become active, it must be treated as active <strong>all the time</strong>.</p>
+<p>That means:</p>
+<ul>
+<li>
+<p>Monitored</p>
+</li>
+<li>
+<p>Audited</p>
+</li>
+<li>
+<p>Validated</p>
+</li>
+<li>
+<p>Trusted</p>
+</li>
+</ul>
+<p>Anything less introduces a gap between:</p>
+<ul>
+<li>
+<p><strong>Resilience architecture</strong></p>
+</li>
+<li>
+<p><strong>Security architecture</strong></p>
+</li>
+</ul>
+<p>And that gap is exactly where failures - and breaches - tend to occur.</p>
+<hr />
+<h2 id="final-thought">Final Thought</h2>
+<p>Clustering is about removing single points of failure.</p>
+<p>But if your security controls only apply to part of the cluster, you’ve just moved the single point of failure somewhere less visible.</p>
+<p>And that’s significantly worse.</p>
+<p>Because it won’t fail loudly.</p>
+<p>It will fail quietly - right at the moment you need it most.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-02-11-building-a-vulnerability-management-program-from-scratch.html">&larr; Older: Building a Vulnerability Management Program from Scratch</a><a class="post-nav-link align-right" href="../posts/2025-08-11-setting-up-your-lab-tripwire-enterprise-with-tailscale.html">Newer: Setting up your lab Tripwire Enterprise with Tailscale &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

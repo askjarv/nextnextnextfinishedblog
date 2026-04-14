@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TE External Rule Elements Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>TE External Rule Elements Example</h1>
+        <div class="meta">
+          <time datetime="2025-11-14">2025-11-14</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>One of the most powerful things I do with Tripwire Enterprise is add external sources to TE's change audit tracking. Whether it's an API, or a device with an unsupported SSH config, this workflow enables me to capture data and bring it along side all the rest of the compliance and change audit workflows that TE manages.</p>
+<h2 id="why-this-approach">Why this approach</h2>
+<p>Reasons for using this approach includes:</p>
+<ul>
+<li>
+<p>Supporting external application information gathering for custom applications such as databases, web API’s, etc.</p>
+</li>
+<li>
+<p>Supporting protocols not available in Tripwire Enterprise’s native toolset (particular SSL ciphers, etc)</p>
+</li>
+</ul>
+<h2 id="methodology">Methodology</h2>
+<p>The method uses leverages a few components:</p>
+<ul>
+<li>
+<p>The Tripwire Enterprise API via TE Commander, a command line utility available for Tripwire Enterprise. Note it's entirely possible to do this directly via the REST API (with your preferred tooling, be that bash scripting, python, powershell).</p>
+</li>
+<li>
+<p>(Optionally) A custom node is configured to reflect where the changes occur</p>
+</li>
+<li>
+<p>An External Rule is created to store configuration information</p>
+</li>
+<li>
+<p>An Command Output Capture Rule (COCR) is created to:</p>
+<ul>
+<li>
+<p>(If required) Connect to the custom device</p>
+</li>
+<li>
+<p>Execute an element information gathering command and stores it to disk in a temporary file on the Tripwire Enterprise Server</p>
+</li>
+<li>
+<p>The COCR subsequently captures the content of the temporary file and uploads it to the Tripwire Enterprise console via the API against the external rule (noted above)</p>
+</li>
+<li>
+<p>The COCR finally removes the temporary file.</p>
+</li>
+<li>
+<p>A check task is configured to regularly execute the COCR (noted above) against the Tripwire Enterprise console server.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="known-limitations">Known Limitations</h2>
+<p>The custom device configuration will be stored on disk (briefly) during the process (the file could be tampered with)</p>
+<p>The preferred method for authentication is via a private key stored and used by the Tripwire Enterprise account to connect. If need be, a password could also be provided in the of a Tripwire Enterprise global variable passed via sshpass to provide authentication (this risks the root on the TE host having a password stored in its command history).</p>
+<p>Any existing configuration history will be stored as a separate element from new elements created via this method (a new rule and element is required to store the configuration). This may require reconfiguring any policies built for the devices (if any)</p>
+<h2 id="configuration-planning">Configuration Planning</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>The following technical prerequisites are required:</p>
+<ul>
+<li>
+<p>Tripwire Enterprise 8.6.0 or greater is required</p>
+</li>
+<li>
+<p>TE Commander 8.7.0 or greater is required</p>
+</li>
+<li>
+<p>TE Commander should be setup and configured as per the installation guide</p>
+</li>
+<li>
+<p>A suitable authentication account for TE Commander should be configured and accessible</p>
+</li>
+<li>
+<p>A suitable authentication account, preferably using SSH Private Key authentication, is required for the target device.</p>
+</li>
+</ul>
+<p>Note: The following guide is based on a deployment on Linux.</p>
+<h2 id="about-this-guides-example">About this Guide’s Example</h2>
+<p>The following sections walk through configuring an example device, a FortiNet FortiGate firewall, for monitoring. The example guidance is based around using Tripwire Enterprise 8.7.0 installed on Red Hat Enterprise Linux 7.2. TE Commander 8.7.0 is deployed to the Tripwire Enterprise console server. A Private Key for authentication has been configured to provide password authentication.</p>
+<h2 id="information-gathering">Information Gathering</h2>
+<p>The following section contains a list of all the information that should be gathered ahead of the implementation of the custom rule to simplify the deployment. The example values given reflect the setup in the rest this guide.</p>
+<ul>
+<li>
+<p>TE Commander Install Path - e.g. /usr/local/tripwire/tecmdr - the path to the TE Commander installation</p>
+</li>
+<li>
+<p>TE Commander Auth file path - e.g. /usr/local/tripwire/tecmdr/config/te_auth.xml - The path to the configuration file in which TE Commander’s credentials are stored</p>
+</li>
+<li>
+<p>TE Commander User - e.g. tecadmin - The username used by TE Commander</p>
+</li>
+<li>
+<p>TE Commander Password - e.g. YOURPASSWORD - The password used by TE Commander</p>
+</li>
+<li>
+<p>TE Console Server Hostname, e.g. localhost - The hostname or IP address of the Tripwire Enterprise console server</p>
+</li>
+<li>
+<p>Rule Group Name - e.g. Your App Rule Group - This is the rule group where your configuration will be stored against your custom device</p>
+</li>
+<li>
+<p>Rule Name e.g. Config Rule - This is the rule where your configuration will be stored against your custom device</p>
+</li>
+<li>
+<p>Custom Node Group - e.g. MyNodeGroup - Used to determine what devices the custom element should be added to assess</p>
+</li>
+<li>
+<p>Custom Node Make/Model/Version - e.g. Fortinet / FortiGate / v1.0 - These attributes can be set manually against the Custom Node type to reflect the make, model and version</p>
+</li>
+<li>
+<p>Custom Node Username Global Variable Name - e.g. fortinet_user - The name of the global variable used to store the Custom Node Username (see below)</p>
+</li>
+<li>
+<p>Custom Node Username e.g. root - Stored in the Global Variable for the device</p>
+</li>
+<li>
+<p>Custom Node Password Global Variable Name e.g. If required, a device password may be stored as a global variable, although it is highly recommended that your use Private Key Authentication</p>
+</li>
+<li>
+<p>Custom Node Password - If required, a device password may be stored as a global variable, although it is highly recommended that your use Private Key Authentication</p>
+</li>
+<li>
+<p>Custom Node Command Global Variable Name e.g. fortigate_command The name of the global variable used to store the Custom Node Configuration Command e.g. show full-configuration - The command to execute on the custom node device</p>
+</li>
+<li>
+<p>Custom Element Name - e.g. FortigateConfig The name of the element to be created holding the output of the Custom Node Configuration Command</p>
+</li>
+</ul>
+<h2 id="configuration">Configuration</h2>
+<h3 id="tecommander-pre-configuration">TECommander Pre-Configuration</h3>
+<p>For the purposes of this document, TECommander is presumed to be installed in the following path:</p>
+<p>/usr/local/tripwire/tecmdr</p>
+<p>If you have specified an alternative path, please ensure this is reflected throughout the following configuration steps.</p>
+<h4 id="configure-authentication-for-te-commander">Configure Authentication for TE Commander</h4>
+<p>TECommander should have authentication configured to authenticate via a configuration file:</p>
+<p>/usr/local/tripwire/tecmdr/bin/tecommander.sh encrypt -M ../config/te_auth.xml -P YOURPASSWORD</p>
+<p>where YOURPASSWORD should be replaced with your password. Please see the TE Commander documentation for further information about</p>
+<p>authentication options using the encrypt command.</p>
+<p>NB: the following characters are NOT permitted in the te_auth password:</p>
+<p>$%&amp;*!\</p>
+<h3 id="configure-an-external-rule">Configure an External Rule</h3>
+<p>In order to store element versions against the custom device, it is necessary to add a new External Rule using the following TE Commander command</p>
+<pre><code>/usr/local/tripwire/tecmdr/bin/tecommander.sh createextrule -M ../config/te_auth.xml -Q -r ConfigRule -x &quot;Root Rule Group&quot;
+</code></pre>
+<p>where:</p>
+<ul>
+<li>
+<p>ConfigRule is the desired name for the External Rule. Ensure you make a note of the value you set as this will be used later in the creation of the Monitoring Rule</p>
+</li>
+<li>
+<p>Root Rule Group is the desired Rule Group in which you wish to create the External Rule.</p>
+</li>
+</ul>
+<h2 id="creating-a-target-node">Creating a Target node</h2>
+<p>If the node does not already exist, it should be created prior to the initial run of the Custom Device Monitoring.</p>
+<h3 id="creating-a-custom-node-type">Creating a Custom Node Type</h3>
+<p>Log in to Tripwire Enterprise with an administrator account</p>
+<p>Navigate to the Settings Manager</p>
+<p>Select Monitoring &gt; Custom Node Types from the tree pane</p>
+<p>Click on the New Custom Node Type button</p>
+<p>Enter the name of the device type and a suitable description</p>
+<p>Click Finish</p>
+<h3 id="creating-a-node">Creating a Node</h3>
+<p>Log in to Tripwire Enterprise with an Administrator account</p>
+<p>Navigate to the Nodes manager</p>
+<p>From the button bar, click on New Node</p>
+<p>From the Node Type selection window, select the custom node type created in the previous section</p>
+<p>Click OK</p>
+<p>In the new device wizard, enter the IP address or hostname of the custom device and a suitable description:</p>
+<p>Click Next</p>
+<p>On the connection method screen (since the connection won’t be established via the console, you may leave the default values set)</p>
+<p>You can optionally continue through the remaining pages for the new device wizard to set any other settings you wish (e.g. the version make and model</p>
+<p>values), otherwise click Finish to complete creating the device.</p>
+<h2 id="creating-global-variables-for-configuration-parameters">Creating Global Variables for configuration parameters</h2>
+<p>Global variables can be created in Tripwire Enterprise to save re-entering values in rules, etc. For our example, two global variables will be set up, representing the following values:</p>
+<ul>
+<li>
+<p>The username for accessing the target device – in our example we will use $(fortigate_user)</p>
+</li>
+<li>
+<p>The configuration command to be sent to the target device – in our example we will use $(fortigate_cmd)</p>
+</li>
+</ul>
+<p>The following steps walk through creating the username global variable and should be repeated for each required global variable for the rule setup:</p>
+<p>Login to the Tripwire Enterprise web console with an administrator account</p>
+<p>Navigate to Settings Manager</p>
+<p>Select System &gt; Global Variables</p>
+<p>Click on New Text on the button bar to create a new text variable</p>
+<p>Enter the name and description for the Global Variable</p>
+<p>Click Next.</p>
+<p>Enter the value (in this case, the username) for the global variable.</p>
+<p>Click Finish to complete the global variable creation.</p>
+<p>Repeat this process for all other remaining global variables required.</p>
+<h3 id="creating-the-configuration-gathering-rule">Creating the Configuration Gathering Rule</h3>
+<ol>
+<li>
+<p>Log in to Tripwire Enterprise with an administrator account</p>
+</li>
+<li>
+<p>Navigate to the Rules Manager</p>
+</li>
+<li>
+<p>Navigate to an appropriate Rule Group in which you want to create the configuration gathering rule.</p>
+</li>
+<li>
+<p>On the button bar, click on New Rule</p>
+</li>
+<li>
+<p>Select File Server &gt; Command Output Capture Rule</p>
+</li>
+<li>
+<p>Click Next</p>
+</li>
+<li>
+<p>Set the name and description required for the rule</p>
+</li>
+<li>
+<p>Set the Default Severity to 0 (this is only used to track our changes so changes needn’t be captured for this rule).</p>
+</li>
+<li>
+<p>Optionally, Enable the Tracking Identifier (recommended).</p>
+</li>
+<li>
+<p>Specify an Element Name of your choosing.</p>
+</li>
+<li>
+<p>Click Next</p>
+</li>
+<li>
+<p>On the command line field add</p>
+</li>
+</ol>
+<pre><code>$(ScriptFile.sh) '$(fortigate_user)' '$(fortigate_cmd)'
+</code></pre>
+<p>13. In the script field, enter the following script:</p>
+<p>COCR Command</p>
+<blockquote>
+<p>!/bin/sh</p>
+<p>Get list of devices in Node group:</p>
+<p>/usr/local/tripwire/tecmdr/bin/tecommander.sh avlistassettags -M /usr/local/tripwire/tecmdr/config<br />
+/te_auth.xml -w Test | grep Node: | cut -f 2 -d ':' &gt; NodeList.txt</p>
+<p>Loop to get device configurations for each IP</p>
+<p>while read n; do<br />
+echo $n</p>
+<p>Get Config</p>
+<p>ssh -o StrictHostKeyChecking=no $1@$n &gt; config.tmp &lt;&lt; EOF<br />
+$2<br />
+exit<br />
+EOF</p>
+</blockquote>
+<p>Set Config in TE</p>
+<p>/usr/local/tripwire/tecmdr/bin/tecommander.sh createextcontent -M /usr/local/tripwire/tecmdr/config<br />
+/te_auth.xml -e FortigateConfig -F config.tmp -n $n -Q -r "ConfigRule"</p>
+<p>Remove Config File</p>
+<p>rm config.tmp<br />
+done &lt; NodeList.txt</p>
+<p>Remove Node List</p>
+<p>rm NodeList.txt<br />
+where</p>
+<p>FortigateConfig reflects the name of the Element you wish to store the configuration with.<br />
+ConfigRule reflects the name of the External Rule created in the section “Configure an External Rule”<br />
+Test reflects the name of the NodeGroup you wish to run the rule against  </p>
+<p>If required, you may also need to configure:<br />
+Config.tmp to reflect your desired temporary file name for storing the configuration<br />
+/usr/local/tripwire/tecmdr/ to reflect the path to the tecommander.sh for execution and te_auth.xml file for authentication</p>
+<p>Click Next</p>
+<p>If required, add any Search and Replace Patterns and Actions, otherwise click Finish.</p>
+<h2 id="_1"></h2>
+<p>Configuring a Check Task</p>
+<p>In order to capture updated configuration information on a regular basis, a Check Task should be created to capture to execute the Rule created.<br />
+Log in to Tripwire Enterprise with an administrator account  </p>
+<p>Navigate to the Tasks Manager<br />
+From button bar, chose New Task<br />
+Chose a Check Rule Task type<br />
+Click OK<br />
+Configure a suitable Name, Description, Run As User and timeout for the task<br />
+Click Next<br />
+Select the Tripwire Enterprise Console Server from the Node selector<br />
+Click Next<br />
+Select the Config Capture rule created in the section entitled “Creating the Configuration Gathering Rule”<br />
+Click Next<br />
+Select the schedule you wish to run the check task<br />
+Click Next<br />
+You should not apply actions to this task, as changes will not be detected (since the element to be updated will be created against the External<br />
+Rule).<br />
+Click Next<br />
+If desired, initialize the baselines, otherwise uncheck the option and allow the task to run as scheduled.<br />
+Click Finish.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>The following troubleshooting steps are suggested to help identify common issues:</p>
+<ul>
+<li>
+<p>Review the contents of the COCR rule – this will include any errors associated with connecting to the target device, uploading to the API via TECommander etc.</p>
+</li>
+<li>
+<p>Review the TECommander logs – typically these are located in the agent path of the TE Console.</p>
+</li>
+<li>
+<p>Try using static values, rather than global variables to ensure that expansion of the global variables is not resulting in errors.</p>
+</li>
+<li>
+<p>Ensure you are reviewing the correct element – data is stored against the device.</p>
+</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-11-07-trigger-a-scan-with-the-ccm-rest-api.html">&larr; Older: Trigger a scan with the CCM REST API</a><a class="post-nav-link align-right" href="../posts/2026-02-17-architecture-anti-patterns.html">Newer: Architecture Anti-Patterns &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

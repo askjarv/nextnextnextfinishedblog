@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Exchange 2007 - SSL without a UCC Certificate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Exchange 2007 - SSL without a UCC Certificate</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/autodiscover.html">autodiscover</a><a class="tag" href="../tags/exchange-2007.html">exchange-2007</a><a class="tag" href="../tags/exchange-2010.html">exchange-2010</a><a class="tag" href="../tags/ucc.html">ucc</a></div>
+        <div class="content">
+          <h5 id="ive-had-this-conversation-several-times-recently-i-thought-id-take-time-to-blog-about-it-it-shouldnt-take-very-long">I've had this conversation several times recently.  I thought I'd take time to blog about it.  It shouldn't take very long!</h5>
+<p><strong><em>MYTH: You need to buy a UCC SSL Certificate in order to use Exchange 2007</em></strong></p>
+<p>What is a UCC SSL Certificate?  In essence, it is a single certificate that allows multiple common names / domains - different than a "wildcard" certificate where each secured domain has the same root.</p>
+<p>Here's what we do, and what I've done for a dozen or more Exchange 2007 installs over the last couple of years.  Three easy steps :)</p>
+<p><strong><em>Step 1 - SSL Certificate</em></strong>I buy my SSL certificates from <a href="http://www.rapidsslonline.com/">Rapid SSL Online</a>.  Why?  They are rapid, and relatively cheap.  They aren't the cheapest I'm sure, but I can go from CSR to Certificate install in about 3 minutes.  That's rapid and worth it to me.  And, it's less than $20 for an SSL cert.  So, you're gonna follow your "normal" SSL procedures to get a certificate installed on IIS to work with Exchange OWA/Outlook Anywhere/etc. - no, I'm not going to walk you through this.  You can find tons of documentation out there.</p>
+<p>Our mail server is SSL secured via the FQDN/CN of "mail01.lifechurch.tv." even though our internal domain is NOT "lifechurch.tv" - it doesn't matter.  SSL Secure yourself based on the FQDN you want your OWA/Outlook Anywhere clients to use.</p>
+<p><strong><em>Step 2 - What about Auto Discover?  How do I configure DNS then?</em></strong>Well, this is the part that leads to the myth I believe.  Many "early" Exchange 2007 adopters had to use UCC to handle the certificate issues that arose with a DNS "A" record of <em>autodiscover.domain.com</em> - but that is no longer the case, and hasn't been for about two years now.  You can read about it on the <a href="http://msexchangeteam.com/archive/2007/09/21/447067.aspx">Exchange Team Blog</a> or in the <a href="http://technet.microsoft.com/en-us/library/bb332063.aspx">actual technet whitepaper</a> from October 2007.</p>
+<p>So, what does that mean?  How do I handle autodiscover without UCC?</p>
+<p><strong><em>Internal/AD DNS</em></strong>I create a DNS SRV record pointing to "mail01.lifechurch.tv" - because that's how my SSL certificate works.  It looks like this:</p>
+<p><a href="http://www.darylhunter.me/.a/6a00e5500aa93388330120a5722f04970b-pi"><img alt="clip_image002" src="images/clip_image0025.jpg" title="clip_image002" /></a></p>
+<p>_.autodiscover._tcp.domain.com - for port tcp443 - pointing to mail01.lifechurch.tv</p>
+<p><strong><em>External/Public DNS</em></strong><br />
+I create a similar DNS SRV record under the "lifechurch.tv" DNS zone.  I use <a href="http://www.dnsmadeeasy.com/">DNS Made Easy</a> - it's awesome.  Here's what it looks like:</p>
+<p><a href="http://www.darylhunter.me/.a/6a00e5500aa93388330120a5c8c68c970c-pi"><img alt="clip_image004" src="images/clip_image0044.jpg" title="clip_image004" /></a></p>
+<p>Look familiar?  It's identical to the one above it.</p>
+<p><strong><em>Step 3 - DNS Doctoring/Rewriting</em></strong><br />
+This is where you may run into problems.  I use a Cisco ASA Cluster for my firewall.  When I create my NAT entries, I have the opportunity to rewrite the DNS resolution.  Let me explain.</p>
+<p>From my house, if I ping mail01.lifechurch.tv - I get a public 12.x.x.x address.</p>
+<p>From inside my network, behind my firewall using DNS Doctoring - I get a 10.x.x.x address.  I'm not using split brain DNS.  I'm using DNS Made Easy.  The Cisco ASA rewrites that.  All it takes is a single firewall command.</p>
+<p>static (Inside,Outside) 12.x.x.x 10.x.x.x 255.255.255.255 dns</p>
+<p>That's it.  That static NAT entry, combined with the "dns" attribute, will handle the rewrite for me.</p>
+<p>I know some of you may be using Microsoft ISA, or Sonicwall, or other firewalls.  I'm not sure if they will handle this rewrite for you.  I've heard of people using host files to handle that, and that may work for you.  But, for Cisco firewalls, it's a single command - built-in functionality.</p>
+<p>Anyway, that's that for today's episode of Exchange 2007 UCC/SSL MYTH-busters :)</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-factory-reset-a-fortigate-if-you-dont-know-the-password.html">&larr; Older: Factory reset a fortigate if you don&amp;rsquo;t know the password</a><a class="post-nav-link align-right" href="../posts/2011-03-04-disabling-datastore-alerts-in-esx.html">Newer: Disabling Datastore Alerts in ESX &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

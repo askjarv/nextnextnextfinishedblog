@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Making Windows Terminal Look nice in 2024</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Making Windows Terminal Look nice in 2024</h1>
+        <div class="meta">
+          <time datetime="2024-06-07">2024-06-07</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>I recently had to rebuild a PC recently and whilst a lot of my settings automatically came across (thanks OneDrive backup) my poor Windows Terminal did not do well with a profile migration. Setting up Windows in 2024 to work "nicely" with OH-MY-POSH (especially if your profile is a bit mangled by years of cruft and auto-sync'd rubbish) can be a bit more painful (particularly with some articles about Nerd font requirements, etc being scattered across various out-of-date articles) so I figured I'd document the process that worked for me!</p>
+<p>First off, install your components:</p>
+<ul>
+<li>
+<p>Install POSH itself:</p>
+<ul>
+<li><a href="https://github.com/devblackops/Terminal-Icons?tab=readme-ov-file">winget install JanDeDobbeleer.OhMyPosh -s winget</a></li>
+</ul>
+</li>
+<li>
+<p>Install PSReadLine</p>
+<ul>
+<li>Install-Module PsReadLine -Force</li>
+</ul>
+</li>
+<li>
+<p>Pick your font:</p>
+<ul>
+<li>oh-my-posh font install</li>
+</ul>
+</li>
+</ul>
+<p>Install Terminal Icons (for icons in ls/dir commands:)</p>
+<ul>
+<li>
+<p>Add Terminal Icons:</p>
+</li>
+<li>
+<p>Do the fix indicated here: <a href="https://gist.github.com/markwragg/6301bfcd56ce86c3de2bd7e2f09a8839">https://gist.github.com/markwragg/6301bfcd56ce86c3de2bd7e2f09a8839</a> - i.e.</p>
+<ul>
+<li>
+<p>Download and install this version of Literation Mono Nerd Font which has been specifically fixed to be recognized as monospace on Windows:</p>
+<ul>
+<li>https://github.com/haasosaurus/nerd-fonts/blob/regen-mono-font-fix/patched-fonts/LiberationMono/complete/Literation%20Mono%20Nerd%20Font%20Complete%20Mono%20Windows%20Compatible.ttf</li>
+</ul>
+</li>
+<li>
+<p>Modify the registry to add this to the list of fonts for terminal apps (cmd, powershell etc.):</p>
+<ul>
+<li>
+<p>$key = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont'</p>
+</li>
+<li>
+<p>Set-ItemProperty -Path $key -Name '000' -Value 'LiberationMono NF'</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Open PowerShell, right click the title bar &gt; properties &gt; Font &gt; select your new font from the list.</p>
+</li>
+<li>
+<p>Install and load Terminal-Icons:</p>
+<ul>
+<li>
+<p>Install-Module Terminal-Icons -Scope CurrentUser</p>
+</li>
+<li>
+<p>Import-Module Terminal-Icons</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a href="https://nextnextnextfinished.wordpress.com/wp-content/uploads/2024/06/image.png"><img alt="" src="images/image.png" /></a></p>
+<p>In the end, my ($Profile) profile looks something like this;</p>
+<p>oh-my-posh init pwsh | Invoke-Expression<br />
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression<br />
+Set-TerminalIconsTheme</p>
+<p>$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"<br />
+if (Test-Path($ChocolateyProfile)) {<br />
+Import-Module "$ChocolateyProfile"<br />
+}</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2024-05-30-vmware-workstation-pro-for-free-for-personal-use.html">&larr; Older: VMWare Workstation Pro - for free (for personal use!)</a><a class="post-nav-link align-right" href="../posts/2024-07-01-guest-comment-on-the-tripwire-blog.html">Newer: Guest Comment on the Tripwire blog &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

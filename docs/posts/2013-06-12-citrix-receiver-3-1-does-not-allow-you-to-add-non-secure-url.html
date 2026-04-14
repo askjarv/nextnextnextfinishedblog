@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Citrix Receiver 3.1 does not Allow you to Add Non-Secure URL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Citrix Receiver 3.1 does not Allow you to Add Non-Secure URL</h1>
+        <div class="meta">
+          <time datetime="2013-06-12">2013-06-12</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/citrix.html">citrix</a><a class="tag" href="../tags/clients.html">clients</a><a class="tag" href="../tags/receiver.html">receiver</a></div>
+        <div class="content">
+          <p>A very annoying one I come across quite often where the internal web interface is an insecure site can be resolved with a quick registry change (that said, there's no reason why you shouldn't just "re-apply" you SSL cert or securely publish you Citrix apps internally!):</p>
+<p>Citrix Receiver 3.1 does not allow you to add a non-secure URL.</p>
+<p><img alt="" src="images/1CTX131857-1.gif" /></p>
+<p><strong>Cause</strong></p>
+<p>The default configuration requires SSL for secure communication to your store.</p>
+<p><strong>Resolution</strong></p>
+<p>You can resolve this issue by modifying the client registry.</p>
+<p><strong>Caution</strong>! This procedure requires you to edit the registry. Using Registry Editor incorrectly can cause serious problems that might require you to reinstall your operating system. Citrix cannot guarantee that problems resulting from the incorrect use of Registry Editor can be solved. Use Registry Editor at your own risk. Back up the registry before you edit it.</p>
+<p>Under HKEY_LOCAL_MACHINE\SOFTWARE\Citrix\Dazzle</p>
+<p>REG_SZ: AllowAddStore</p>
+<p>Value: A</p>
+<p><strong>Note</strong>: Changing the value to <strong>A</strong> allows you to add non-secure URLs.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2013-06-12-sap-basics-applying-a-license-to-a-user.html">&larr; Older: SAP Basics - Applying a License to a User</a><a class="post-nav-link align-right" href="../posts/2013-08-07-script-to-extract-mailbox-sizes-from-exchange-2003.html">Newer: Script to Extract Mailbox sizes from Exchange 2003 &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Enabling root SSH login on an ESX host</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Enabling root SSH login on an ESX host</h1>
+        <div class="meta">
+          <time datetime="2011-03-09">2011-03-09</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>The oldies are the best ones - I always forget this when I get stumped by weird vRanger/vReplicator issues- from VMware.com:</p>
+<p>Details</p>
+<p>This article provides steps to use SSH to login to an ESX host as the root user.</p>
+<p>Solution</p>
+<p>Since ESX 3.0, for increased security, SSH is disabled by default for the root account on an ESX host. That is, the actual sshd service does not allow root logins. Non-root users are able to login with SSH. This is another layer of protection in addition to the host firewall.</p>
+<p><strong>Note</strong>: Each SSH connection to an ESX host uses additional Service Console resources. Use caution when using scripts or third party software that create multiple SSH sessions to the ESX Service Console. Excessive use of SSH on an ESX machine may cause the service console to exhibit symptoms of memory exhaustion.</p>
+<p>To enable root login for SSH and SCP clients:</p>
+<ol>
+<li>
+<p>If you have physical access to the ESX host, login to the console of your ESX host as the root user. If you can only connect to the ESX host over the network, connect using an SSH client (such as PuTTY) and log in as a user other than root.</p>
+<p>To create a user in ESX host for using a SSH client:
+1. Log in to the vSphere Client as a root user.
+2. Click <strong>Users &amp; Groups</strong>.
+3. Right-click on a blank area and click <strong>Add</strong>.
+4. Enter a username and password. Confirm your password.</p>
+<pre><code>**Note**: Starting in ESX 4.0, the password needs to be at least 8 characters in length.
+</code></pre>
+<ol>
+<li>Select <strong>Grant shell access to this user</strong> and click <strong>OK</strong>.</li>
+<li>After you are logged in SSH session, switch to the root user with the command:</li>
+</ol>
+<p>su -</p>
+<p><strong>Note</strong>: If you do not have any other users on the ESX host, you can create a new user by connecting directly to the ESX host with VMware Infrastructure (VI) or vSphere Client. Go to the <strong>Users &amp;</strong> <strong>Groups</strong> tab, right-click on the Users list and select <strong>Add</strong> to open the <strong>Add New User</strong> dialog. Ensure that the <strong>Grant shell access to this user</strong>option is selected. These options are only available when connecting to the ESX host directly. They are not available if connecting to vCenter Server.
+3. Edit the configuration file for SSH with the command:</p>
+<p>nano /etc/ssh/sshd_config
+4. Find the line that starts with PermitRootLogin and change the no to yes. You can find this line about 2 pages down from the top. Save the file by first pressing <strong>Ctrl-O</strong> and then <strong>Enter</strong>. Exit with <strong>Ctrl-X</strong>.
+5. Restart the sshd service with the command:</p>
+<p>service sshd restart</p>
+<p><strong>Note</strong>: Alternatively, use the command:</p>
+<p>/etc/init.d/sshd restart</p>
+</li>
+</ol>
+<p>Taken from:<a href="http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&amp;cmd=displayKC&amp;externalId=8375637">http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&amp;cmd=displayKC&amp;externalId=8375637</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-2-hour-exchange-2007-sp1-single-server-install.html">&larr; Older: 2 Hour Exchange 2007 SP1 Single Server Install</a><a class="post-nav-link align-right" href="../posts/2011-03-24-spf-creation-website.html">Newer: SPF creation website &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

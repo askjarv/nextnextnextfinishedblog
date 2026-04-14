@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Simple tip- get the log on server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Simple tip- get the log on server</h1>
+        <div class="meta">
+          <time datetime="2011-07-24">2011-07-24</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Trying to troubleshot a group policy replication issue but not sure where to start? Seeing weird behaviour on some clients, but unable to pin point which server is causing the problem? Just need to verify which DC you connected to on logon? You can get this from the (under-rated IMHO) command, SET. Set brings back a whole bunch of information.</p>
+<p>Unforunately, there's a downside to that- too much information to quickly see what you're looking for- it's just one line- LOGONSERVER that you're looking for- so use our friend "findstr" to filter straight down to what you want:</p>
+<p>set | findstr "LOGONSERVER"</p>
+<p>gives you the bit you want - in a quick and easy way!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-06-23-step-by-step-guide-for-adding-autotask-search-in-ie9.html">&larr; Older: Step-By-Step guide for Adding AutoTask search in IE9</a><a class="post-nav-link align-right" href="../posts/2011-07-24-golden-rules-of-good-support-part-3.html">Newer: Golden Rules of Good Support (Part 3) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Checking mySQL privileges</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Checking mySQL privileges</h1>
+        <div class="meta">
+          <time datetime="2012-04-10">2012-04-10</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Again, just to show my lack of mySQL knowledge, I'm posting on what "should" be simple - checking why you can't access mySQL from a remote host.</p>
+<p>First off, establish a session from the localhost using the mySQL command line (it's typically in the install directory)- the syntax is normally along the lines of:</p>
+<pre><code>mysql -u root -p
+</code></pre>
+<p>then check your user list and access IP's with the command</p>
+<pre><code>select User,Host from mysql.user;
+</code></pre>
+<p>Then, if, like me, you find you lack permissions, you can grant them, with the command:</p>
+<pre><code>GRANT ALL PRIVILEGES ON *.* TO USERNAME@IP IDENTIFIED BY &quot;PASSWORD&quot;;
+</code></pre>
+<p>where Username is your desired username, ip is your connecting host IP, and Password is the desired password for your user. You may then want to run</p>
+<pre><code>FLUSH PRIVILEGES;
+</code></pre>
+<p>to apply the settings- then give it a go!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2012-04-09-from-the-book-of-this-should-be-easier-than-it-is-mysql-in-sharepoint-2010-foundation.html">&larr; Older: From the book of &quot;this should be easier than it is!&quot; - MySql in Sharepoint 2010 Foundation</a><a class="post-nav-link align-right" href="../posts/2012-04-30-autotask-chrome-custom-searches.html">Newer: Autotask Chrome Custom Searches &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

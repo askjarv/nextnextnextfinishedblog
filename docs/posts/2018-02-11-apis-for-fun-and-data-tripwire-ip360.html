@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API&#x27;s for fun and data! Tripwire IP360</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>API&#x27;s for fun and data! Tripwire IP360</h1>
+        <div class="meta">
+          <time datetime="2018-02-11">2018-02-11</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/api.html">api</a><a class="tag" href="../tags/ip360.html">ip360</a><a class="tag" href="../tags/plot-ly.html">plot-ly</a><a class="tag" href="../tags/python.html">python</a><a class="tag" href="../tags/python3.html">python3</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>The following is a tutorial I put together to take you through the process of connecting to Tripwire’s vulnerability and exposure (VnE) virtual appliance API using Python 3, capturing vulnerability scanning data and then outputting it graphically using another web service, plot.ly.</p>
+<h2 id="pre-requisites">Pre-requisites</h2>
+<p>To follow through with the following exercises you’ll need:</p>
+<ul>
+<li>An IP360 VnE virtual machine – ideally this should already have completed a scan with some data in order to provide sample data to work with (many of the examples may result in errors otherwise!).</li>
+<li>A machine with Python (version 3.x or greater) installed and internet access.</li>
+</ul>
+<h2 id="about-ip360">About IP360</h2>
+<p>Tripwire IP360 is Tripwire’s vulnerability detection tool and helps gather information about networks (what devices there are, what network address they have), how devices are configured (what applications are detected on the devices) alongside the vulnerabilities that exist on the devices.</p>
+<h3 id="scanning-with-ip360">Scanning with IP360</h3>
+<p>IP360 has two components- a Vulnerability and Exposure (VnE) Manager and Device Profiler’s (DP). The VnE directs the DP to carry out scanning on a periodic (or on demand basis) based on the settings configured on the VnE Manager.</p>
+<h3 id="key-ip360-configuration-parameters">Key Ip360 Configuration Parameters</h3>
+<p>For the purposes of this exercise we’ll touch on four of the key configuration components of IP360:</p>
+<ul>
+<li>Networks</li>
+<li>Scan Profiles</li>
+<li>Scheduled Scans</li>
+<li>Scan Results</li>
+</ul>
+<p><img alt="2018-02-11 12_11_29-Tripwire IP360 - API Worksheets.docx [Read-Only] - Word" src="images/2018-02-11-12_11_29-tripwire-ip360-api-worksheets-docx-read-only-word.png" /></p>
+<h3 id="working-with-ip360">Working with IP360</h3>
+<p>All of the settings noted in the previous section can be configured in the web interface. Each configuration component has its own “widget” to manage:</p>
+<p><img alt="1" src="images/1.png" /></p>
+<p>You can modify (or review the settings) of any component by putting a check mark against one of the items and clicking edit:</p>
+<p><img alt="2" src="images/2.png" /></p>
+<h2 id="about-the-ip360-api">About the IP360 API</h2>
+<p>The API included with Tripwire IP360 enables users to programmatically command and control the functionality of Tripwire IP360 through the use of scripts. By using scripts, you can remotely control Tripwire IP360 and integrate it with third-party products. Programmers can take the next step and wrap those scripts in their desired code to create a useful procedure batch to be run according to their own timing and usage goals. Tripwire IP360 functionality is available through the API just like it is through the user interface, and is limited only by the availability of API calls corresponding to those functions.</p>
+<h2 id="api-supporting-documentation">API Supporting Documentation</h2>
+<p>There is supporting documentation for the IP360 API available directly from the VnE web interface on <a href="https://VNEIP/documentation/admin/Default_Left.html">https://<strong>VNEIP</strong>/documentation/admin/Default_Left.html</a> (replacing <strong>VNEIP</strong> with the address used by the VNE). Additionally there is a helpful utility built into IP360 to test API functionality: <a href="https://vneIP/APIExplorer.html">https://<strong>vneIP</strong>/APIExplorer.html#</a></p>
+<p><img alt="9" src="images/9.png" /></p>
+<p>In the following activities we will connect to the IP360 API and capture some data out from a recent vulnerability scan. The following examples will use Microsoft Visual Studio Code a free IDE available on multiple platforms but you can follow along in your preferred IDE if you wish!</p>
+<h2 id="activity-setting-up-your-ide-visual-studio-code">Activity- Setting Up your IDE (Visual Studio Code)</h2>
+<ol>
+<li>Install Python 3.6.4 from <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> and install using the default options.</li>
+<li>Visit <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a> to download the relevant version of Visual Studio Code and install using the default options</li>
+<li>Install the Python extension for Visual Studio Code from <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">https://marketplace.visualstudio.com/items?itemName=ms-python.python</a></li>
+<li>Launch Visual Studio Code.</li>
+<li>Select your Python version From within VS Code, select a version of Python using the Python: Select Interpreter command on the Command Palette (Ctrl+Shift+P), or by using the Select Python Environment option on the Status Bar if available.</li>
+</ol>
+<p><img alt="4" src="images/4.png" /></p>
+<p>The command presents a list of available interpreters that VS Code can find automatically and should allow you to select the Python version you installed in the first step.</p>
+<h2 id="activity-connecting-to-ip360-and-getting-information">Activity- Connecting to IP360 and Getting Information</h2>
+<ol>
+<li>Create a new folder for your work, and open this in Visual Studio Code:</li>
+</ol>
+<p><img alt="5" src="images/5.png" /></p>
+<ol>
+<li>Create a new python file by clicking on your folder name and entering a filename ending in <strong>py</strong> (ip360.py).</li>
+</ol>
+<p><img alt="6" src="images/6.png" /></p>
+<ol>
+<li>To test your IDE you can run a simple print introduction with:</li>
+</ol>
+<pre><code># IP360 API Tutorial Example Script
+
+msg = &quot;IP360 API Example&quot;
+
+print(msg)
+</code></pre>
+<ol>
+<li>We can then quickly run this with the following command at the debug console:</li>
+</ol>
+<pre><code>python3 ip360.py
+</code></pre>
+<ol>
+<li>Next we can start setting up our connection to IP360. First, we’ll create variables representing the username, password and network IP address of the VNE:</li>
+</ol>
+<pre><code>USERNAME = &quot;ip360@tripwire.com&quot;
+
+PASSWORD = &quot;Tripwire&quot;
+
+VNEADDRESS = &quot;192.168.0.58&quot;
+</code></pre>
+<ol>
+<li>Then we’ll import the relevant modules:</li>
+</ol>
+<pre><code>import xmlrpclib
+
+import ssl
+</code></pre>
+<ol>
+<li>Since we aren’t using a trusted SSL certificate (see <a href="https://www.digicert.com/ssl-support/certificate-not-trusted-error.htm">https://www.digicert.com/ssl-support/certificate-not-trusted-error.htm</a> for more information about certificates) we need to tell Python to ignore the SSL certificate during our test script setup:</li>
+</ol>
+<pre><code>try:
+
+    _create_unverified_https_context = ssl._create_unverified_context
+
+except AttributeError:
+
+    # Legacy Python that doesn't verify HTTPS certificates by default
+
+    pass
+
+else:
+
+    # Handle target environment that doesn't support HTTPS verification
+
+    ssl._create_default_https_context = _create_unverified_https_context
+</code></pre>
+<ol>
+<li>Next we’ll test our connection – we’ll create a serverproxy for the API to make it easier to interact with:</li>
+</ol>
+<pre><code>server = xmlrpclib.ServerProxy(&quot;https://&quot;+VNEADDRESS+&quot;/api2xmlrpc&quot;)
+</code></pre>
+<ol>
+<li>Then we can store the resulting sessionID (which we can use for later interactions with the API) by passing our username and password:</li>
+</ol>
+<pre><code>sessionID = server.login(2,0,USERNAME,PASSWORD)
+</code></pre>
+<ol>
+<li>Next we can make a call to the API. We’ll do a request against the getUserObject</li>
+</ol>
+<pre><code>result = server.call(sessionID, &quot;SESSION&quot;, &quot;getUserObject&quot;,{})
+</code></pre>
+<ol>
+<li>And print the results:</li>
+</ol>
+<pre><code>print &quot;My user object is %s&quot; % (result)
+</code></pre>
+<p>The resulting output should look something like the below:</p>
+<p><img alt="14" src="images/14.png" /></p>
+<h2 id="about-getting-more-data">About- Getting More data</h2>
+<p>Let’s have a closer look at how to request different data from the VnE. The server.call takes several parameters –</p>
+<ul>
+<li>a <em>sessionid</em> which we use to identify ourselves to the device.</li>
+<li>a <em>class</em> to call to get the relevant data,</li>
+<li>a <em>method</em> to get the relevant</li>
+<li>and finally, a parameters list (so far we’ve just used blank values).</li>
+</ul>
+<p>Let’s look at another simple call- retrieving version information:</p>
+<pre><code>version = server.call(sessionID, &quot;class.VNE&quot;, &quot;getVersionInfo&quot;,{})
+print &quot;VnE version information is %s&quot; % (version)
+</code></pre>
+<p>Our server.call is very similar to the one we used to retrieve our user object information – except this time we have a new class (class.VNE) and method (getVersionInfo). If you’re not too sure what Class and Method options you have, you can have a look in the Help for IP360’s API:</p>
+<p>Alternatively, you can use the API Explorer to look at what the Request XML was:</p>
+<p><img alt="7" src="images/7.png" /></p>
+<p>In the API Explorer when you run a search you can click on the <strong>Show Request XML</strong></p>
+<p><img alt="8" src="images/8.png" /></p>
+<p>to give you a window with the request XML used by the Explorer utility- in here you can see the <em>class</em> and <em>method</em> called:</p>
+<p><img alt="9" src="images/9.png" /></p>
+<h2 id="activity-getting-more-data">Activity- Getting more data</h2>
+<p>We’re going to build on our simple examples from the previous steps to get more information- let’s start with getting the most recent audit (scan) that occurred on the network:</p>
+<pre><code>audit = server.call(sessionID, &quot;class.Audit&quot;, &quot;fetch&quot;, {'limit' : 1, 'sortBy' : 'id', 'sortOrder' : 'descending'})
+print audit
+</code></pre>
+<p>For my test system I get back the audit id of 4. Now we have an audit, we can check what hosts where scanned as part of that audit:</p>
+<pre><code>hosts = server.call(sessionID, &quot;class.Host&quot;, &quot;fetch&quot;,{'query' : 'audit = \'%s\'' % audit})
+
+print hosts
+</code></pre>
+<p>This gives me a list of hosts…</p>
+<p>but not a lot else, so let's use that data to get more info. First, we need to know what attributes we're trying to get data for so we ask the <em>Class.Host</em> for an attribute list with the method <em>getAttributes</em>:</p>
+<pre><code>attributes = server.call(sessionID, &quot;class.Host&quot;, &quot;getAttributes&quot;, {})
+
+print &quot;Attributes for a host includes:&quot;
+
+print attributes
+
+giving us:
+
+Attributes for a host includes:
+
+['audit', 'customScore', 'customer', 'domainName', 'hostScore', 'id', 'ifaceMacAddress', 'ipAddress', 'macAddress', 'name', 'netbiosName', 'network', 'os', 'osFprint', 'portSignature', 'tarpit', 'timeStamp', 'vulnerabilities']
+</code></pre>
+<p>OK, now we know what all our attributes are, we can ask for each of these</p>
+<pre><code># Let's pick a single host to test with for now:
+
+host = &quot;Host.30&quot;
+</code></pre>
+<p>and ask for each of the host's attributes with a for loop working through each (attrib) in attributes:</p>
+<pre><code>print &quot;Host details&quot;
+
+for attrib in attributes:
+
+    hostdetail = server.call(sessionID, host, &quot;getAttribute&quot;, {'attribute': a, })
+
+    print attrib + &quot;:&quot;
+     print hostdetail
+</code></pre>
+<p>Now we’ve got some interesting data like how well it’s scored, what it’s address is, etc.:</p>
+<pre><code>hostScore:
+
+565
+
+netbiosName:
+
+network:
+
+Network.2
+
+os:
+
+OS.20
+
+osFprint:
+
+/
+
+portSignature:
+
+126530483294762351
+
+tarpit:
+
+False
+
+timeStamp:
+
+1517330219
+
+vulnerabilities:
+
+2
+</code></pre>
+<p>What if we wanted to get all the IP addresses and scores for ALL the hosts- well we can do that with another for loop</p>
+<p>OK, how about getting the IP and scores for all the hosts?</p>
+<pre><code>for h in hosts:
+
+    #Get the host IP
+
+    hostIPaddress = server.call(sessionID, h, &quot;getAttribute&quot;, {'attribute':'ipAddress'})
+
+    # And it's score
+
+    hostScore = server.call(sessionID, h, &quot;getAttribute&quot;, {'attribute':'hostScore'})
+
+    # Print them
+
+    print &quot;Host: &quot; + hostIPaddress + &quot; scored: &quot;
+
+    print hostScore
+</code></pre>
+<p>Now I have some IP’s and scores:</p>
+<pre><code>Host: 192.168.12.250 scored:
+
+12282
+
+Host: 192.168.12.99 scored:
+
+36429
+
+Host: 192.168.12.101 scored:
+
+0
+</code></pre>
+<h2 id="optional-activity-getting-even-more-data">(Optional) Activity- Getting Even More data</h2>
+<p>From the examples in the previous section you can see how we can get some score data that we’ll use later in our integration example, but there’s much more data in the API you might be interested- have a look at the example below that shows the vulnerability details for all the detected vulnerabilities (so you can see the port, protocols, and details from your scanning:</p>
+<pre><code># Carrying on from before, and now we have some hosts, let's get some vuln results
+
+vulns = server.call(sessionID, &quot;class.VulnResult&quot;,&quot;search&quot;,{'query' : 'host = \'%s\'' % host})
+
+print vulns
+
+# Not very interesting - we want the vulnerability details:
+
+attributes = server.call(sessionID, &quot;class.vulnResult&quot;, &quot;getAttributes&quot;, {})
+
+print &quot;Attributes for a vulnresult includes:&quot;
+
+print attributes
+
+for v in vulns:
+
+    for a in attributes:
+
+        vulnDetails = server.call(sessionID, v, &quot;getAttribute&quot;, {'attribute': a})
+
+        print a+&quot;:&quot;
+
+        print vulnDetails
+</code></pre>
+<p>Now that you have some data from IP360 we can have a look at using the data in an interestingly way. There’s a variety of visualisation frameworks available for Python but for our purpose’s we’ll use Plot.ly – a free web service that lets you create graphs from your data.</p>
+<h2 id="activity-creating-an-account">Activity- Creating an Account</h2>
+<ol>
+<li>Create a free account on plot.ly (<a href="https://plot.ly/">https://plot.ly/</a> by entering your email address, desired username and password:</li>
+<li>Once registered you can get your API key via <a href="https://plot.ly/settings/api">https://plot.ly/settings/api</a> (HINT: you may need to click “Regenerate Key” to show the API key value)</li>
+</ol>
+<h2 id="activity-installing-and-connecting-to-your-account">Activity- Installing and Connecting to your Account</h2>
+<ol>
+<li>Logon to your Linux machine or Visual Studio and get the dependencies for running Plot.ly (if you're using Visual Studio code you can run this in the terminal window):</li>
+</ol>
+<pre><code>sudo apt-get install imagemagick libmagickcore-dev libmagickwand-dev libmagic-dev
+
+sudo apt-get install imagemagick
+</code></pre>
+<ol>
+<li>Install plot.ly:</li>
+</ol>
+<pre><code>sudo pip3 install plotly
+
+pip3 install plotly –upgrade
+# Used to generate random data for testing
+pip3 install numpy
+</code></pre>
+<p>or, if you’re in the visual Studio Code terminal you can run <em>pip install plotly</em> and <em>pip install numpy</em> directly:</p>
+<ol>
+<li>We can now create a test python file to verify your account. In Visual Studio code you can simply add a new .py file:</li>
+<li>In the new plot.ly import the plot.ly toolset and add your credentials (don’t forget to update your username and APIkeyfield values):</li>
+</ol>
+<pre><code>import plotly
+
+plotly.tools.set_credentials_file(username='yourusername', api_key='yourAPIkeyHere')
+
+import plotly.plotly as py
+
+import plotly.graph_objs as go
+</code></pre>
+<ol>
+<li>Now we can generate some test data to work with quickly using numpy:</li>
+</ol>
+<pre><code># Create random data with numpy
+
+import numpy as np
+
+N = 500
+
+random_x = np.linspace(0, 1, N)
+
+random_y = np.random.randn(N)
+</code></pre>
+<ol>
+<li>Now we can plot this data with:</li>
+</ol>
+<pre><code># Create a plot
+
+trace = go.Scatter(
+
+    x = random_x,
+
+    y = random_y
+
+)
+
+data = [trace]
+
+py.iplot(data, filename='basic-line')
+</code></pre>
+<ol>
+<li>When we run the script we can check the results out on the Plot.ly file pages: <a href="https://plot.ly/organize/home/">https://plot.ly/organize/home/</a></li>
+</ol>
+<p><img alt="12" src="images/12.png" /></p>
+<p>Now that we have both IP360 and Plot.ly configured we can combine the two to presenting the data graphically.</p>
+<h2 id="activity-combining-ip360-and-plotly">Activity– Combining IP360 and Plot.ly</h2>
+<ol>
+<li>Let’s start by repeating our plot.ly setup</li>
+</ol>
+<pre><code>import plotly
+
+plotly.tools.set_credentials_file(username='yourusername', api_key='yourAPIkeyHere')
+
+import plotly.plotly as py
+
+import plotly.graph_objs as go
+</code></pre>
+<ol>
+<li>Then get data from IP360 and add them to a list (the xval for the x-axis, and yval for the v axis)</li>
+</ol>
+<pre><code># Get data from IP360
+
+print &quot;************************************************&quot;
+
+xval = []
+
+yval = []
+
+for h in hosts:
+
+    #Get the host IP
+
+    hostIPaddress = server.call(sessionID, h, &quot;getAttribute&quot;, {'attribute':'ipAddress'})
+
+    # And it's score
+
+    hostScore = server.call(sessionID, h, &quot;getAttribute&quot;, {'attribute':'hostScore'})
+
+    xval.append(hostIPaddress)
+
+    yval.append(hostScore)
+
+print &quot;************************************************&quot;
+
+print xval
+
+print yval
+
+print &quot;************************************************&quot;
+</code></pre>
+<ol>
+<li>Finally, we can generate a graph with our data. This time we’ll create a bar chart, so the code will look like:</li>
+</ol>
+<pre><code># Create a bar graph
+
+data  = [go.Bar(
+
+    x = xval,
+
+    y = yval
+
+)]
+
+py.iplot(data, filename='basic-bar')
+</code></pre>
+<ol>
+<li>This will give you a new graph on the Plotly site looking something like the graph below:</li>
+</ol>
+<p><img alt="13" src="images/13.png" /></p>
+<h2 id="moving-on">Moving on</h2>
+<p>There is a lot more you can do with the data and plot.ly API – for example:</p>
+<h3 id="ip360-data">IP360 Data:</h3>
+<ul>
+<li>You can pull back individual vulnerabilities, or applications from the data- a stacked bar graph showing applications on hosts, or vulnerability counts can easily be built from the foundations in the previous sections.</li>
+</ul>
+<h3 id="presentation">Presentation:</h3>
+<ul>
+<li>Change the colour of the graphs: <a href="https://plot.ly/python/bar-charts/#customizing-individual-bar-colors">https://plot.ly/python/bar-charts/#customizing-individual-bar-colors</a></li>
+<li>Adding labels that appear when you hover over them: <a href="https://plot.ly/python/bar-charts/#bar-chart-with-hover-text">https://plot.ly/python/bar-charts/#bar-chart-with-hover-text</a></li>
+<li>Have a look around the plot examples: <a href="https://plot.ly/python/#3d-charts">https://plot.ly/python/#3d-charts</a> and you’ll see the wide variety of charts you can create with example code you use!</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2018-01-28-android-development-quick-start-with-phonegap-part-1.html">&larr; Older: Android Development - Quick Start with PhoneGap (Part 1)</a><a class="post-nav-link align-right" href="../posts/2018-02-12-free-transfer-of-playlists-from-google-play-music-to-spotify.html">Newer: Free transfer of playlists from Google Play Music to Spotify... &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

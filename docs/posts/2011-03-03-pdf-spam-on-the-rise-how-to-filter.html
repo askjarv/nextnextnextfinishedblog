@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PDF SPam on the rise- how to filter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>PDF SPam on the rise- how to filter</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/antispam.html">antispam</a><a class="tag" href="../tags/mail-filter.html">mail-filter</a></div>
+        <div class="content">
+          <p>PDF Email Spam on the rise</p>
+<p>I have been getting lots of emails lately that have most of the time no text whatsoever but a pdf attachment with titles such as report.pdf, article.pdf or bill.pdf. Those are real pdf files and if you open them you see that they contain - you guessed it already didn’t you - spam.</p>
+<p>If I want to be a little bit more precise they contain spam about shares and claim that if you buy them you will receive highest returns. The pdf contains normally between three and four pages and only the first page is about the subject that they want you to react on.</p>
+<p>The other pages contain random sentences put together to irritate antispam routines and make the pdf look like a new message all the time and not the same. If we put all of this together we see a new type of spam that consists of the following:</p>
+<p>1. Emails with pdf attachments</p>
+<p>2. Random senders</p>
+<p>3. Several names for the pdf files</p>
+<p>4. Sometimes with body</p>
+<p>5. Sometimes with subject</p>
+<p>6. The pdf has several pages</p>
+<p>7. Only the first page is relevant to the spammer and contains stock information</p>
+<p>8. The other pages consist of random sentences to avoid spam filters.</p>
+<p>Here is a little trick on how to make Thunderbird’s spam filter recognize the pdf spam and move it right into a special folder:</p>
+<p>Method 1:</p>
+<p>If you analyze the header of the pdf spam emails you see that most use the User-Agent Thunderbird 1.5.0.12. We will now create a new message filter to move pdf files directly into a newly created folder if the User-Agent is Thunderbird 1.5.0.12.</p>
+<p>Click on Tools &gt; Message Filters.</p>
+<p>Select a mail account from the list and click on New.</p>
+<p>Name the Filter accordingly, something like PDF Spam will do.</p>
+<p>Check Match all of the following</p>
+<p>Choose Customize from the first pulldown menu</p>
+<p>Add “User-Agent”</p>
+<p>leave “contains” in the second field</p>
+<p>write “Thunderbird 1.5.0.12″ in the last field (without the “”)</p>
+<p>Click on the + icon</p>
+<p>Choose Body from the pulldown menu</p>
+<p>“contains” stays where it is</p>
+<p>write “.pdf” in the last field</p>
+<p>go to Perform these actions</p>
+<p>Select “Move Message to” and choose a folder from the second pulldown menu. You could create a new folder named Spam for instance in Thunderbird.</p>
+<p>This message will move all messages that have the User-Agent Thunderbird 1.5.0.12 and a pdf attachment to a folder named spam.</p>
+<p>This method is working fine at the moment but will stop working as soon as the spammer is changing the User-Agent of his client.</p>
+<p>Method 2:</p>
+<p>The following method is also using message filters but works without adding the User-Agent variable which makes it a more general method to fight pdf spam.</p>
+<p>Click on Tools &gt; Message Filters.</p>
+<p>Select a mail account from the list and click on New.</p>
+<p>Name the Filter accordingly, something like PDF Spam 2 will do.</p>
+<p>Check Match all of the following</p>
+<p>Select “From”</p>
+<p>Select “Isn’t in my address book”</p>
+<p>Select “Personal address book”</p>
+<p>Click on the + icon</p>
+<p>Choose Body from the pulldown menu</p>
+<p>“contains” stays where it is</p>
+<p>write “.pdf” in the last field</p>
+<p>Select to move the message again to a newly created folder in Thunderbird.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-rebuild-performance-counters.html">&larr; Older: Rebuild performance counters</a><a class="post-nav-link align-right" href="../posts/2011-03-03-outlook-deployment-on-citrix-via-transofmraiton-files.html">Newer: Outlook Deployment on Citrix via Transofmraiton Files &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

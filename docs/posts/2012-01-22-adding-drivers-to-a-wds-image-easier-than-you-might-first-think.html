@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Adding drivers to a WDS image- easier than you might first think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Adding drivers to a WDS image- easier than you might first think</h1>
+        <div class="meta">
+          <time datetime="2012-01-22">2012-01-22</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>WDS is a great time saver- but for some reason the documentation for it on the web sometimes lacks simple to follow guides- which means you waste time trying to help people do the simplest of things with it sometimes- hopefully the below will help you save some time!</p>
+<ul>
+<li>Connect to your WDS server</li>
+<li>Grab your drivers from the web and <strong>extract</strong> them to a folder (all too easy to leave them in a zip or executable!). Ensure they’re appropriate for the version of windows you are deploying (e.g. 64 bit).</li>
+<li>Open up the WDS console.</li>
+<li>Expand the servers area, then your server group and select drivers. Right click and chose Add Driver Package…</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds01.png"><img alt="WDS Console" src="images/image006.png" title="WDS Console" /></a>WDS Console - Add Driver</p>
+<ul>
+<li>It’s often easiest to point it to the directory, rather than a specific INF in case the driver has multiple components, so select “Select all driver packages from a fodler and click browse to find the extraction path from the step above.</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/image014.jpg"><img alt="Insert Driver" src="images/image014.jpg" title="Insert Driver" /></a></p>
+<ul>
+<li>Click next, and allow it to find the driver packages</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds02.jpg"><img alt="Select Drivers" src="images/image015.jpg" title="Select Drivers" /></a></p>
+<ul>
+<li>Click next once you’ve got the packages you want and next to add them to the server:</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds03.png"><img alt="Confirm Selection" src="images/image011.png" title="Confirm Selection" /></a></p>
+<ul>
+<li>It’ll start adding them in the WDS driver collection.</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds04.png"><img alt="Installing" src="images/image012.png" title="Installing" /></a></p>
+<ul>
+<li>Once that’s done, you can add it to a group (which makes it easier to identify old drivers, etc) – if one doesn’t exist, you can create one to reflect the laptop details (like the one in the example below)</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds004.png"><img alt="Select Driver Group" src="images/image007.png" title="Select Driver Group" /></a></p>
+<ul>
+<li>Click next and you’re done- you can untick the modify the filters for this group now and click finish to get straight into action.</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds07.jpg"><img alt="Modify Filters" src="images/image019.jpg" title="Modify Filters" /></a></p>
+<ul>
+<li>Once added, you need to insert the driver into the boot image. Before that, though, you should back up the image- so expand Boot image then right click on the Windows Setup X86 and chose EXPORT IMAGE to save a copy of the image (date mark it for easy reference).</li>
+<li>Then right click again on the image from before and chose add driver packages to image:</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds0008.png"><img alt="Apply to image" src="images/image0161.png" title="Apply to image" /></a></p>
+<ul>
+<li>In order to find the driver packages you want, click on the Add button, and chose the attribute type and set it to driver group name and equal to. Then, in the drop down box below, you can simply pick the driver group we created earlier and click add and ok. Then click on search for packages and it’ll pull back all the drivers you just added.</li>
+</ul>
+<p><a href="http://nextnextnextfinished.wordpress.com/wp-content/uploads/2012/01/wds00009.png"><img alt="Apply Driver Group" src="images/image017.png" title="Apply Driver Group" /></a></p>
+<ul>
+<li>Simply click on next, then next again and it’ll mount and insert the driver image details. Once complete, you should be ready to go</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2012-01-21-custom-tmg-web-listener-login-forms.html">&larr; Older: Custom TMG Web Listener login forms</a><a class="post-nav-link align-right" href="../posts/2012-02-07-more-powershell-uptime-stuff.html">Newer: More powershell uptime stuff. &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

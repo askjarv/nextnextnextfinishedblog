@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Setting up your lab Tripwire Enterprise with Tailscale</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Setting up your lab Tripwire Enterprise with Tailscale</h1>
+        <div class="meta">
+          <time datetime="2025-08-11">2025-08-11</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>One of the most common things I need in my lab is access to the web console for Tripwire Enterprise to do demos- but it can be a nuisance to demonstrate with a VM quickly if I'm out on the road... until Tailscale quietly made homelabs easy to remotely setup. Now, I don't even need to replace the default TE certificate, I can quickly deploy a virtual machine and get it up and running on my Tailscale network with a NGINX setup that means I even have a nice, trusted SSL certificate in moments - here's the workflow I use for this on Windows:</p>
+<h1 id="install-tailscale-client">Install tailscale client</h1>
+<p>After installing TE as usual, you'll want to download and install the Tailscale client and register it: <a href="https://tailscale.com/download/windows">https://tailscale.com/download/windows</a></p>
+<h1 id="get-a-cert">Get a cert:</h1>
+<p>Once tailscale is up and running, you'll want a certificate to use for your site:</p>
+<pre><code>tailscale cert yourmachine.domain.com
+</code></pre>
+<h1 id="download-nginx">Download NGINX</h1>
+<p>With Tailscale and your certs ready to go, you can setup NGINX - starting with a quick download (https://nginx.org/en/download.html).</p>
+<p>Once unzipped, you can then add in your certificates from the previous step to a suitable directory for NGINX to use<br />
+Finally, you'll want to setup NGINX to give access to your TE console - I use port 8443 for access the NGINX site, and, in this example, my TE console host is running on 192.168.1.20 - you'll want to update these to suit your needs (I've also weakened the security requirements here a bit to help support some legacy clients connecting to TE - in the real world I'd advise against this of course!).</p>
+<pre><code>/etc/nginx/nginx.conf
+
+user nginx; # 'www-data' on Debian/Ubuntu
+worker_processes auto;
+
+pid nginx.pid;
+
+events {
+worker_connections 1024;
+}
+
+http {
+include mime.types;
+default_type application/octet-stream;
+
+sendfile        on;
+tcp_nopush      on;
+tcp_nodelay     on;
+keepalive_timeout  65;
+
+# --- TLS defaults for the public side (clients -&gt; NGINX) ---
+ssl_session_cache   shared:SSL:10m;
+ssl_session_timeout 1d;
+ssl_protocols       TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+
+# If you enable OCSP stapling, you need a resolver:
+resolver 1.1.1.1 1.0.0.1 valid=300s;
+resolver_timeout 5s;
+
+# --- Upstream (your backend that has a self-signed cert and listens on 443) ---
+upstream backend_https {
+    server 192.168.1.20:443;   # change to your backend IP or hostname
+    keepalive 32;
+}
+
+# --- Public listener on your custom port, with valid certs ---
+server {
+    listen 8443 ssl http2;               # custom port
+    server_name yourcertificatesubjecthostname;             # change to your hostname
+
+    ssl_certificate     yourcerthere.crt;  # change
+    ssl_certificate_key yourcertkeyhere.key;    # change
+    #ssl_stapling on;
+    #ssl_stapling_verify on;
+
+    # --- Reverse proxy to HTTPS backend (self-signed) ---
+    location / {
+        proxy_http_version 1.1;
+
+        # Forward client details
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Use SNI when talking to backend (good practice)
+        proxy_ssl_server_name on;
+
+        # Quick/easy: don't verify the backend's self-signed cert
+        proxy_ssl_verify off;
+        proxy_ssl_conf_command CipherString &quot;DEFAULT@SECLEVEL=0&quot;;
+        proxy_ssl_ciphers ECDHE+AESGCM:ECDHE+CHACHA20:!DHE:!aNULL:!MD5:!3DES;
+        proxy_ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+
+        # If you prefer verification, comment the line above and use:
+        # proxy_ssl_trusted_certificate /etc/nginx/trusted/upstream_ca.pem;  # put backend CA or cert here if you prefer - 
+        # proxy_ssl_verify on;
+        # proxy_ssl_verify_depth 2;
+        # Optionally force a specific SNI name if backend needs it:
+        # proxy_ssl_name backend.internal.example;
+
+        proxy_pass https://backend_https;
+
+        # Timeouts/buffers (tweak as needed)
+        proxy_connect_timeout 10s;
+        proxy_send_timeout    60s;
+        proxy_read_timeout    60s;
+        proxy_buffering on;
+    }
+}
+
+}
+</code></pre>
+<h1 id="finally">Finally...</h1>
+<p>If you run into dh2 errors (not unusual with a default install that hasn't been hardened yet) you'll want to to ensure that the TE console is using a decent, more modern cipher - e.g. add</p>
+<pre><code>tw.tomcat.ciphers=TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA 
+</code></pre>
+<p>to your server.properties, as per https://customers.tripwire.com/customers/article?id=ka44T000000PObeQAG, and restart the console.</p>
+<p>5 minutes setup, and you've got a shiny cert, proxied access, and a remote way of accessing your TE lab console</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-04-22-fim-auditing-and-configuration-compliance-in-active-active-and-active-passive-designs.html">&larr; Older: FIM, Auditing, and Configuration Compliance in Active-Active and Active-Passive Designs</a><a class="post-nav-link align-right" href="../posts/2025-09-27-microsoft-powerbi-and-tripwire-enterprise.html">Newer: Microsoft PowerBi and Tripwire Enterprise &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

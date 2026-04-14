@@ -1,0 +1,430 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0">
+  <channel>
+    <title>Next...Next...Next...Finished</title>
+    <link>https://askjarv.github.io/nextnextnextfinishedblog</link>
+    <description>A technical blog by some one in IT Security</description>
+    <lastBuildDate>Tue, 14 Apr 2026 15:02:34 +0000</lastBuildDate>
+    <generator>build.py</generator>
+    <item>
+      <title>Building an MCP server for Tripwire IP360 vulnerability information</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-04-06-building-an-mcp-server-for-tripwire-ip360-vulnerability-information.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-04-06-building-an-mcp-server-for-tripwire-ip360-vulnerability-information.html</guid>
+      <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+      <description>For those of you have been experimenting with AI's recently it's likely you've come across Model Context Protocol (MCP) (for those who haven't, it is effectively a clean way to expose operational systems to an LLM as a structured toolset). There's lot of use cases for this, but…</description>
+      <category>tripwire-ip360</category>
+    </item>
+    <item>
+      <title>Identity is the New OS: Rethinking Security Boundaries in the Cloud</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-04-03-identity-is-the-new-os-rethinking-security-boundaries-in-the-cloud.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-04-03-identity-is-the-new-os-rethinking-security-boundaries-in-the-cloud.html</guid>
+      <pubDate>Fri, 03 Apr 2026 00:00:00 +0000</pubDate>
+      <description>In traditional infrastructure, the operating system was the security boundary.</description>
+      <category>aws</category>
+      <category>azure</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Monitoring Azure Blob Storage with CLI-Based File Integrity Monitoring</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-31-monitoring-azure-blob-storage-with-cli-based-file-integrity-monitoring.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-31-monitoring-azure-blob-storage-with-cli-based-file-integrity-monitoring.html</guid>
+      <pubDate>Tue, 31 Mar 2026 00:00:00 +0000</pubDate>
+      <description>Continuing my previous post about cloud storage monitoring, I'm back with the "Azure edition" today. I'll skip the preamble about why this is important and get straight to the commands this time (but stay tuned about some additional considerations that are relevant to both AWS a…</description>
+      <category>azure</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Monitoring Amazon S3 with CLI-Based File Integrity Monitoring</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-27-monitoring-amazon-s3-with-cli-based-file-integrity-monitoring.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-27-monitoring-amazon-s3-with-cli-based-file-integrity-monitoring.html</guid>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <description>Cloud object storage introduces a subtle but critical challenge for File Integrity Monitoring (FIM): there is no “file system” in the traditional sense. But that doesn't mean you shouldn't be monitoring it (given it's even more exposed than your on-premise architecture in many c…</description>
+      <category>aws</category>
+      <category>s3</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Monitoring OpenGaussDB with Tripwire Enterprise</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-25-monitoring-opengaussdb-with-tripwire-enterprise.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-25-monitoring-opengaussdb-with-tripwire-enterprise.html</guid>
+      <pubDate>Wed, 25 Mar 2026 00:00:00 +0000</pubDate>
+      <description>I've not done much with GaussDB/OpenGaussDB, so figured I'd post the process I used to setup some monitoring including the deployment itself.</description>
+      <category>database</category>
+      <category>gaussdb</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Integrating VirusTotal with Fortra's Tripwire Enterprise in two minutes</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-23-integrating-virustotal-with-fortras-tripwire-enterprise-in-two-minutes.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-23-integrating-virustotal-with-fortras-tripwire-enterprise-in-two-minutes.html</guid>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 +0000</pubDate>
+      <description>One of Tripwire Enterprise's greatest strengths is the ability to quickly and easily take action in response to changes either automatically or during a review by an administrator... and one of the most common requests I see from clients is "how can I know whether this is a good…</description>
+      <category>scripting</category>
+      <category>tripwire-enterprise</category>
+      <category>virustotal</category>
+    </item>
+    <item>
+      <title>Monitoring Containers - A FIM perspective</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-10-monitoring-containers-a-fim-perspective.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-03-10-monitoring-containers-a-fim-perspective.html</guid>
+      <pubDate>Tue, 10 Mar 2026 00:00:00 +0000</pubDate>
+      <description>One of the common asks I get as a consultant at the moment is how best to approach monitoring containers with "FIM"... but modern Kubernetes/container platforms (e.g. Red Hat OpenShift ) change a lot of the assumptions that traditional host-based security monitoring relied on si…</description>
+      <category>openshift</category>
+      <category>rhel</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Architecture Anti-Patterns</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-02-17-architecture-anti-patterns.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2026-02-17-architecture-anti-patterns.html</guid>
+      <pubDate>Tue, 17 Feb 2026 00:00:00 +0000</pubDate>
+      <description>File Integrity Monitoring (FIM) and Security Configuration Management (SCM) platforms like the ones I currently work with at Fortra are deceptively simple on the surface: deploy/configure endpoints, define rules/assessments, schedule tasks, evaluate results, report.</description>
+      <category>architecture</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>TE External Rule Elements Example</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-11-14-te-external-rule-elements-example.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-11-14-te-external-rule-elements-example.html</guid>
+      <pubDate>Fri, 14 Nov 2025 00:00:00 +0000</pubDate>
+      <description>One of the most powerful things I do with Tripwire Enterprise is add external sources to TE's change audit tracking. Whether it's an API, or a device with an unsupported SSH config, this workflow enables me to capture data and bring it along side all the rest of the compliance a…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Trigger a scan with the CCM REST API</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-11-07-trigger-a-scan-with-the-ccm-rest-api.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-11-07-trigger-a-scan-with-the-ccm-rest-api.html</guid>
+      <pubDate>Fri, 07 Nov 2025 00:00:00 +0000</pubDate>
+      <description>On the theme of recent posts about scripting (and automating scanning - if you're still doing this manually, you're doing something wrong IMHO!), here's a useful script I put together to help demo how to trigger a compliance scan with Tripwire's Configuration Compliance Manager</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Google's Unsigned APK Crackdown</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-31-googles-unsigned-apk-crackdown.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-31-googles-unsigned-apk-crackdown.html</guid>
+      <pubDate>Fri, 31 Oct 2025 00:00:00 +0000</pubDate>
+      <description>I'm late to publicly comment on this hot topic (and do my best not to post "opinions" online in general!), but I thought I'd offer a personal story on Google's moves to required app developers provide personal ID to back the signing of all apps that run on Android (for those who…</description>
+      <category>android</category>
+      <category>opinion</category>
+    </item>
+    <item>
+      <title>Posting a Tripwire IP360 ASPL update with Python</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-24-posting-a-tripwire-ip360-aspl-update-with-python.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-24-posting-a-tripwire-ip360-aspl-update-with-python.html</guid>
+      <pubDate>Fri, 24 Oct 2025 00:00:00 +0000</pubDate>
+      <description>This one initially threw me, so I figured I'd post the script here for others in case they run into issues:</description>
+      <category>python</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Change Audit for Network Devices</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-17-change-audit-for-network-devices.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-17-change-audit-for-network-devices.html</guid>
+      <pubDate>Fri, 17 Oct 2025 00:00:00 +0000</pubDate>
+      <description>I often post over on the Tripwire/Fortra bIog about the importance of monitoring, but don't typically talk about the "technical ins and outs" of how I approach and think about Change Audit so I'm hoping to start a series of posts about File Integrity Monitoring (FIM) aka Change…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Configuring IP360 Windows targets via group policy</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-14-configuring-ip360-windows-targets-via-group-policy.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-14-configuring-ip360-windows-targets-via-group-policy.html</guid>
+      <pubDate>Tue, 14 Oct 2025 00:00:00 +0000</pubDate>
+      <description>Group Policy is the typical/preferred method of setting many of the requirements for Tripwire IP360 vulnerability scanning and whilst the official endpoint guide is helpful with identifying various settings, it can take time to map many of the settings to the specific GPO settin…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>IP360 API with Python - Work Experience Case Study</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-11-ip360-api-with-python-work-experience-case-study.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-11-ip360-api-with-python-work-experience-case-study.html</guid>
+      <pubDate>Sat, 11 Oct 2025 00:00:00 +0000</pubDate>
+      <description>The following was created to test a work experience student's Python skills! It was prior to the official implementation of the REST API, so uses the XML interface and as a result some of this is now slightly dated (using API Explorer for example) but it can still potentially be…</description>
+      <category>scripting</category>
+      <category>tripwire</category>
+      <category>tripwire-ip360</category>
+    </item>
+    <item>
+      <title>Initiating a Vulnerability Scan with IP360 Rest API and PowerShell</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-03-initiating-a-vulnerability-scan-with-ip360-rest-api-and-powershell.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-10-03-initiating-a-vulnerability-scan-with-ip360-rest-api-and-powershell.html</guid>
+      <pubDate>Fri, 03 Oct 2025 00:00:00 +0000</pubDate>
+      <description>One of the most common things I do with Tripwire's IP360 in Professional Services it automate workflows. Nearly everyone wants a way to quickly trigger a scan (be it on detection of a new machine or a request for further data in a security playbook) and it's nice and easy to do…</description>
+      <category>tripwire-ip360</category>
+    </item>
+    <item>
+      <title>Microsoft PowerBi and Tripwire Enterprise</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-09-27-microsoft-powerbi-and-tripwire-enterprise.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-09-27-microsoft-powerbi-and-tripwire-enterprise.html</guid>
+      <pubDate>Sat, 27 Sep 2025 00:00:00 +0000</pubDate>
+      <description>A common request I get is setting up Microsoft PowerBi with Tripwire Enterprise. Whilst we don't have an official "out-of-the-box" solution for this, TE's REST API makes this a pretty simple option to get started with even if you just want to use PowerBi's native web reporting:</description>
+      <category>powerbi</category>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Setting up your lab Tripwire Enterprise with Tailscale</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-08-11-setting-up-your-lab-tripwire-enterprise-with-tailscale.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-08-11-setting-up-your-lab-tripwire-enterprise-with-tailscale.html</guid>
+      <pubDate>Mon, 11 Aug 2025 00:00:00 +0000</pubDate>
+      <description>One of the most common things I need in my lab is access to the web console for Tripwire Enterprise to do demos- but it can be a nuisance to demonstrate with a VM quickly if I'm out on the road... until Tailscale quietly made homelabs easy to remotely setup. Now, I don't even ne…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>FIM, Auditing, and Configuration Compliance in Active-Active and Active-Passive Designs</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-04-22-fim-auditing-and-configuration-compliance-in-active-active-and-active-passive-designs.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-04-22-fim-auditing-and-configuration-compliance-in-active-active-and-active-passive-designs.html</guid>
+      <pubDate>Tue, 22 Apr 2025 00:00:00 +0000</pubDate>
+      <description>In a lot of environments I walk into, clustering is treated as a resilience problem - but not always as a security one. We're busy designing for uptime, failover, scale, etc... but we don’t always design for consistency of trust across the cluster (especially for on premise depl…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Building a Vulnerability Management Program from Scratch</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-02-11-building-a-vulnerability-management-program-from-scratch.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2025-02-11-building-a-vulnerability-management-program-from-scratch.html</guid>
+      <pubDate>Tue, 11 Feb 2025 00:00:00 +0000</pubDate>
+      <description>A post on Vulnerability Management this week on the Tripwire blog: https://www.tripwire.com/state-of-security/building-vulnerability-management-program-scratch</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>What's Next for Cybersecurity in 2025 and Beyond? Fortra Experts Weigh In</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-12-31-whats-next-for-cybersecurity-in-2025-and-beyond-fortra-experts-weigh-in.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-12-31-whats-next-for-cybersecurity-in-2025-and-beyond-fortra-experts-weigh-in.html</guid>
+      <pubDate>Tue, 31 Dec 2024 00:00:00 +0000</pubDate>
+      <description>I got a comment in the Fortra blog today about 2025 -</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>The Top 10 State of Security Blog Posts From 2024</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-12-21-the-top-10-state-of-security-blog-posts-from-2024.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-12-21-the-top-10-state-of-security-blog-posts-from-2024.html</guid>
+      <pubDate>Sat, 21 Dec 2024 00:00:00 +0000</pubDate>
+      <description>I made it to a top ten list: https://www.tripwire.com/state-of-security/top-state-security-blog-posts for my post: Bake Security Into Your Cyber Kitchen. I love writing a top ten list, but being a part of one is even more exciting- you can read the original post here: https://ww…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>How to Integrate FIM with SOAR Platforms</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-11-07-1530.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-11-07-1530.html</guid>
+      <pubDate>Thu, 07 Nov 2024 00:00:00 +0000</pubDate>
+      <description>I have another new blog up on the Tripwire State of Security site: https://www.tripwire.com/state-of-security/how-integrate-fim-soar-platforms</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Security Automation – As Easy As Making Tea?</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-09-09-security-automation-as-easy-as-making-tea.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-09-09-security-automation-as-easy-as-making-tea.html</guid>
+      <pubDate>Mon, 09 Sep 2024 00:00:00 +0000</pubDate>
+      <description>I can't deny, I always like a metaphor that makes sense to me - hence my latest blog over on the Tripwire site: https://www.tripwire.com/state-of-security/security-automation-easy-making-tea</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Guest Comment on the Tripwire blog</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-07-01-guest-comment-on-the-tripwire-blog.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-07-01-guest-comment-on-the-tripwire-blog.html</guid>
+      <pubDate>Mon, 01 Jul 2024 00:00:00 +0000</pubDate>
+      <description>I got to contribute to the Tripwire blog again this week with a quick comment on Cybersecurity Frameworks: What Do the Experts Have to Say? https://www.tripwire.com/state-of-security/cybersecurity-frameworks-what-do-experts-have-say</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Making Windows Terminal Look nice in 2024</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-06-07-making-windows-terminal-look-nice-in-2024.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-06-07-making-windows-terminal-look-nice-in-2024.html</guid>
+      <pubDate>Fri, 07 Jun 2024 00:00:00 +0000</pubDate>
+      <description>I recently had to rebuild a PC recently and whilst a lot of my settings automatically came across (thanks OneDrive backup) my poor Windows Terminal did not do well with a profile migration. Setting up Windows in 2024 to work "nicely" with OH-MY-POSH (especially if your profile i…</description>
+    </item>
+    <item>
+      <title>VMWare Workstation Pro - for free (for personal use!)</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-05-30-vmware-workstation-pro-for-free-for-personal-use.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-05-30-vmware-workstation-pro-for-free-for-personal-use.html</guid>
+      <pubDate>Thu, 30 May 2024 00:00:00 +0000</pubDate>
+      <description>Whilst I'd love to say every app I want to run in my home lab works well with Docker or similar, it's often the case I end up using a full VM for emulation - and VMware workstation has remained a solid option for this for years (especially around running a number of high resourc…</description>
+      <category>cloud</category>
+      <category>virtualization</category>
+      <category>vmware</category>
+      <category>vmware-cloud-foundation</category>
+      <category>vsphere</category>
+    </item>
+    <item>
+      <title>Bake-off: Ensuring Security in the Cyber Kitchen</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-03-27-bake-off-ensuring-security-in-the-cyber-kitchen.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-03-27-bake-off-ensuring-security-in-the-cyber-kitchen.html</guid>
+      <pubDate>Wed, 27 Mar 2024 00:00:00 +0000</pubDate>
+      <description>The Bear (on Disney+ in the UK) has gotten to me (and my blog post): https://www.tripwire.com/state-of-security/bake-ensuring-security-cyber-kitchen</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Where Security Starts in Your Security Projects</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-01-19-where-security-starts-in-your-security-projects.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-01-19-where-security-starts-in-your-security-projects.html</guid>
+      <pubDate>Fri, 19 Jan 2024 00:00:00 +0000</pubDate>
+      <description>Security starts... by reading my latest blog post over on the Tripwire blog https://www.tripwire.com/state-of-security/where-security-starts-your-security-projects !</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Know Thyself and Thy Network</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-01-10-know-thyself-and-thy-network.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2024-01-10-know-thyself-and-thy-network.html</guid>
+      <pubDate>Wed, 10 Jan 2024 00:00:00 +0000</pubDate>
+      <description>Another Tripwire blog post for me this week: https://www.tripwire.com/state-of-security/know-thyself-and-thy-network</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Change Variance: How Tiny Differences Can Impact Your IT World</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-11-20-change-variance-how-tiny-differences-can-impact-your-it-world.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-11-20-change-variance-how-tiny-differences-can-impact-your-it-world.html</guid>
+      <pubDate>Mon, 20 Nov 2023 00:00:00 +0000</pubDate>
+      <description>File Integrity Monitoring and Change Audit is the two words I use the most in a week - and this blog explores Change Variance over at Tripwire: https://www.tripwire.com/state-of-security/change-variance-how-tiny-differences-can-impact-your-it-world</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>A Scary Story of Group Policy Gone Wrong: Accidental Misconfigurations</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-10-31-a-scary-story-of-group-policy-gone-wrong-accidental-misconfigurations.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-10-31-a-scary-story-of-group-policy-gone-wrong-accidental-misconfigurations.html</guid>
+      <pubDate>Tue, 31 Oct 2023 00:00:00 +0000</pubDate>
+      <description>Does everyone have one of these: https://www.tripwire.com/state-of-security/scary-story-group-policy-gone-wrong-accidental-misconfigurations ?</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Is secure-by-default an achievable reality?</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-08-04-is-secure-by-default-an-achievable-reality.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-08-04-is-secure-by-default-an-achievable-reality.html</guid>
+      <pubDate>Fri, 04 Aug 2023 00:00:00 +0000</pubDate>
+      <description>I want to believe it's possible - but is it? https://www.tripwire.com/state-of-security/secure-default-achievable-reality</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Learning from the Playground: The Original SOC</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-07-18-learning-from-the-playground-the-original-soc.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-07-18-learning-from-the-playground-the-original-soc.html</guid>
+      <pubDate>Tue, 18 Jul 2023 00:00:00 +0000</pubDate>
+      <description>I can't deny, I like an oddball theme for blog posts over at Tripwire: https://www.tripwire.com/state-of-security/what-security-operations-center-soc</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Root Cause Analysis for Deployment Failures</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-04-25-root-cause-analysis-for-deployment-failures.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-04-25-root-cause-analysis-for-deployment-failures.html</guid>
+      <pubDate>Tue, 25 Apr 2023 00:00:00 +0000</pubDate>
+      <description>A long background of infrastructure support means I spend a lot of time thinking about RCA</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>ITIL For Change Management and Continuous Improvement – Powered by Tripwire</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-24-itil-for-change-management-and-continuous-improvement-powered-by-tripwire.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-24-itil-for-change-management-and-continuous-improvement-powered-by-tripwire.html</guid>
+      <pubDate>Fri, 24 Mar 2023 00:00:00 +0000</pubDate>
+      <description>I remember my ITIL training well - hence my latest post on the Tripwire State of Security blog</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>A Bright Future for Forensic Analysis</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-23-a-bright-future-for-forensic-analysis.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-23-a-bright-future-for-forensic-analysis.html</guid>
+      <pubDate>Thu, 23 Mar 2023 00:00:00 +0000</pubDate>
+      <description>A key element of Change Audit is getting good data in:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Security Journeys: From Change Management to Compliance</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-17-security-journeys-from-change-management-to-compliance.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-17-security-journeys-from-change-management-to-compliance.html</guid>
+      <pubDate>Fri, 17 Mar 2023 00:00:00 +0000</pubDate>
+      <description>Was it a fad:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Professional Services in the World of Cybersecurity</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-10-professional-services-in-the-world-of-cybersecurity.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-10-professional-services-in-the-world-of-cybersecurity.html</guid>
+      <pubDate>Fri, 10 Mar 2023 00:00:00 +0000</pubDate>
+      <description>Tooting my own horn somewhat over at Tripwire.com this week on the State of Security blog:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Stop Working in Silos: Integrating with APIs</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-06-stop-working-in-silos-integrating-with-apis.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-03-06-stop-working-in-silos-integrating-with-apis.html</guid>
+      <pubDate>Mon, 06 Mar 2023 00:00:00 +0000</pubDate>
+      <description>My favourite topic/day job at Tripwire is my focus on my latest post:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Learning from the Playground: The Original SOC</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-01-18-learning-from-the-playground-the-original-soc-2.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2023-01-18-learning-from-the-playground-the-original-soc-2.html</guid>
+      <pubDate>Wed, 18 Jan 2023 00:00:00 +0000</pubDate>
+      <description>Foundation and Fundamentals is what I'm talking about on my latest Tripwire State of Security blog: https://www.tripwire.com/state-of-security/what-security-operations-center-soc</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Place your budgets on the right cybersecurity for your business</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-10-20-place-your-budgets-on-the-right-cybersecurity-for-your-business.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-10-20-place-your-budgets-on-the-right-cybersecurity-for-your-business.html</guid>
+      <pubDate>Thu, 20 Oct 2022 00:00:00 +0000</pubDate>
+      <description>One area where security can deliver cost-savings to the business is by speeding up incident response . Though, achieving more efficient incident response may require some strategizing. Recurring incidents like AV detections or firewall intrusion alerts can be expedited by ensuri…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Integrating IP360 with AWS Lambda</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-10-04-integrating-ip360-with-aws-lambda.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-10-04-integrating-ip360-with-aws-lambda.html</guid>
+      <pubDate>Tue, 04 Oct 2022 00:00:00 +0000</pubDate>
+      <description>I built the below script to allow users to easily scale our vulnerability management monitoring of servers deployed in AWS with automated exceptions being pulled from an S3 bucket and automatically added to Tripwire IP360 via a AWS Lambda call:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Regulatory Compliance – Holding Security Back or Forcing us to Reassess old biases?</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-04-19-regulatory-compliance-holding-security-back-or-forcing-us-to-reassess-old-biases.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-04-19-regulatory-compliance-holding-security-back-or-forcing-us-to-reassess-old-biases.html</guid>
+      <pubDate>Tue, 19 Apr 2022 00:00:00 +0000</pubDate>
+      <description>Back tgo psychology and security controls in my latest Tripwire blog:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Regulatory Compliance in the Cloud: What you Need to Know</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-03-23-regulatory-compliance-in-the-cloud-what-you-need-to-know.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-03-23-regulatory-compliance-in-the-cloud-what-you-need-to-know.html</guid>
+      <pubDate>Wed, 23 Mar 2022 00:00:00 +0000</pubDate>
+      <description>I've got a post up on the Tripwire blog about Regulatory Compliance this week: https://www.tripwire.com/state-of-security/regulatory-compliance-cloud</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Observation vs. Monitoring: What’s the Difference in the World of Cybersecurity</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-02-22-observation-vs-monitoring-whats-the-difference-in-the-world-of-cybersecurity.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-02-22-observation-vs-monitoring-whats-the-difference-in-the-world-of-cybersecurity.html</guid>
+      <pubDate>Tue, 22 Feb 2022 00:00:00 +0000</pubDate>
+      <description>I've managed to get another blog posted up on the Tripwire blog:</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Cybersecurity Laws – Get Ready Today to Save Some Money Tomorrow</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-01-27-cybersecurity-laws-get-ready-today-to-save-some-money-tomorrow.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2022-01-27-cybersecurity-laws-get-ready-today-to-save-some-money-tomorrow.html</guid>
+      <pubDate>Thu, 27 Jan 2022 00:00:00 +0000</pubDate>
+      <description>It feels like the UK Cyber Security Council might starting playing a bigger role in the day-to-day security conversation so I helped with a post on the Tripwire State of Security https://www.tripwire.com/state-of-security/cybersecurity-laws-get-ready-today-to-save-some-money-tom…</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Google’s Office of the CISO Points the Way Towards Scaling Security</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-05-18-googles-office-of-the-ciso-points-the-way-towards-scaling-security.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-05-18-googles-office-of-the-ciso-points-the-way-towards-scaling-security.html</guid>
+      <pubDate>Tue, 18 May 2021 00:00:00 +0000</pubDate>
+      <description>I have another new Tripwire blog this week: https://www.tripwire.com/state-of-security/googles-office-of-the-ciso-points-the-way-towards-scaling-security</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Define, Reinforce and Track: Helping Develop Positive Cybersecurity Habits</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-04-27-define-reinforce-and-track-helping-develop-positive-cybersecurity-habits.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-04-27-define-reinforce-and-track-helping-develop-positive-cybersecurity-habits.html</guid>
+      <pubDate>Tue, 27 Apr 2021 00:00:00 +0000</pubDate>
+      <description>I've got a new Tripwire blog post up today: https://www.tripwire.com/state-of-security/define-reinforce-and-track-helping-develop-positive-cybersecurity-habits - it's all about</description>
+      <category>tripwire</category>
+    </item>
+    <item>
+      <title>Cloud-Based Storage Misconfigurations – Understanding the Security Risks and Responses</title>
+      <link>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-03-02-cloud-based-storage-misconfigurations-understanding-the-security-risks-and-responses.html</link>
+      <guid>https://askjarv.github.io/nextnextnextfinishedblog/posts/2021-03-02-cloud-based-storage-misconfigurations-understanding-the-security-risks-and-responses.html</guid>
+      <pubDate>Tue, 02 Mar 2021 00:00:00 +0000</pubDate>
+      <description>A Tripwire blog from me is up! Check it out here: https://www.tripwire.com/state-of-security/cloud-misconfigurations-understanding-security-risks-and-responses</description>
+      <category>tripwire</category>
+    </item>
+  </channel>
+</rss>

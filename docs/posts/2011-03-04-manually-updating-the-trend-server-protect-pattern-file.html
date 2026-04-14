@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Manually updating the Trend Server-protect pattern file</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Manually updating the Trend Server-protect pattern file</h1>
+        <div class="meta">
+          <time datetime="2011-03-04">2011-03-04</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/pattern-file.html">pattern-file</a><a class="tag" href="../tags/serverprotect.html">serverprotect</a></div>
+        <div class="content">
+          <p>Manual update the pattern file using this procedure:</p>
+<p>1. Download the <a href="http://www.trendmicro.com/download/pattern-cpr-disclaimer.asp">latest Official Pattern Release (OPR)/Controlled Pattern Release (CPR)</a>. The pattern file will have two values.</p>
+<p>o The standard pattern number (XXX)</p>
+<p>o The new pattern file numbering format (W.XXX.YY). W represents the generation number, XXX represents the actual pattern file number and YY represents the pattern file build number or control release. For more information, visit the <a href="http://www.trendmicro.com/npf">NPF Web site</a>.</p>
+<p>2. On the Information Server, save the pattern file (you downloaded from the Web site) as vsapiXXX.zip (where XXX is the pattern file number you are downloading) to the \…\SpntShare\Pattern directory. (e.g., C:\Program Files\Trend\Sprotect\SpntShare\Pattern).</p>
+<p>3. On the ServerProtect Information Server, open the server.ini file in the \Program Files\Trend\Sprotect\SpntShare directory.</p>
+<p>4. Under the [PATTERN] section, change the MergeCount and P.4.MergeCount values to have a value equal to zero (0).</p>
+<p>5. Change the Version value to equal the current pattern file number you downloaded from Step 2.</p>
+<p>6. Change the P.4. value so that it reflects the correct pattern file number you are updating (i.e., \pattern\vsapiXXX.zip), the correct name for new pattern file format, and the correct size of the zip file. The line should look like the following:</p>
+<p>P.4=pattern/vsapiXXX,zip, WXXXYY, ZZZZZZZ<br />
+Where</p>
+<p>§ W is the pattern generation number</p>
+<p>§ XXX is the pattern file number</p>
+<p>§ YY is the current pattern file release version</p>
+<p>§ ZZZZZZZ is the size of the zip file. This is the Size value and not the Size on disk value.</p>
+<p>7. Change the Path_VSAPI value so that it reflects the correct pattern file number you are updating (\pattern\vsapiXXX.zip) and the correct size of the ZIP file. The line should look like this:</p>
+<p>Path_VSAPI=pattern/vsapiXXX.zip, ZZZZZZZ<br />
+Where</p>
+<p>§ XXX is the pattern file number</p>
+<p>§ ZZZZZZZ is the size of the ZIP file. This is the Size value and not the Size on disk value.</p>
+<p>8. Save the changes you have made to the server.ini file.</p>
+<p>9. Open the ServerProtect Management Console and click the <strong>Do</strong> &gt;<strong>Update menu items</strong> to view the new pattern file information.</p>
+<p>At this point, the ServerProtect Information Server can perform a pattern deployment to all Normal Server(s) using the Deploy Now method or the Deploy Task method.</p>
+<p>Taken from: <a href="http://esupport.trendmicro.com/Pages/Manually-updating-the-pattern-file-on-ServerProtect-for-NT-5.58.aspx">http://esupport.trendmicro.com/Pages/Manually-updating-the-pattern-file-on-ServerProtect-for-NT-5.58.aspx</a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-04-net-uninstall-clean-up-tool.html">&larr; Older: .Net uninstall clean up tool</a><a class="post-nav-link align-right" href="../posts/2011-03-04-installing-drivers-for-32-bit-clients-on-64-bit-servers.html">Newer: Installing drivers for 32 bit clients on 64 bit servers. &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Missing folder in Outlook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Missing folder in Outlook</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/mailbox.html">mailbox</a><a class="tag" href="../tags/office-2003.html">office-2003</a><a class="tag" href="../tags/office-2007.html">office-2007</a><a class="tag" href="../tags/office-2010.html">office-2010</a><a class="tag" href="../tags/ost.html">ost</a></div>
+        <div class="content">
+          <p>Missing Folder in Outlook (item may show in other Outlook sessions, or Outlook Web Access, but doesn't show in Outlook).</p>
+<p>This normally happens when your local cache has become corrupt- you can “repair” it by deleting it and recreating it:</p>
+<ol>
+<li>Quit Outlook, if it is running. Quit Lync/OCS client if running/any apps which access Outlook.</li>
+<li>From the <strong>Start</strong> menu, choose <strong>Run</strong>.</li>
+<li>In the Run window, type this path in the <strong>Open</strong> box and click OK: "%APPDATA%\Microsoft\Outlook\" To find the exact path, follow the steps above to get to <strong>Offline Folder File Settings</strong> (steps 1-4 for Outlook 2002/2003/2007/2010, or steps 1-3 for Outlook 2000). You can see the .ost file location in the <strong>File</strong> box. You may want to copy and paste that information in the Run window for accuracy and ease.</li>
+<li>In the Explorer window, locate the .ost file to be deleted. Select it and press DELETE on your keyboard or click the Delete icon on the toolbar.</li>
+<li>Open up Outlook again</li>
+<li>In Outlook 2007: Open the <strong>Tools</strong> menu. In Outlook 2010: Open the <strong>File</strong> tab on the Ribbon, click <strong>Info</strong>, and choose <strong>Account Settings.</strong></li>
+<li>Click <strong>Account Settings</strong>, then double-click <strong>Microsoft Exchange</strong>.</li>
+<li>Click <strong>More Settings</strong>.</li>
+<li>Click the <strong>Advanced</strong> tab, then click <strong>Offline Folder File Settings</strong>.</li>
+<li>
+<p>In the <strong>File</strong> box, type the path to the file that you want to use as the .ost file and click <strong>OK</strong>. The default name is <strong>Outlook.ost</strong>. If this file already exists, you will be prompted for a new name.If you see this message, click <strong>OK</strong>: <em>"<path> <filename>.ost could not be found. Would you like to create it?"</em> (<em><path></em> represents the path to the .ost file and <em><filename></em> represents the name of the .ost file.)</p>
+<p>[caption id="attachment_23" align="alignnone" width="300" caption="Screenshot- Offline Folder File Settings"]<img alt="Screenshot- Offline Folder File Settings" src="images/1.jpg" title="Screenshot - OST" />[/caption]
+11. Click <strong>OK</strong>, <strong>Next</strong>, and then click <strong>Finish</strong>. <strong>Note</strong>: Outlook must be connected to the Exchange server for the initial creation and synchronization of the Offline Folder file.</p>
+</li>
+</ol>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-36.html">&larr; Older: 2011-03-03-36</a><a class="post-nav-link align-right" href="../posts/2011-03-04-xenapp6-printer-policies.html">Newer: XenApp6 printer policies &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

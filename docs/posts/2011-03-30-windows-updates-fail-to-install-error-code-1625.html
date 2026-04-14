@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Windows Updates fail to install - Error code: 1625</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Windows Updates fail to install - Error code: 1625</h1>
+        <div class="meta">
+          <time datetime="2011-03-30">2011-03-30</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/patch.html">patch</a></div>
+        <div class="content">
+          <p>If you get caught out by the (vague) error of "Windows Updates fail to install - Error code: 1625", after much searching I found this solution worked in most scenarios:</p>
+<p>**</p>
+<p>start &gt; run regedit</p>
+<p>**</p>
+<p>Browse the registry to <strong>HKLM\Software\Policies\Microsoft\Windows\Installer</strong></p>
+<p><strong>Create: DisableMSI</strong></p>
+<p>Type: REG_DWORD 　value = 0 　 (0 should allow you to install it was originally 1)</p>
+<p>(In my case the value had been set to 2 so I changed it to 0)</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-30-xenapp-6-cross-farm-application-publication-hiding-apps-from-the-old-farm.html">&larr; Older: XenApp 6 Cross Farm Application Publication - Hiding Apps from the old farm</a><a class="post-nav-link align-right" href="../posts/2011-03-30-windows-7-failing-to-boot-after-sp1-install-fatal-error-code-c0000034.html">Newer: Windows 7 failing to boot after SP1 install - fatal error code c0000034 &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

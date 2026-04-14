@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Microsoft PowerBi and Tripwire Enterprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Microsoft PowerBi and Tripwire Enterprise</h1>
+        <div class="meta">
+          <time datetime="2025-09-27">2025-09-27</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/powerbi.html">powerbi</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>A common request I get is setting up Microsoft PowerBi with Tripwire Enterprise. Whilst we don't have an official "out-of-the-box" solution for this, TE's REST API makes this a pretty simple option to get started with even if you just want to use PowerBi's native web reporting:</p>
+<ul>
+<li>
+<p>Choose "Add Data" and select Web</p>
+</li>
+<li>
+<p>Add a relevant URL for the dataset of interest in the API - e.g. https://yourwebserver/api/v1/nodegroups to get node groups</p>
+</li>
+<li>
+<p>Provide some suitable (basic) auth login details...</p>
+</li>
+<li>
+<p>And you're done!</p>
+</li>
+</ul>
+<p>Remember you'll want to factor in things like ensuring you have a valid SSL cert on your TE console matched to the connection address, that your account should be able to read from the data points and that, if you're using large data areas (like versions) you'll want to handle paging.</p>
+<p>For those who prefer to look at the "code behind" the scenes, you'll end up with something like this for nodegroups from this aprpacoh:</p>
+<pre><code>letSource = Json.Document(Web.Contents(&quot;https://teconsole.munchkin-justice.ts.net:8443/api/v1/nodegroups&quot;)),#&quot;Converted to Table&quot; = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),#&quot;Expanded Column1&quot; = Table.ExpandRecordColumn(#&quot;Converted to Table&quot;, &quot;Column1&quot;, {&quot;description&quot;, &quot;id&quot;, &quot;importedTime&quot;, &quot;modifiedTime&quot;, &quot;name&quot;, &quot;type&quot;}, {&quot;description&quot;, &quot;id&quot;, &quot;importedTime&quot;, &quot;modifiedTime&quot;, &quot;name&quot;, &quot;type&quot;}),#&quot;Changed Type&quot; = Table.TransformColumnTypes(#&quot;Expanded Column1&quot;,{{&quot;description&quot;, type any}, {&quot;id&quot;, type text}, {&quot;importedTime&quot;, type datetime}, {&quot;modifiedTime&quot;, type datetime}, {&quot;name&quot;, type text}, {&quot;type&quot;, type text}})in#&quot;Changed Type&quot;
+</code></pre>
+<p>And here's some example report/dashboard screenshots I've created in the past to demo/inspire:</p>
+<figure>
+
+[![](images/2025-09-10-20_01_39-te-example.png)](https://nextnextnextfinished.wordpress.com/wp-content/uploads/2025/09/2025-09-10-20_01_39-te-example.png)
+
+<figcaption>
+
+PowerBi Compliance Dashboard from Tripwire
+
+</figcaption>
+
+</figure>
+
+<figure>
+
+[![](images/2025-09-10-20_01_21-te-example.png)](https://nextnextnextfinished.wordpress.com/wp-content/uploads/2025/09/2025-09-10-20_01_21-te-example.png)
+
+<figcaption>
+
+PowerBi Change Audit Dashboard from Tripwire
+
+</figcaption>
+
+</figure>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-08-11-setting-up-your-lab-tripwire-enterprise-with-tailscale.html">&larr; Older: Setting up your lab Tripwire Enterprise with Tailscale</a><a class="post-nav-link align-right" href="../posts/2025-10-03-initiating-a-vulnerability-scan-with-ip360-rest-api-and-powershell.html">Newer: Initiating a Vulnerability Scan with IP360 Rest API and PowerShell &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TAPI &amp;ldquo;Call Contact&amp;rdquo; in Outlook on Windows 7 with Lync Installed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>TAPI &amp;ldquo;Call Contact&amp;rdquo; in Outlook on Windows 7 with Lync Installed</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/lync.html">lync</a><a class="tag" href="../tags/office-2010.html">office-2010</a><a class="tag" href="../tags/tapi.html">tapi</a></div>
+        <div class="content">
+          <p>When I installed Lync on my Windows 7 Laptop the Tapi dialing feature didn’t work anymore.<br />
+After some research I found a <a href="http://tek-tips.com/viewthread.cfm?qid=1619910&amp;page=25">forum presenting the Solution</a> - as so often it is only a question of adding a registry Key:</p>
+<p>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Office\Outlook\Call Integration needs a DWORD called TAPIOVERRIDE with Value = 1</p>
+<p>[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Office\Outlook\Call Integration]<br />
+"TAPIOVERRIDE"=dword:00000001</p>
+<p>And off you go – after a short restart you can again Dial via TAPI from Outlook 2010!</p>
+<p><a href="http://blog.lieberlieber.com/wp-content/uploads/image86.png"><img alt="clip_image002" src="images/clip_image002.gif" title="clip_image002" /></a></p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-test-reply-email.html">&larr; Older: Test reply email</a><a class="post-nav-link align-right" href="../posts/2011-03-03-ssl-vpn-auth-by-security-group-using-ldap-on-fortigate-os-4-0mr2.html">Newer: SSL VPN Auth by Security Group using LDAP on FortiGate OS 4.0MR2 &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

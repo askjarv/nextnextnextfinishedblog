@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SQL Pivots for the rest of us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>SQL Pivots for the rest of us</h1>
+        <div class="meta">
+          <time datetime="2017-10-23">2017-10-23</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Every time I have to build a SQL pivot I can't remember how to do it and end up searching online and struggle to work out what the heck people are talking about in their examples and spend ages looking at "sales" data examples, etc. that are overly complicated for my simple pivot purposes so I'm posting this as an aide-memoire...</p>
+<h2 id="do-i-need-to-pivot-or-can-i-summarise-in-some-other-way">Do I need to PIVOT - or can I summarise in some other way</h2>
+<p>First of all, double check if you really need a pivot table! SQL has nice summary functions available to you in the form of <strong>group by</strong> - let’s assume you have some data that looks like (in a table we'll call #temptable1):</p>
+<table>
+<thead>
+<tr>
+<th><strong>IP</strong></th>
+<th><strong>TestResult</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>10.1.1.1</strong></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><strong>10.1.1.1</strong></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><strong>10.1.1.1</strong></td>
+<td>Fail</td>
+</tr>
+<tr>
+<td><strong>10.1.1.1</strong></td>
+<td>Inconclusive</td>
+</tr>
+<tr>
+<td><strong>10.1.1.2</strong></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><strong>10.1.1.2</strong></td>
+<td>Fail</td>
+</tr>
+<tr>
+<td><strong>10.1.1.2</strong></td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<p>Etc.</p>
+<p>If I want a simple summary table I can do:</p>
+<pre><code> select COUNT(IP) as Devices, [TestResult]
+ from #temptable1
+ Group by [TestResult]
+</code></pre>
+<p>to give me:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Devices</strong></th>
+<th><strong>TestResult</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>4</strong></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Fail</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td>Inconclusive</td>
+</tr>
+</tbody>
+</table>
+<p>This gives us a good high level summary by aggregating (counting/summing the device count) - but not a lot of use if I want to get details for a specific IP address.</p>
+<p>We could do:</p>
+<pre><code> select ip, [Test State], COUNT(IP) as Total
+ from #temptable1
+ Group by ip, [Test State]
+</code></pre>
+<p>To give us</p>
+<table>
+<thead>
+<tr>
+<th><strong>IP</strong></th>
+<th><strong>TestResult</strong></th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101.1.1</td>
+<td>Fail</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10.1.1.1</td>
+<td>Inconclusive</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10.1.1.1</td>
+<td>Pass</td>
+<td>2</td>
+</tr>
+<tr>
+<td>10.1.1.2</td>
+<td>Fail</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10.1.1.2</td>
+<td>Pass</td>
+<td>2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>...and we can even filter by IP:</p>
+<pre><code> select ip, [Test State], COUNT(IP) as Total
+ from #temptable1
+ where ip = '10.1.1.1'
+ Group by ip, [Test State]
+</code></pre>
+<p>To show a single host:</p>
+<table>
+<thead>
+<tr>
+<th><strong>IP</strong></th>
+<th><strong>TestResult</strong></th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.1.1.1</td>
+<td>Failed</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10.1.1.1</td>
+<td>Inconclusive</td>
+<td>1</td>
+</tr>
+<tr>
+<td>10.1.1.1</td>
+<td>Passed</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>But there are some limits here- for example, we might want to include an inconclusive score of "0" - in this summary if an IP has no inconclusive it simply won't show.</p>
+<h2 id="a-nasty-way-to-brute-force-a-solution">...A nasty way to brute force a solution...</h2>
+<p>OK, so we want to see the type of data we want- we could do a series of selects to give us the results we want:</p>
+<pre><code>select Count(#temptable1.[TestResult]) As Pass, Ip from #temptable1 
+where [TestResult] = 'Pass'
+and ip = '10.1.1.1'
+group by IP
+
+select Count(#temptable1.[TestResult]) As Inconclusive, Ip from #temptable1 
+where [TestResult] = 'Inconclusive'
+and ip = '10.1.1.1'
+group by IP
+
+select Count(#temptable1.[TestResult]) As Inconclusive, Ip from #temptable1 
+where [TestResult] = 'Fail'
+and ip = '10.1.1.1'
+group by IP
+
+select Count(#temptable1.[TestResult]) as TotalTests, Ip from #temptable1 
+where ip = '10.254.180.202'
+group by IP;
+</code></pre>
+<p>That'll give us a series of result tables showing Pass, Fail, and Inconclusive - but then we have a whole bunch of tables, rather than just one! In certain scenarios this will do just fine (and is perhaps easier to read than a pivot) but how can we aggregate these?</p>
+<p>Well, we could brute force this now we have the select statements above:</p>
+<pre><code>Select (
+select Count(#temptable1.[TestResult]) As Pass from #temptable1 
+where [TestResult] = 'Pass'
+and ip = '10.1.1.1'
+group by IP ) as Passed,
+(
+select Count(#temptable1.[TestResult]) As Inconclusive from #temptable1 
+where [TestResult] = 'Inconclusive'
+and ip = '10.1.1.1'
+group by IP) As Inconclusive,
+(
+select Count(#temptable1.[TestResult]) As Inconclusive from #temptable1 
+where [TestResult] = 'Fail'
+and ip = '10.1.1.1'
+group by IP ) As Failed,
+(
+select Count(#temptable1.[TestResult]) as TotalTests from #temptable1 
+where ip = '10.1.1.1'
+group by IP) As Total
+</code></pre>
+<p>giving us</p>
+<table>
+<thead>
+<tr>
+<th><strong>Passed</strong></th>
+<th><strong>Inconclusive</strong></th>
+<th><strong>Failed</strong></th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>But that's seems like messy approach to our problem and not very scalable!</p>
+<h2 id="the-real-pivot">The real pivot...</h2>
+<p>So let's define what how we want to summarise the data. In this case, let's say the below table is the result we'd like:</p>
+<table>
+<thead>
+<tr>
+<th><strong>IP</strong></th>
+<th><strong>Pass</strong></th>
+<th><strong>Fail</strong></th>
+<th><strong>Inconclusive</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>10.1.1.1</strong></td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>10.1.1.2</strong></td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>So we’ve PIVOTED the TestRESULT column and grouped by the IP address.</p>
+<p>So we can start with a simple select statement laying out our table data including the <strong>IP</strong> column, the <strong>TestResult</strong> and a new column which we can <strong><em>SUM</em></strong> later (we’ll call this <strong><em>ResultSUM</em></strong>).</p>
+<pre><code>select *
+from
+(
+  select IP, [TestResult], [TestResult] as ResultSUM -- The columns we want, plus a result we do our sum on
+  from #temptable1
+) src
+</code></pre>
+<p>But now we need to tell SQL what values we want and what the possible headers for our PIVOT will be and populate the values:</p>
+<pre><code>Count(ResultSUM) -- We have to do a count here
+for [TestResult] in ([Failed], [Passed], [Inconclusive]) -- The possible PIVOT Headers
+</code></pre>
+<p>OK- that should be us. We need to tell SQL it’s a PIVOT too – so the final result should look something like this:</p>
+<pre><code>select *
+from
+(
+  select IP, [TestResult], [TestResult] as Result -- The columns we want, plus a result we do our sum on
+  from #temptable1
+) src
+pivot
+(
+  Count(ResultSUM) -- We have to do a count here
+  for [Test State] in ([Failed], [Passed], [Inconclusive]) -- As the possible PIVOT Headers
+) piv;
+</code></pre>
+<p>And that's it!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2017-07-29-weekend-reads-3.html">&larr; Older: Weekend Reads</a><a class="post-nav-link align-right" href="../posts/2017-10-23-bonus-sql-pivot-totals.html">Newer: Bonus SQL Pivot (% totals) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

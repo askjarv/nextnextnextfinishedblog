@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Monitoring Azure Blob Storage with CLI-Based File Integrity Monitoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Monitoring Azure Blob Storage with CLI-Based File Integrity Monitoring</h1>
+        <div class="meta">
+          <time datetime="2026-03-31">2026-03-31</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/azure.html">azure</a><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>Continuing my previous post about cloud storage monitoring, I'm back with the "Azure edition" today. I'll skip the preamble about why this is important and get straight to the commands this time (but stay tuned about some additional considerations that are relevant to both AWS and Azure):</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Install and authenticate Azure CLI:</p>
+<pre><code>az login
+</code></pre>
+<p>Ensure access to:</p>
+<ul>
+<li>
+<p>Storage accounts</p>
+</li>
+<li>
+<p>Containers</p>
+</li>
+<li>
+<p>Role assignments (if required)</p>
+</li>
+</ul>
+<hr />
+<h2 id="core-azure-storage-checks">Core Azure Storage Checks</h2>
+<h3 id="list-storage-accounts">List Storage Accounts</h3>
+<pre><code>az storage account list --output json
+</code></pre>
+<hr />
+<h3 id="check-secure-transfer-requirement">Check Secure Transfer Requirement</h3>
+<pre><code>az storage account show \  --name mystorageaccount \  --resource-group myrg \  --query &quot;enableHttpsTrafficOnly&quot;
+</code></pre>
+<hr />
+<h3 id="blob-service-properties">Blob Service Properties</h3>
+<pre><code>az storage account blob-service-properties show \  --account-name mystorageaccount \  --output json
+</code></pre>
+<hr />
+<h3 id="container-access-level">Container Access Level</h3>
+<pre><code>az storage container show \  --name mycontainer \  --account-name mystorageaccount \  --auth-mode login \  --output json
+</code></pre>
+<hr />
+<h3 id="encryption-settings">Encryption Settings</h3>
+<pre><code>az storage account show \  --name mystorageaccount \  --query &quot;encryption&quot;
+</code></pre>
+<hr />
+<h3 id="network-rules">Network Rules</h3>
+<pre><code>az storage account network-rule list \  --account-name mystorageaccount \  --resource-group myrg \  --output json
+</code></pre>
+<hr />
+<h3 id="key-design-considerations-for-both-azure-and-aws">Key Design Considerations (for both Azure and AWS!)</h3>
+<p>Plan your commands and verify your output - to be effective you're going to want to work out how to make these useful change indicators... so when using commands like these you'll want to:</p>
+<h3 id="1-normalize-output">1. Normalize Output</h3>
+<ul>
+<li>
+<p>Prefer <code>--output json</code> or output formats that lend themselves to "one change per line" (fortunately TE's change viewer gives you good context for changes when using the difference viewer)</p>
+</li>
+<li>
+<p>Strip timestamps if present so you're not just logging a timestamp being present (I'd blog about useful regex for filters here, but I'm confident anyone can find some solid regex's for date/timestamp formats these days!)</p>
+</li>
+</ul>
+<hr />
+<h3 id="2-scope-carefully">2. Scope Carefully</h3>
+<p>Avoid brute-force scanning all buckets/accounts every run if it's not necessary. Instead:</p>
+<ul>
+<li>
+<p>Tag or label monitored resources that make sense to monitor for your goals - just as with traditional file monitoring, less is often more!</p>
+</li>
+<li>
+<p>Maintain a scoped inventory list - use TE's reporting (such as Change Audit Coverage) to help here too!</p>
+</li>
+<li>
+<p>Iterate deterministically</p>
+</li>
+</ul>
+<hr />
+<h3 id="3-handle-missing-configurations">3. Handle Missing Configurations</h3>
+<p>Some APIs return errors if a feature is not enabled - e.g.</p>
+<pre><code>An error occurred (ServerSideEncryptionConfigurationNotFoundError)
+</code></pre>
+<p>This <strong>is itself a signal</strong> and should be captured but consider how you report on these - perhaps respond to .*error.* content with actions that alert the appropriate people.</p>
+<hr />
+<h3 id="4-cross-cloud-consistency">4. Cross-Cloud Consistency</h3>
+<p>You’ll notice strong parallels:</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>AWS S3</th>
+<th>Azure Blob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encryption</td>
+<td>SSE-S3 / KMS</td>
+<td>Storage Service Encryption</td>
+</tr>
+<tr>
+<td>Public Access</td>
+<td>ACL / Policy</td>
+<td>Container access level</td>
+</tr>
+<tr>
+<td>Network Restriction</td>
+<td>Bucket policy / VPC</td>
+<td>Network rules</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Access logging</td>
+<td>Diagnostic settings</td>
+</tr>
+</tbody>
+</table>
+<p>This allows you to build <strong>portable monitoring patterns -</strong> not just one off approaches.</p>
+<hr />
+<h3 id="files-arent-just-on-your-file-system">"Files" aren't just on your file system</h3>
+<p>This whole approach is all about making your monitoring work beyond your disks:</p>
+<ul>
+<li>
+<p>Monitoring <strong>non-agent systems</strong> is important - but having a consistent approach if you've got a hybrid setup is important (especially when it comes to audit season, as well as helping to avoid "tool overload")</p>
+</li>
+<li>
+<p>Capturing <strong>cloud-native drift</strong> isn't difficult - it could be a dozen or so simple rules that get you from no visibility to deep knowledge in an afternoon.</p>
+</li>
+<li>
+<p>Extending FIM into <strong>control plane configuration</strong> makes sense - especially when it means you get to keep the same reports for your more traditional, on-prem platforms and correlate changes across platforms/vendors.</p>
+</li>
+<li>
+<p>Creating <strong>auditable baselines across cloud providers</strong> by leveraging platform agnostic options (like TE!).</p>
+</li>
+</ul>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2026-03-27-monitoring-amazon-s3-with-cli-based-file-integrity-monitoring.html">&larr; Older: Monitoring Amazon S3 with CLI-Based File Integrity Monitoring</a><a class="post-nav-link align-right" href="../posts/2026-04-03-identity-is-the-new-os-rethinking-security-boundaries-in-the-cloud.html">Newer: Identity is the New OS: Rethinking Security Boundaries in the Cloud &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

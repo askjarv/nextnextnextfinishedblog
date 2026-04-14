@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Trend Client Agent Removal Tool/Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Trend Client Agent Removal Tool/Guide</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/uninstall.html">uninstall</a></div>
+        <div class="content">
+          <p>Unsure if this is old news but the Trend agent can be a real pain to get off some client machines when an upgrade fails. There are guides to removing it manually on both XP and Vista but it is rather time consuming and doesn’t always work. Trend has provided an automatic removal tool that worked instead. It may be best to use this tool first which saves a lot of time and effort. Regardless here are the manual uninstall guides:</p>
+<p>XP: <a href="http://esupport.trendmicro.com/7/Manually-removing-the-ClientServer-Security-Agent.aspx">http://esupport.trendmicro.com/7/Manually-removing-the-ClientServer-Security-Agent.aspx</a></p>
+<p>Vista/Win7: <a href="http://esupport.trendmicro.com/3/Manually-uninstalling-the-ClientServer-Security-Agent-from-a-computer.aspx">http://esupport.trendmicro.com/3/Manually-uninstalling-the-ClientServer-Security-Agent-from-a-computer.aspx</a></p>
+<p><strong>OR</strong> use the tool I've popped up here: http://www.mediafire.com/?tp17w7afzchugd4 . Just run the Uninstall.bat and type ‘Y’ when asked to reboot.</p>
+<p>README BELOW:</p>
+<p>----------------------------------------------------------------------------------------------------------</p>
+<p>******************************************</p>
+<p>*** Security Agent Removal Toolset 1.0 ***</p>
+<p>******************************************</p>
+<p>Purpose:</p>
+<p>Remove or Stop Security Agents to facilitate WFBS 7 debugging.</p>
+<p>Supported client:</p>
+<p>WFBS Client/Server Security Agent 5.0</p>
+<p>WFBS Client/Server Security Agent 5.1</p>
+<p>WFBS Client/Server Security Agent 6.0</p>
+<p>WFBS Security Agent 7.0</p>
+<p>How to Use:</p>
+<p>To remove client:</p>
+<p>1. Log on to Windows as Administrator or any account with Administrators</p>
+<p>privilege.</p>
+<p>2. On Windows Vista/7/2008, right click on "Unisntall.bat" and select "Run</p>
+<p>As Administrator". Agree to the UAC dialog that appears.</p>
+<p>On Windows XP/2003, just double click "Uninstall.bat".</p>
+<p>3. Wait a few minutes until this message appear:</p>
+<p>--------------------------------------------------------</p>
+<p>Do you want to reboot now? (Y/N)</p>
+<p>Type "N[Enter]" if you do not want to reboot right now. Some drivers will</p>
+<p>not be removed until reboot.</p>
+<p>Type "Y[Enter]", the computer will start to count down 30 seconds. After the</p>
+<p>count down ends, The computer will restart.</p>
+<p>*Note*: The remove client tool will stop client automatically. You don't</p>
+<p>need to run "Stop.bat" before running "Unisntall.bat".</p>
+<p>To stop running client:</p>
+<p>1. Log on to Windows as Administrator or any account with Administrators</p>
+<p>privilege.</p>
+<p>2. On Windows Vista/7/2008, right click on "Stop.bat" and select "Run</p>
+<p>As Administrator". Agree to the UAC dialog that appears.</p>
+<p>On Windows XP/2003, just double click "Stop.bat".</p>
+<p>3. The program ends after the client is stopped.</p>
+<p>Known Issues:</p>
+<p>1. Some directories in AMSP directory can not be cleaned:</p>
+<p>C:\Program Files\Trend Micro\AMSP\temp\TMFBE</p>
+<p>Manual editing of the direcotry's security property is required to remove</p>
+<p>the directory. The directory does not block re-installation of WFBS</p>
+<p>Security Agent 7.0.</p>
+<p>2. If certain applications are running, some files could not be removed. The</p>
+<p>application may cause this include:</p>
+<p>* Internet Explorer</p>
+<p>* Firefox</p>
+<p>* Windows Live Mail</p>
+<p>* Windows Mail</p>
+<p>* Outlook</p>
+<p>* Outlook Express</p>
+<p>Please either close these applications before remove client ro remove</p>
+<p>remaining files after reboot.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-trend-worry-free-business-security-7-messaging-agent.html">&larr; Older: Trend Worry-Free Business Security 7 - Messaging Agent</a><a class="post-nav-link align-right" href="../posts/2011-03-03-testing-exchange-rpchttps-and-active-sync.html">Newer: Testing Exchange RPC/HTTPS and Active Sync &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

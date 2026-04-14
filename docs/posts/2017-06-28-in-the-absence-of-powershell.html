@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>In the absence of Powershell...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>In the absence of Powershell...</h1>
+        <div class="meta">
+          <time datetime="2017-06-28">2017-06-28</time>
+        </div>
+        <div class="tags"></div>
+        <div class="content">
+          <p>Every so often I come across some older machines that I need to script and forget how much I take for granted the power (sorry) of powershell. Here's a useful command for when you next run into Windows Server 2003 and want nicely formatted disk information (yes, it's still around, along with XP, 2000 and, good heavens, NT too):</p>
+<p>Get Disk Space (C drive)</p>
+<pre><code>WMIC LOGICALDISK GET Name,Size,FreeSpace | find /i &quot;C:&quot;
+</code></pre>
+<p>or just</p>
+<pre><code>WMIC LOGICALDISK GET Name,Size,FreeSpace
+</code></pre>
+<p>for all drives.</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2017-03-09-osquery.html">&larr; Older: OSQuery</a><a class="post-nav-link align-right" href="../posts/2017-07-02-my-weekend-reads.html">Newer: My Weekend Reads &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Change Audit for Network Devices</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Change Audit for Network Devices</h1>
+        <div class="meta">
+          <time datetime="2025-10-17">2025-10-17</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/tripwire.html">tripwire</a></div>
+        <div class="content">
+          <p>I often post over on the Tripwire/Fortra bIog about the importance of monitoring, but don't typically talk about the "technical ins and outs" of how I approach and think about Change Audit so I'm hoping to start a series of posts about File Integrity Monitoring (FIM) aka Change Audit (an important term since today we won't be talking about "files" necessarily, but rather "live" configurations that we might want to audit). I'll also hopefully start adding some posts around my other more common areas of monitoring such as Vulnerability Management (VM), and Security Configuration Management (SCM, or policy compliance... we do love our terms in IT security, don't we!?).</p>
+<h2 id="why-this-matters">Why this matters?</h2>
+<p>ln regulated and security-conscious environments, the ability to detect unauthorized or unintended changes to network devices is critical. Change audit and integrity monitoring are well-established disciplines in servers and endpoints, but applying the same principles to firewalls, routers, and switches requires a slightly different approach but a homogenous approach to "change audit" in general is important.</p>
+<p>One of the most effective techniques that Tripwire Enterprise tends to focus on is what we call "Command Output Validation Rules" though you might see or think of more generically as command output comparison—running specific “show” or “get” commands against a device, capturing the output, and comparing it against a trusted baseline. Any difference can then be flagged as a potential configuration drift, service-impacting change, or even a security risk.</p>
+<h2 id="why-command-based-integrity-monitoring">Why Command-Based Integrity Monitoring?</h2>
+<p>Most enterprise network devices expose their configuration and runtime state via CLI commands - pulling data from "mini-config databases" or from memory/a protected file system. By defining a list of appropriate commands that should not change frequently, administrators can build an integrity monitoring profile that reveals:</p>
+<ul>
+<li>
+<p>Unauthorized configuration changes (e.g., firewall rules added or removed without change control).</p>
+</li>
+<li>
+<p>Service-impacting modifications (e.g., routing table differences, interface status changes).</p>
+</li>
+<li>
+<p>Security exposures (e.g., new administrative accounts or relaxed password requirements).</p>
+</li>
+</ul>
+<p>Note this isn't just about ensuring secure configs, it's about ensuring secure processes and service availability. Unsurprisingly then, this approach also aligns with well-recognized standards:</p>
+<ul>
+<li>
+<p>PCI DSS v4.0 Requirement 11.5.2 calls for file integrity monitoring or change-detection mechanisms to ensure critical configurations are not altered without authorization.</p>
+</li>
+<li>
+<p>CIS Benchmarks for firewalls (including Palo Alto Networks, Cisco, and Check Point) recommend regular validation of system and security configuration settings against a secure baseline.</p>
+</li>
+</ul>
+<h2 id="choosing-the-right-commands">Choosing the Right Commands</h2>
+<p>Ok, so let's get to the "technical" part. The key to this whole approach is to select deterministic commands—those that yield stable output unless a meaningful configuration or state change has occurred. Commands that include ephemeral values like uptime, session counters, or CPU utilization are not suitable for integrity monitoring, because they will always differ and offer "low value".</p>
+<p>Instead, focus on commands that:</p>
+<ul>
+<li>
+<p>Reflect the configuration state of the device.</p>
+</li>
+<li>
+<p>Represent security policies or access controls.</p>
+</li>
+<li>
+<p>Expose critical system settings like SNMP strings, NTP servers, or authentication sources.</p>
+</li>
+<li>
+<p>Show interface and routing configuration where unauthorized changes could disrupt service.</p>
+</li>
+</ul>
+<p>With that in mind, examples of unsuitable commands I've seen people sometimes run:</p>
+<ul>
+<li>
+<p>show system info (contains uptime, dynamic session counts).</p>
+</li>
+<li>
+<p>show session all (sessions constantly change).</p>
+</li>
+</ul>
+<p>whereas here's examples of suitable commands:</p>
+<ul>
+<li>
+<p>show config running (running configuration snapshot).</p>
+</li>
+<li>
+<p>show admins/users (administrative accounts and roles).</p>
+</li>
+<li>
+<p>show network interface all (interface IPs and link states).</p>
+</li>
+<li>
+<p>show deviceconfig system (system-level settings like DNS, NTP, banners).</p>
+</li>
+</ul>
+<p>Now there is a caveat here - thanks to Tripwire policy tooling and regex based filtering, some of those earlier unsuitable commands might still be used but only with a bit of extra effort - for example we might use that <em>show system info</em> command but filter via regex the dynamic data out or use regex just to select, say, firmware versions we can identify changes tied to a software update (or capture an inventory of versions that can prove super helpful to confirm patching and/or identify if you're at risk of, say, a zero day vulnerability</p>
+<h2 id="an-actual-example-palo-alto-firewalls">An Actual Example: Palo Alto Firewalls</h2>
+<p>Let’s walk through a few example commands on a Palo Alto Networks firewall and how they could be used in a change audit framework.</p>
+<ol>
+<li>Running Configuration</li>
+</ol>
+<blockquote>
+<p>show config running</p>
+</blockquote>
+<p>Purpose: Captures the live configuration of the device.</p>
+<p>Audit Use: Any deviation from the baseline should trigger review. Even small differences (e.g., security rule order) can materially impact traffic flow.</p>
+<p>Standard Mapping: PCI DSS 11.5.2 (critical configuration integrity), CIS Palo Alto Benchmark section 1.1.</p>
+<ol>
+<li>Administrator Accounts</li>
+</ol>
+<blockquote>
+<p>show admins all</p>
+</blockquote>
+<p>Purpose: Lists all local and remote admin accounts with their roles.</p>
+<p>Audit Use: Detects unauthorized creation of admin accounts or role escalation.</p>
+<p>Standard Mapping: PCI DSS 7 (restrict access to system components and cardholder data).</p>
+<ol>
+<li>Interfaces and Zones</li>
+</ol>
+<blockquote>
+<p>show network interface all<br />
+show zone</p>
+</blockquote>
+<p>Purpose: Captures the assignment of IPs, physical/logical interfaces, and their security zones.</p>
+<p>Audit Use: Highlights unexpected changes in segmentation—potentially exposing sensitive networks.</p>
+<p>Standard Mapping: CIS Benchmark 3.1 (secure zone definitions), PCI DSS 1 (segmentation and firewall requirements).</p>
+<ol>
+<li>System Services (NTP, DNS, Logging)</li>
+</ol>
+<blockquote>
+<p>show deviceconfig system</p>
+</blockquote>
+<p>Purpose: Shows core services such as NTP servers, DNS configuration, syslog destinations, banners, and hostnames.</p>
+<p>Audit Use: Detects redirection of logs (security gap) or changes to NTP/DNS that could affect trust and time synchronization.</p>
+<p>Standard Mapping: CIS Benchmark 1.2 (configure time synchronization), PCI DSS 10 (logging integrity).</p>
+<ol>
+<li>Security Rules</li>
+</ol>
+<blockquote>
+<p>show running security-policy</p>
+</blockquote>
+<p>Purpose: Extracts the active firewall rulebase.</p>
+<p>Audit Use: Ensures no rules are added, removed, or reordered outside of change control.</p>
+<p>Standard Mapping: PCI DSS 1.2 (firewall configuration management), CIS Benchmark 4.x (secure ACLs).</p>
+<h2 id="building-a-monitoring-framework">Building a Monitoring Framework</h2>
+<p>With those commands in mind we can then start to consider what a basic monitoring framework can achieve next so we can start to build "business" goals for our monitoring that can further define what's useful out of those commands to capture for change audit.</p>
+<p>Baseline Capture: After initial hardening and approval, capture the baseline output of each selected command. Store this securely in your monitoring system.</p>
+<p>Regular Polling: At defined intervals (daily, weekly, or aligned with change windows), rerun the commands and compare outputs against the baseline.</p>
+<p>Exception Handling: Integrate with your change management process. If an authorized change has been made, update the baseline after validation.</p>
+<p>Alerting &amp; Reporting: Trigger alerts on unauthorized deviations and report regularly for compliance evidence.</p>
+<h2 id="interpreting-differences">Interpreting Differences</h2>
+<p>Not every difference is equal. Some may indicate service impact (e.g., an interface moved zones) while others may represent a security impact (e.g., new admin account created). Thus, once you've got your framework in place, a useful approach is to categorize alerts into a few different "buckets" e.g.:</p>
+<ul>
+<li>
+<p>Security-critical: new admin accounts, security rules changes, altered logging destinations.</p>
+</li>
+<li>
+<p>Service-critical: routing changes, interface reassignments.</p>
+</li>
+<li>
+<p>Informational/compliance aligned: hostname or banner updates.</p>
+</li>
+</ul>
+<p>By triaging changes in this way to respond to quickly to material risks while maintaining audit evidence for all detected modifications - again, this is something Tripwire is particularly good at helping out with. You can even tie specific change alert types to different notification routes - changes that impact operations versus security can then end up with the "right person".</p>
+<h2 id="hard-to-argue-with-simple-flexible-and-insightful">Hard to argue with <strong>simple</strong>, <strong>flexible</strong> <em>and</em> <strong>insightful</strong></h2>
+<p>Command output comparison is, to my mind, a powerful, low-cost way to extend integrity monitoring principles to network devices. By carefully selecting commands that reflect stable, security- or service-relevant configuration data, administrators can meet regulatory requirements (PCI DSS, CIS Benchmarks), strengthen their change management processes, and detect potentially dangerous drift before it causes downtime or a breach.</p>
+<p>When done right, this approach provides both compliance assurance and operational resilience—key goals for any modern security program. And, if you're not sure what's what, don't forget that consultants like myself have (literal) years of experience in delivering value around these functions so don't be afriad to reach out)!</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2025-10-14-configuring-ip360-windows-targets-via-group-policy.html">&larr; Older: Configuring IP360 Windows targets via group policy</a><a class="post-nav-link align-right" href="../posts/2025-10-24-posting-a-tripwire-ip360-aspl-update-with-python.html">Newer: Posting a Tripwire IP360 ASPL update with Python &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>

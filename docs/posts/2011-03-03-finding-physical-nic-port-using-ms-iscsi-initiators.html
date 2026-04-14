@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Finding Physical NIC Port using MS iSCSI Initiators</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1><a href="../index.html">Next...Next...Next...Finished</a></h1>
+    </header>
+
+    <main>
+      <article class="post-full">
+        <h1>Finding Physical NIC Port using MS iSCSI Initiators</h1>
+        <div class="meta">
+          <time datetime="2011-03-03">2011-03-03</time>
+        </div>
+        <div class="tags"><a class="tag" href="../tags/nic.html">nic</a><a class="tag" href="../tags/qlogic.html">qlogic</a></div>
+        <div class="content">
+          <p>I had to check the MS iSCSI Initiator and find which port on the back of a QLogic card was used.</p>
+<p>- Launch MS iSCSI Initiator</p>
+<p>- Targets, Select Connected Target Name and click Details</p>
+<p>- Select Identifier under Sessions and click Connections</p>
+<p>- Note the Source Port (This is linked to the Interface IP)</p>
+<p>- Launch Device Manager</p>
+<p>- Expand SCSI and RAID Controllers</p>
+<p>- Select QLogic iSCSI Adapter and check the TCP/IP Settings in the adapter properties (Match the IP as noted above, if not check any additional QLogic Adapters)</p>
+<p>- Select the General Tab and check the Location section (This Lists the Device PCI slot, device and function)</p>
+<p>- The Function should reference the physical port on the QLogic card</p>
+        </div>
+      </article>
+      <nav class="post-nav"><a class="post-nav-link" href="../posts/2011-03-03-formula-to-find-numbers-within-a-cell-containing-text-numbers-and-spaces.html">&larr; Older: Formula to find numbers within a cell containing text, numbers and spaces.</a><a class="post-nav-link align-right" href="../posts/2011-03-03-exchange-grt-restore-fails-backup-exec.html">Newer: Exchange GRT restore Fails (Backup Exec) &rarr;</a></nav>
+    </main>
+  </div>
+</body>
+</html>
